@@ -1,5 +1,6 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { FormsModule } from '@angular/forms';
 
 import { AppComponent } from './app.component';
@@ -8,17 +9,32 @@ import { environment } from '../environments/environment';
 import { TimeRecordingFormComponent } from './time-recording-form/time-recording-form.component';
 
 // Angular Material
-import { MatButtonModule, MatCheckboxModule, MatFormFieldModule} from '@angular/material';
+import {
+  MatButtonModule,
+  MatCheckboxModule,
+  MatFormFieldModule,
+  MatDatepickerModule,
+  MatInputModule,
+  MatNativeDateModule,
+} from '@angular/material';
+
+
+import { MatIconModule } from '@angular/material/icon';
 
 @NgModule({
   declarations: [AppComponent, TimeRecordingFormComponent],
   imports: [
     BrowserModule,
+    BrowserAnimationsModule,
     ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production }),
     FormsModule,
     MatButtonModule,
     MatCheckboxModule,
-    MatFormFieldModule
+    MatFormFieldModule,
+    MatIconModule,
+    MatDatepickerModule,
+    MatInputModule,
+    MatNativeDateModule
   ],
   providers: [],
   bootstrap: [AppComponent]

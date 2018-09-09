@@ -1,7 +1,8 @@
 export class TimeRecording {
   constructor(
-    public Date: string,
-    public WorkDescription: string,
-    public WorkingTime: string
+    public customer: string,
+    public date: string,
+    public workDescription: string,
+    public workingTime: string
   ) {}
 }
