@@ -5,13 +5,19 @@ import { AppComponent } from './app.component';
 import { ServiceWorkerModule } from '@angular/service-worker';
 import { environment } from '../environments/environment';
 
+// Angular Material
+import { MatButtonModule, MatCheckboxModule, MatFormFieldModule} from '@angular/material';
+
 @NgModule({
   declarations: [
     AppComponent
   ],
   imports: [
     BrowserModule,
-    ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production })
+    ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production }),
+    MatButtonModule,
+    MatCheckboxModule,
+    MatFormFieldModule
   ],
   providers: [],
   bootstrap: [AppComponent]
