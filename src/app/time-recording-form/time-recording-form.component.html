@@ -1,25 +1,36 @@
 <h1>Regiestunden Erfassung</h1>
-<form>
+<form #timeRecordingForm="ngForm" (ngSubmit)="onSubmit()">
   <div class="form-group">
-    <input type="text" class="form-control" id="customer" placeholder="Kunde">
+    <input [(ngModel)]="model.customer" name="customer" type="text" class="form-control" id="customer" placeholder="Kunde">
   </div>
+  <br>
+  {{model.customer}}
 
 
   <div class="form-group">
     <mat-form-field>
-      <input (click)="myDatepicker.open()" matInput [matDatepicker]="myDatepicker" placeholder="Datum auswählen">
+      <input [(ngModel)]="model.date" name="date" (click)="myDatepicker.open()" matInput [matDatepicker]="myDatepicker" placeholder="Datum auswählen">
       <mat-datepicker-toggle matSuffix [for]="myDatepicker"></mat-datepicker-toggle>
       <mat-datepicker #myDatepicker></mat-datepicker>
     </mat-form-field>
   </div>
+  <br>
+  {{model.date}}
 
   <div class="form-group">
-    <input type="text" class="form-control" id="workDescription" placeholder="Art der Arbeit">
+    <input [(ngModel)]="model.workDescription" name="workDescription" type="text" class="form-control" id="workDescription" placeholder="Art der Arbeit">
   </div>
+  <br>
+  {{model.workDescription}}
 
   <div class="form-group">
     <label for="workingTime">Stunden</label>
-    <input type="text" class="form-control" id="workingTime">
+    <input [(ngModel)]="model.workingTime" name="workingTime" type="text" class="form-control" id="workingTime">
   </div>
+  {{model.workingTime}}
+
+
   <button mat-fab type="submit" class="btn btn-success"><mat-icon>icon_send</mat-icon></button>
+<br>
+{{model.workingTime}}
 </form>

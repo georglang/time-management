@@ -7,7 +7,7 @@ import { AppComponent } from './app.component';
 import { ServiceWorkerModule } from '@angular/service-worker';
 import { environment } from '../environments/environment';
 import { TimeRecordingFormComponent } from './time-recording-form/time-recording-form.component';
-
+import { GermanDateAdapter } from './GermanDateAdapter';
 // Angular Material
 import {
   MatButtonModule,
@@ -16,8 +16,8 @@ import {
   MatDatepickerModule,
   MatInputModule,
   MatNativeDateModule,
+  DateAdapter
 } from '@angular/material';
-
 
 import { MatIconModule } from '@angular/material/icon';
 
@@ -36,7 +36,7 @@ import { MatIconModule } from '@angular/material/icon';
     MatInputModule,
     MatNativeDateModule
   ],
-  providers: [],
+  providers: [{ provide: DateAdapter, useClass: GermanDateAdapter }],
   bootstrap: [AppComponent]
 })
 export class AppModule {}
