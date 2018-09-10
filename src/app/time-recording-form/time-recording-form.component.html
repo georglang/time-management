@@ -1,36 +1,46 @@
 <h1>Regiestunden Erfassung</h1>
-<form #timeRecordingForm="ngForm" (ngSubmit)="onSubmit()">
-  <div class="form-group">
-    <input [(ngModel)]="model.customer" name="customer" type="text" class="form-control" id="customer" placeholder="Kunde">
+
+<form [formGroup]="timeRecordingForm" (ngSubmit)="onSubmit()">
+
+  <label>
+    Kunde / Revier:
+    <input type="text" formControlName="customerName">
+  </label>
+
+  <label>
+    Art der Arbeit
+    <input type="text" formControlName="workDescription">
+  </label>
+
+  <label>
+    Zeit
+    <input type="text" formControlName="time">
+  </label>
+
+  <div formArrayName="aliases">
+    <div *ngFor="let address of aliases.controls; let i=index">
+      <!-- The repeated alias template -->
+      <label>
+        Kunde / Revier
+        <input type="text" [formControlName]="i">
+      </label>
+      <label>
+        Art der Arbeit
+        <input type="text" [formControlName]="i">
+      </label>
+      <label>
+        Dauer in Stunden
+        <input type="text" [formControlName]="i">
+      </label>
+    </div>
   </div>
-  <br>
-  {{model.customer}}
 
-
-  <div class="form-group">
-    <mat-form-field>
-      <input [(ngModel)]="model.date" name="date" (click)="myDatepicker.open()" matInput [matDatepicker]="myDatepicker" placeholder="Datum auswählen">
-      <mat-datepicker-toggle matSuffix [for]="myDatepicker"></mat-datepicker-toggle>
-      <mat-datepicker #myDatepicker></mat-datepicker>
-    </mat-form-field>
-  </div>
-  <br>
-  {{model.date}}
-
-  <div class="form-group">
-    <input [(ngModel)]="model.workDescription" name="workDescription" type="text" class="form-control" id="workDescription" placeholder="Art der Arbeit">
-  </div>
-  <br>
-  {{model.workDescription}}
-
-  <div class="form-group">
-    <label for="workingTime">Stunden</label>
-    <input [(ngModel)]="model.workingTime" name="workingTime" type="text" class="form-control" id="workingTime">
-  </div>
-  {{model.workingTime}}
-
-
-  <button mat-fab type="submit" class="btn btn-success"><mat-icon>icon_send</mat-icon></button>
-<br>
-{{model.workingTime}}
+  <button type="submit">Submit</button>
 </form>
+
+<br>
+<br>
+<br>
+
+<button (click)="aliases">Get Aliases</button>
+<button (click)="addAlias()">Add Aliases</button>
