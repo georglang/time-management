@@ -1,46 +1,87 @@
-<h1>Regiestunden Erfassung</h1>
+<br>
+<h1>Abnahmeprotokoll</h1>
+<br>
 
-<form [formGroup]="timeRecordingForm" (ngSubmit)="onSubmit()">
-
-  <label>
-    Kunde / Revier:
-    <input type="text" formControlName="customerName">
-  </label>
-
-  <label>
-    Art der Arbeit
-    <input type="text" formControlName="workDescription">
-  </label>
-
-  <label>
-    Zeit
-    <input type="text" formControlName="time">
-  </label>
-
-  <div formArrayName="aliases">
-    <div *ngFor="let address of aliases.controls; let i=index">
-      <!-- The repeated alias template -->
-      <label>
-        Kunde / Revier
-        <input type="text" [formControlName]="i">
-      </label>
-      <label>
-        Art der Arbeit
-        <input type="text" [formControlName]="i">
-      </label>
-      <label>
-        Dauer in Stunden
-        <input type="text" [formControlName]="i">
-      </label>
+<div id="render-container">
+  <form [formGroup]="timeRecordForm" (ngSubmit)="onSubmit()">
+    <h2>Time Records</h2>
+    <div formArrayName="time_records">
+      <table class="table">
+        <th *ngFor="let col of columns">
+          {{col}}
+        </th>
+        <tr *ngFor="let item of timeRecords.controls; let pointIndex = index" [formGroupName]="pointIndex">
+          <td>
+            <mat-form-field>
+              <input matInput [matDatepicker]="picker" placeholder="Choose Date" id="date" name="date" formControlName="date"
+                (click)="picker.open()" autocomplete="off" required>
+              <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+              <mat-datepicker #picker></mat-datepicker>
+            </mat-form-field>
+          </td>
+          <td>
+            <mat-form-field class="full-width">
+              <input matInput type="text" placeholder="Customer" formControlName="customer" autocomplete="off" required>
+              <mat-error *ngFor="let validation of form_validation_messages.customer">
+                <mat-error class="error-message" *ngIf="item.controls.customer.hasError(validation.type) && (item.controls.customer.dirty || item.controls.customer.touched)">{{validation.message}}</mat-error>
+              </mat-error>
+            </mat-form-field>
+          </td>
+          <td>
+            <mat-form-field>
+              <input matInput formControlName="description" placeholder="Description" autocomplete="off" required />
+              <mat-error *ngFor="let validation of form_validation_messages.description">
+                <mat-error class="error-message" *ngIf="item.controls.description.hasError(validation.type) && (item.controls.description.dirty || item.controls.description.touched)">{{validation.message}}</mat-error>
+              </mat-error>
+            </mat-form-field>
+          </td>
+          <td>
+            <mat-form-field>
+              <input matInput type="number" step="0.25" value=0.00 formControlName="time" placeholder="Time" autocomplete="off" required />
+              <mat-error *ngFor="let validation of form_validation_messages.time">
+                <mat-error class="error-message" *ngIf="item.controls.time.hasError(validation.type) && (item.controls.time.dirty || item.controls.time.touched)">{{validation.message}}</mat-error>
+              </mat-error>
+            </mat-form-field>
+          </td>
+          <td>
+            <button mat-icon-button>
+              <i class="material-icons" (click)="deleteRow(pointIndex)">
+                delete
+              </i>
+            </button>
+          </td>
+        </tr>
+      </table>
     </div>
-  </div>
 
-  <button type="submit">Submit</button>
-</form>
+    <input type="text" readonly="true" value="{{totalTime}}" class="float-right">
 
-<br>
-<br>
-<br>
+    <br>
+    <button mat-fab class="add-record-btn float-left" (click)="onSubmit()">
+      <i class="material-icons">send</i>
+    </button>
+    <br>
+    <br>
 
-<button (click)="aliases">Get Aliases</button>
-<button (click)="addAlias()">Add Aliases</button>
+    <button mat-fab class="add-record-btn float-right disabled" (click)="addControl()">
+      <i class="material-icons">add</i>
+    </button>
+  </form>
+
+
+<button (click)="sum()">Sum</button>
+
+
+  <br>
+  <br>
+  <br>
+
+  <button (click)="createPdfFromJson()">Create Pdf</button>
+
+  <br>
+
+  {{ this.timeRecordForm.value | json }}
+
+
+
+</div>

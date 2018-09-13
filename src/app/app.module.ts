@@ -6,23 +6,22 @@ import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { AppComponent } from './app.component';
 import { ServiceWorkerModule } from '@angular/service-worker';
 import { environment } from '../environments/environment';
-import { TimeRecordingFormComponent } from './time-recording-form/time-recording-form.component';
-import { GermanDateAdapter } from './GermanDateAdapter';
+import { TimeRecordFormComponent } from './time-recording-form/time-recording-form.component';
+
 // Angular Material
 import {
   MatButtonModule,
-  MatCheckboxModule,
-  MatFormFieldModule,
-  MatDatepickerModule,
+  MatIconModule,
+  MatListModule,
+  MatCardModule,
   MatInputModule,
+  MatDatepickerModule,
   MatNativeDateModule,
-  DateAdapter
+  MatFormFieldModule
 } from '@angular/material';
 
-import { MatIconModule } from '@angular/material/icon';
-
 @NgModule({
-  declarations: [AppComponent, TimeRecordingFormComponent],
+  declarations: [AppComponent, TimeRecordFormComponent],
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
@@ -30,14 +29,15 @@ import { MatIconModule } from '@angular/material/icon';
     ReactiveFormsModule,
     FormsModule,
     MatButtonModule,
-    MatCheckboxModule,
     MatFormFieldModule,
     MatIconModule,
     MatDatepickerModule,
     MatInputModule,
-    MatNativeDateModule
+    MatNativeDateModule,
+    MatListModule,
+    MatCardModule,
   ],
-  providers: [{ provide: DateAdapter, useClass: GermanDateAdapter }],
+  providers: [],
   bootstrap: [AppComponent]
 })
 export class AppModule {}
