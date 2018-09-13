@@ -50,7 +50,7 @@ export class TimeRecordFormComponent implements OnInit {
           date: ['', Validators.required],
           customer: ['', Validators.required],
           description: ['', Validators.required],
-          time: ['', Validators.required]
+          time: [0, Validators.required]
         })
       ])
     });
@@ -63,7 +63,7 @@ export class TimeRecordFormComponent implements OnInit {
         date: ['', Validators.required],
         customer: ['', Validators.required],
         description: ['', Validators.required],
-        time: ['', Validators.required]
+        time: [0, Validators.required]
       })
     );
     console.log('Control', control);
@@ -127,18 +127,10 @@ export class TimeRecordFormComponent implements OnInit {
 
     this.timeRecords.valueChanges.subscribe(change => {
       let tempTotalTime = 0.0;
-      for (let i = 0; i < change.length; i++) {
-        tempTotalTime += <number>change[i].time;
-      }
-
       change.forEach(record => {
-        if (typeof record.time !== 'number') {
-          debugger;
-        }
-
-        tempTotalTime += <number>record.time;
+        console.log('Value', record.time);
+        tempTotalTime += record.time;
       });
-
       this.totalTime = tempTotalTime;
     });
   }
