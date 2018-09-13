@@ -80,8 +80,7 @@
             "styles": [
               "./src/styles.css"
             ],
-            "scripts": [
-            ],
+            "scripts": [],
             "assets": [
               "src/favicon.ico",
               "src/assets",
@@ -131,5 +130,10 @@
       }
     }
   },
-  "defaultProject": "angular-pwa"
+  "defaultProject": "angular-pwa",
+  "schematics": {
+    "@schematics/angular:component": {
+      "styleext": "sass"
+    }
+  }
 }

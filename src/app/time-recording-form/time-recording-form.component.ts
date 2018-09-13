@@ -9,7 +9,7 @@ import { DateAdapter } from '@angular/material';
 @Component({
   selector: 'app-time-recording-form',
   templateUrl: './time-recording-form.component.html',
-  styleUrls: ['./time-recording-form.component.css'],
+  styleUrls: ['./time-recording-form.component.sass'],
   providers: [{ provide: 'Window', useValue: window }]
 })
 export class TimeRecordFormComponent implements OnInit {
