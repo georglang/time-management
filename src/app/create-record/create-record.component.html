@@ -1,6 +1,9 @@
-<br>
-<h1>Abnahmeprotokoll</h1>
-<br>
+<button mat-button [matMenuTriggerFor]="menu">Menu</button>
+<mat-menu #menu="matMenu">
+  <button mat-menu-item>Item 1</button>
+  <button mat-menu-item>Item 2</button>
+</mat-menu>
+
 
 <div id="render-container">
   <form [formGroup]="timeRecordForm" (ngSubmit)="onSubmit()">
@@ -57,7 +60,7 @@
     <input type="text" readonly="true" value="{{totalTime}}" class="float-right">
 
     <br>
-    <button mat-fab class="add-record-btn float-left" (click)="onSubmit()">
+    <button mat-fab class="add-record-btn float-left" [disabled]="!timeRecordForm.valid" (click)="onSubmit()">
       <i class="material-icons">send</i>
     </button>
     <br>
@@ -68,12 +71,6 @@
     </button>
   </form>
 
-
-<button (click)="sum()">Sum</button>
-
-
-  <br>
-  <br>
   <br>
 
   <button (click)="createPdfFromJson()">Create Pdf</button>

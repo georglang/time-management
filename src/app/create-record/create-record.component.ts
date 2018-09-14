@@ -7,12 +7,12 @@ import * as jquery from 'jquery';
 import { DateAdapter } from '@angular/material';
 
 @Component({
-  selector: 'app-time-recording-form',
-  templateUrl: './time-recording-form.component.html',
-  styleUrls: ['./time-recording-form.component.sass'],
+  selector: 'app-create-record',
+  templateUrl: './create-record.component.html',
+  styleUrls: ['./create-record.component.sass'],
   providers: [{ provide: 'Window', useValue: window }]
 })
-export class TimeRecordFormComponent implements OnInit {
+export class CreateRecordComponent implements OnInit {
   public timeRecordForm: FormGroup;
   public createRecordForm: FormGroup;
   public columns: string[];
