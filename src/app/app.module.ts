@@ -3,10 +3,13 @@ import { NgModule } from '@angular/core';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 
+// own modules
+import {AppRoutingModule} from './router/app.routing.module';
+
+
 import { AppComponent } from './app.component';
 import { ServiceWorkerModule } from '@angular/service-worker';
 import { environment } from '../environments/environment';
-import { TimeRecordFormComponent } from './time-recording-form/time-recording-form.component';
 
 // Angular Material
 import {
@@ -17,15 +20,32 @@ import {
   MatInputModule,
   MatDatepickerModule,
   MatNativeDateModule,
-  MatFormFieldModule
+  MatFormFieldModule,
+  MatMenuModule,
+  MatToolbarModule,
+  MatTabsModule
 } from '@angular/material';
 
+// components
+import { RecordListComponent } from './record-list/record-list.component';
+import { CreateRecordComponent } from './create-record/create-record.component';
+import { SearchComponent } from './search/search.component';
+import { HeaderComponent } from './header/header.component';
+
+
 @NgModule({
-  declarations: [AppComponent, TimeRecordFormComponent],
+  declarations: [
+    AppComponent,
+    RecordListComponent,
+    CreateRecordComponent,
+    SearchComponent,
+    HeaderComponent,
+  ],
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
     ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production }),
+    AppRoutingModule,
     ReactiveFormsModule,
     FormsModule,
     MatButtonModule,
@@ -36,6 +56,9 @@ import {
     MatNativeDateModule,
     MatListModule,
     MatCardModule,
+    MatMenuModule,
+    MatToolbarModule,
+    MatTabsModule
   ],
   providers: [],
   bootstrap: [AppComponent]
