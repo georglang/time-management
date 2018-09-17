@@ -23,7 +23,8 @@ import {
   MatFormFieldModule,
   MatMenuModule,
   MatToolbarModule,
-  MatTabsModule
+  MatTabsModule,
+  MatTableModule
 } from '@angular/material';
 
 // components
@@ -31,6 +32,7 @@ import { RecordListComponent } from './record-list/record-list.component';
 import { CreateRecordComponent } from './create-record/create-record.component';
 import { SearchComponent } from './search/search.component';
 import { HeaderComponent } from './header/header.component';
+import { IndexDBService } from './index-db.service';
 
 
 @NgModule({
@@ -58,9 +60,12 @@ import { HeaderComponent } from './header/header.component';
     MatCardModule,
     MatMenuModule,
     MatToolbarModule,
-    MatTabsModule
+    MatTabsModule,
+    MatTableModule
   ],
-  providers: [],
+  providers: [
+    IndexDBService
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule {}
