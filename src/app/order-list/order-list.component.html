@@ -1,0 +1,10 @@
+<mat-nav-list class="order-list-item">
+  <mat-list-item *ngFor="let order of orders" [routerLink]="['/order-details', order.id]">
+    <h3 mat-line> {{order.companyName}}</h3>
+    <p mat-line><span> {{order.contactPerson}} </span></p>
+    <div class="place"> {{ order.place }}</div>
+    <button mat-icon-button>
+      <mat-icon class="mat-24">edit</mat-icon>
+    </button>
+  </mat-list-item>
+</mat-nav-list>
