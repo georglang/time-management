@@ -28,21 +28,24 @@ import {
 } from '@angular/material';
 
 // components
-import { RecordListComponent } from './record-list/record-list.component';
+import { OrderListComponent } from './order-list/order-list.component';
 import { CreateRecordComponent } from './create-record/create-record.component';
 import { SearchComponent } from './search/search.component';
 import { HeaderComponent } from './header/header.component';
-import { IndexDBService } from './database/index-db.service';
+import { IndexDBService } from './service/index-db.service';
 import { Database } from './database/Database';
-
+import { NewOrderComponent } from './new-order/new-order.component';
+import { OrderDetailComponent } from './order-detail/order-detail.component';
 
 @NgModule({
   declarations: [
     AppComponent,
-    RecordListComponent,
+    OrderListComponent,
     CreateRecordComponent,
     SearchComponent,
     HeaderComponent,
+    NewOrderComponent,
+    OrderDetailComponent,
   ],
   imports: [
     BrowserModule,
