@@ -1,0 +1,35 @@
+<div class="container-fluid">
+  <form [formGroup]="customerForm" (ngSubmit)="onSubmit()">
+
+    <fieldset class="form-group">
+      <mat-form-field>
+        <input matInput set control name formControlName="company" placeholder="Firmenname" class="form-control form-control-sm"
+          type="text">
+      </mat-form-field>
+
+    </fieldset>
+
+    <fieldset class="form-group">
+      <mat-form-field>
+
+        <input matInput set control name formControlName="contactPerson" placeholder="Ansprechpartner" class="form-control form-control-sm"
+          type="text" />
+      </mat-form-field>
+
+    </fieldset>
+
+    <fieldset class="form-group">
+      <mat-form-field>
+
+        <input matInput set control name formControlName="place" placeholder="Ort" class="form-control form-control-sm" type="text"
+        />
+      </mat-form-field>
+
+    </fieldset>
+
+    <button class="btn btn-sm" type="submit">
+      Submit
+    </button>
+
+  </form>
+</div>
