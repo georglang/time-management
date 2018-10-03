@@ -60,25 +60,37 @@
     <input type="text" readonly="true" value="{{totalTime}}" class="float-right">
 
     <br>
-    <button mat-fab class="add-record-btn float-left" [disabled]="!timeRecordForm.valid" (click)="onSubmit()">
+    <button type="submit" mat-fab class="add-record-btn float-left" [disabled]="!timeRecordForm.valid">
       <i class="material-icons">send</i>
     </button>
     <br>
     <br>
 
-    <button mat-fab class="add-record-btn float-right disabled" (click)="addControl()">
-      <i class="material-icons">add</i>
-    </button>
   </form>
 
   <br>
 
+  <button mat-fab class="add-record-btn float-right disabled" (click)="addControl()">
+    <i class="material-icons">add</i>
+  </button>
   <button (click)="createPdfFromJson()">Create Pdf</button>
 
   <br>
 
   {{ this.timeRecordForm.value | json }}
-
-
-
 </div>
+
+<h1>Index DB Data</h1>
+
+<button (click)="getRecordsFromDb()">Get Records</button>
+
+<button (click)="insertRecord()">Insert Record</button>
+
+<ul>
+  <li *ngFor="let record of records">
+      <input type="checkbox"/>
+      <span>{{record.customer}}</span>
+      <button type="button" (click)="onDelete(record.id)">Delete</button>
+    <input type="text">
+  </li>
+</ul>

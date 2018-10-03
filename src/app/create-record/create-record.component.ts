@@ -1,10 +1,11 @@
-import { Component, OnInit, Inject } from '@angular/core';
+import { Component, OnInit, Inject, Input, Output, EventEmitter } from '@angular/core';
 import { FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
-import { ErrorStateMatcher } from '@angular/material/core';
+import { IndexDBService } from '../database/index-db.service';
 
 import * as jsPDF from 'jspdf';
 import * as jquery from 'jquery';
 import { DateAdapter } from '@angular/material';
+import { TimeRecord } from '../data-classes/time-record';
 
 @Component({
   selector: 'app-create-record',
@@ -16,8 +17,8 @@ export class CreateRecordComponent implements OnInit {
   public timeRecordForm: FormGroup;
   public createRecordForm: FormGroup;
   public columns: string[];
-
   public totalTime = 0.0;
+  public title = '';
 
   public form_validation_messages = {
     customer: [{ type: 'required', message: 'Bitte Kunde eintragen' }],
@@ -27,21 +28,24 @@ export class CreateRecordComponent implements OnInit {
     time: [{ type: 'required', message: 'Bitte Stunden eintragen' }]
   };
 
-  private specialElementHandlers = {
-    '#editor': function(element, renderer) {
-      console.log('Element', element);
-      console.log('Renderer', renderer);
-      return true;
-    }
-  };
+
+  public onDelete(id) {
+
+  }
+
+  public addRecord(record: TimeRecord) {
+    this.indexDbService.add(record);
+    // this.addRecord.emit(this.title);
+  }
+
 
   constructor(
     private formBuilder: FormBuilder,
     @Inject('Window') private window: Window,
-    private dateAdapter: DateAdapter<Date>
+    private dateAdapter: DateAdapter<Date>,
+    private indexDbService: IndexDBService
   ) {
     this.dateAdapter.setLocale('de');
-
     this.columns = ['Date', 'Customer', 'Description', 'Time', 'Delete'];
 
     this.timeRecordForm = this.formBuilder.group({
@@ -53,6 +57,23 @@ export class CreateRecordComponent implements OnInit {
           time: [0, Validators.required]
         })
       ])
+    });
+  }
+
+  ngOnInit() {
+    this.createRecordForm = this.formBuilder.group({
+      customer: []
+    });
+
+    console.log('TOTAL TIME', this.totalTime);
+
+    this.timeRecords.valueChanges.subscribe(change => {
+      let tempTotalTime = 0.0;
+      change.forEach(record => {
+        //console.log('Value', record.time);
+        tempTotalTime += record.time;
+      });
+      this.totalTime = tempTotalTime;
     });
   }
 
@@ -69,23 +90,14 @@ export class CreateRecordComponent implements OnInit {
     console.log('Control', control);
   }
 
-  get timeRecords() {
-    // console.log('Time Records', this.timeRecordForm.get(
-    //   'time_records'
-    // ) as FormArray);
-    return this.timeRecordForm.get('time_records') as FormArray;
+  public onSubmit() {
+    // this.getItems();
+    const _tempArray = this.timeRecordForm.value as FormArray;
+    console.log('Temp Array', _tempArray );
+    this.indexDbService.add(_tempArray);
   }
 
-  public sum() {}
-
-  // public createPdfFromJson() {
-  //   const doc = new jsPDF();
-  //   console.log('Test', jquery('#render-container').get(0));
-  //   doc.fromHTML(jquery('#render-container').html(), 5, 5, {
-  //     elementHandlers: this.specialElementHandlers
-  //   });
-  //   doc.save('Test.pdf');
-  // }
+  // Pdf Creation
 
   public createPdfFromJson() {
     const doc = new jsPDF();
@@ -104,12 +116,24 @@ export class CreateRecordComponent implements OnInit {
     doc.save('team-cover.pdf');
   }
 
-  public onSubmit() {
-    this.getItems();
+
+
+
+  // Database Operations
+
+  public insertRecord() {
+    console.log('Record', this.indexDbService.insertOneRecord());
+
+  }
+  get timeRecords() {
+    // console.log('Time Records', this.timeRecordForm.get(
+    //   'time_records'
+    // ) as FormArray);
+    return this.timeRecordForm.get('time_records') as FormArray;
   }
 
-  deleteRow(index: number): void {
-    this.timeRecords.removeAt(index);
+  public getRecordsFromDb() {
+    this.indexDbService.getAllRecords();
   }
 
   public getItems() {
@@ -118,20 +142,5 @@ export class CreateRecordComponent implements OnInit {
     // .time_records as FormArray);
   }
 
-  ngOnInit() {
-    this.createRecordForm = this.formBuilder.group({
-      customer: []
-    });
 
-    console.log('TOTAL TIME', this.totalTime);
-
-    this.timeRecords.valueChanges.subscribe(change => {
-      let tempTotalTime = 0.0;
-      change.forEach(record => {
-        console.log('Value', record.time);
-        tempTotalTime += record.time;
-      });
-      this.totalTime = tempTotalTime;
-    });
-  }
 }
