@@ -41,10 +41,16 @@ export class IndexDBService {
       });
   }
 
+  public addRecordToOrder(record, orderId) {
+    return this.timeRecordsDb.orders
+      .where('id')
+      .equals(orderId)
+      .modify(order => order.records.push(record));
+  }
+
   public addOrder(order) {
     order['records'] = [];
-    this.timeRecordsDb.orders.add(order)
-    .catch(e => {
+    this.timeRecordsDb.orders.add(order).catch(e => {
       console.error('IndexDB addOrder: ', e);
     });
   }
@@ -58,6 +64,13 @@ export class IndexDBService {
       .catch(e => {
         console.error('IndexDB getAllOrders: ', e);
       });
+  }
+
+  public getOrderById(paramId: number) {
+    return this.timeRecordsDb.orders
+      .where('id')
+      .equals(paramId)
+      .toArray();
   }
 
   public update(id, data) {

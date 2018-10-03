@@ -4,6 +4,7 @@ import { FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
 import { IndexDBService } from '../service/index-db.service';
 import { DateAdapter } from '@angular/material';
 import { TimeRecord } from '../data-classes/time-record';
+import { Order } from '../data-classes/order';
 
 @Component({
   selector: 'app-order-detail',
@@ -11,14 +12,14 @@ import { TimeRecord } from '../data-classes/time-record';
   styleUrls: ['./order-detail.component.sass']
 })
 export class OrderDetailComponent implements OnInit {
-  private id;
+  private paramId;
   private sub;
 
   public timeRecordForm: FormGroup;
   public createRecordForm: FormGroup;
   public columns: string[];
   public totalTime = 0.0;
-  public title = '';
+  private order: Order;
 
   public form_validation_messages = {
     customer: [{ type: 'required', message: 'Bitte Kunde eintragen' }],
@@ -54,9 +55,9 @@ export class OrderDetailComponent implements OnInit {
 
   ngOnInit() {
     this.sub = this.route.params.subscribe(params => {
-      this.id = +params['id']; // (+) converts string 'id' to a number
+      this.paramId = +params['id']; // (+) converts string 'id' to a number
     });
-    console.log('ID: ', this.id);
+    console.log('ID: ', this.paramId);
 
     this.createRecordForm = this.formBuilder.group({
       customer: []
@@ -92,6 +93,7 @@ export class OrderDetailComponent implements OnInit {
     const recordsFromFormInput = this.timeRecordForm.controls.time_records.value;
     recordsFromFormInput.forEach(record => {
       this.indexDbService.addRecord(record);
+      this.indexDbService.addRecordToOrder(record, this.paramId);
     });
   }
 
@@ -109,6 +111,19 @@ export class OrderDetailComponent implements OnInit {
 
   public getRecordsFromDb() {
     // this.indexDbService. .getAllOrders();
+  }
+
+  public getOrders() {
+    this.indexDbService.getAllOrders().then((data) => {
+      console.log('Orders', data);
+    });
+  }
+
+  public getOrderById() {
+    this.indexDbService.getOrderById(this.paramId).then((order) => {
+      this.order = order[0];
+      console.log('Order By ID', this.order);
+    });
   }
 
   public getItems() {
