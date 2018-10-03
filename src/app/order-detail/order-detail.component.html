@@ -75,6 +75,10 @@
   </button>
   <button (click)="createPdfFromJson()">Create Pdf</button>
 
+  <button (click)="getOrders()">Get Orders</button>
+
+  <button (click)="getOrderById()">Order By Id</button>
+
   <br>
 
   {{ this.timeRecordForm.value | json }}
