@@ -32,7 +32,8 @@ import { RecordListComponent } from './record-list/record-list.component';
 import { CreateRecordComponent } from './create-record/create-record.component';
 import { SearchComponent } from './search/search.component';
 import { HeaderComponent } from './header/header.component';
-import { IndexDBService } from './index-db.service';
+import { IndexDBService } from './database/index-db.service';
+import { Database } from './database/Database';
 
 
 @NgModule({
@@ -64,7 +65,8 @@ import { IndexDBService } from './index-db.service';
     MatTableModule
   ],
   providers: [
-    IndexDBService
+    IndexDBService,
+    Database
   ],
   bootstrap: [AppComponent]
 })
