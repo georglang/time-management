@@ -7,8 +7,9 @@ import { Component, OnInit } from '@angular/core';
 })
 export class HeaderComponent implements OnInit {
   public navLinks = [
-    { path: '', label: 'Kunde' },
-    { path: '/create-record', label: 'Neuer Auftrag' },
+    { path: '', label: 'Aufträge' },
+    { path: '/create-order', label: 'Neuer Auftrag' },
+    { path: '/create-record', label: 'Neuer Eintrag' },
     { path: '/search', label: 'Suchen' },
   ];
 
