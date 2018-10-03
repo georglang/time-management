@@ -1,6 +1,6 @@
 import { Component, OnInit, Inject, Input, Output, EventEmitter } from '@angular/core';
 import { FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
-import { IndexDBService } from '../database/index-db.service';
+import { IndexDBService } from '../service/index-db.service';
 
 import * as jsPDF from 'jspdf';
 import * as jquery from 'jquery';
@@ -85,7 +85,6 @@ export class CreateRecordComponent implements OnInit {
   }
 
   public onSubmit() {
-    // this.getItems();
     // const _tempArray = this.timeRecordForm.controls.time_records as FormArray;
     const recordsFromFormInput = this.timeRecordForm.controls.time_records.value;
     recordsFromFormInput.forEach(record => {
@@ -125,7 +124,7 @@ export class CreateRecordComponent implements OnInit {
   }
 
   public getRecordsFromDb() {
-    this.indexDbService.getAllRecords();
+    // this.indexDbService. .getAllOrders();
   }
 
   public getItems() {
