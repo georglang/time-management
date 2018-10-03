@@ -9,22 +9,30 @@ export class IndexDBService {
   }
 
   public insertOneRecord() {
-    const record = new TimeRecord('Lang', '20.20.20', 'Arbeit', 10.00, 'Wolfskopf');
+    const record = new TimeRecord('Lang', '20.20.20', 'Arbeit', 10.0, 'Wolfskopf');
     this.timeRecordsDb.records.add(record).then(() => {
       return this.timeRecordsDb.records.where('workingHours').below(20).toArray;
     });
   }
 
   public getAllRecords(): Promise<any> {
-    return this.timeRecordsDb.records.toArray().then(result => {
-      return result;
-    }).catch((e) => {
-      console.error('IndexDB getAllRecords: ', e);
-    });
+    return this.timeRecordsDb.records
+      .toArray()
+      .then(result => {
+        return result;
+      })
+      .catch(e => {
+        console.error('IndexDB getAllRecords: ', e);
+      });
   }
 
-  public add(data) {
-    // return this.table.add(data);
+  public addRecord(record) {
+    return this.timeRecordsDb.records
+      .add(record)
+      .then(result => {})
+      .catch(e => {
+        console.error('IndexDB addRecord: ', e);
+      });
   }
 
   public update(id, data) {

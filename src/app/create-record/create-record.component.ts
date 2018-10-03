@@ -22,22 +22,16 @@ export class CreateRecordComponent implements OnInit {
 
   public form_validation_messages = {
     customer: [{ type: 'required', message: 'Bitte Kunde eintragen' }],
-    description: [
-      { type: 'required', message: 'Bitte Art der Arbeit eintragen' }
-    ],
+    description: [{ type: 'required', message: 'Bitte Art der Arbeit eintragen' }],
     time: [{ type: 'required', message: 'Bitte Stunden eintragen' }]
   };
 
-
-  public onDelete(id) {
-
-  }
+  public onDelete(id) {}
 
   public addRecord(record: TimeRecord) {
-    this.indexDbService.add(record);
+    this.indexDbService.addRecord(record);
     // this.addRecord.emit(this.title);
   }
-
 
   constructor(
     private formBuilder: FormBuilder,
@@ -92,9 +86,11 @@ export class CreateRecordComponent implements OnInit {
 
   public onSubmit() {
     // this.getItems();
-    const _tempArray = this.timeRecordForm.value as FormArray;
-    console.log('Temp Array', _tempArray );
-    this.indexDbService.add(_tempArray);
+    // const _tempArray = this.timeRecordForm.controls.time_records as FormArray;
+    const recordsFromFormInput = this.timeRecordForm.controls.time_records.value;
+    recordsFromFormInput.forEach(record => {
+      this.indexDbService.addRecord(record);
+    });
   }
 
   // Pdf Creation
@@ -116,14 +112,10 @@ export class CreateRecordComponent implements OnInit {
     doc.save('team-cover.pdf');
   }
 
-
-
-
   // Database Operations
 
   public insertRecord() {
     console.log('Record', this.indexDbService.insertOneRecord());
-
   }
   get timeRecords() {
     // console.log('Time Records', this.timeRecordForm.get(
@@ -141,6 +133,4 @@ export class CreateRecordComponent implements OnInit {
     // console.log('Single Record', this.timeRecordForm.value
     // .time_records as FormArray);
   }
-
-
 }

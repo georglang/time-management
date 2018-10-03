@@ -26,9 +26,9 @@ export class RecordListComponent implements OnInit {
   getCustomerNameAndPlace() {
     this.indexDbService.getAllRecords().then(allRecords => {
       allRecords.forEach(record => {
-        if ('place' in record) {
+        // if ('place' in record) {
           this.CustomerRecords.push({ name: record.customer, place: record.place });
-        }
+        // }
         this.dataSource = this.CustomerRecords;
       });
     });
