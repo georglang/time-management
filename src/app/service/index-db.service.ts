@@ -8,7 +8,7 @@ export class IndexDBService {
   constructor(private timeRecordsDb: Database) {}
 
   public insertOneRecord() {
-    const record = new TimeRecord('Lang', '20.20.20', 'Arbeit', 10.0, 'Wolfskopf');
+    const record = new TimeRecord('Lang', '20.20.20', 10.0, 'Wolfskopf');
     this.timeRecordsDb.records.add(record).then(() => {
       return this.timeRecordsDb.records.where('workingHours').below(20).toArray;
     });
@@ -50,9 +50,14 @@ export class IndexDBService {
 
   public addOrder(order) {
     order['records'] = [];
-    this.timeRecordsDb.orders.add(order).catch(e => {
-      console.error('IndexDB addOrder: ', e);
-    });
+    return this.timeRecordsDb.orders.add(order);
+    //   .then(data => {
+    //     debugger;
+    //     console.log('Record Added', data);
+    //   })
+    //   .catch(e => {
+    //   console.error('IndexDB addOrder: ', e);
+    // });
   }
 
   public getAllOrders(): Promise<any> {

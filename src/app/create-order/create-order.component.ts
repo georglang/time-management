@@ -9,7 +9,7 @@ import { Order } from '../data-classes/order';
   styleUrls: ['./create-order.component.sass']
 })
 export class CreateOrderComponent implements OnInit {
-  public customerForm: FormGroup;
+  public createOrderForm: FormGroup;
   public columns: string[];
 
   constructor(
@@ -18,7 +18,7 @@ export class CreateOrderComponent implements OnInit {
   ) {
     this.columns = ['Firma', 'Ansprechpartner', 'Ort'];
 
-    this.customerForm = this.formBuilder.group({
+    this.createOrderForm = this.formBuilder.group({
       companyName: ['', Validators.required],
       location: ['', Validators.required],
       contactPerson: ['']
@@ -49,7 +49,7 @@ export class CreateOrderComponent implements OnInit {
 
 
     // this.addOrder(this.customerForm.value)
-    this.indexDbService.addOrder(this.customerForm.value)
+    this.indexDbService.addOrder(this.createOrderForm.value)
       .then((data) => {
         console.log('ADDED ORDER', data);
 

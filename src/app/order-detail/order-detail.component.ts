@@ -22,7 +22,6 @@ export class OrderDetailComponent implements OnInit {
   private order: Order;
 
   public form_validation_messages = {
-    customer: [{ type: 'required', message: 'Bitte Kunde eintragen' }],
     description: [{ type: 'required', message: 'Bitte Art der Arbeit eintragen' }],
     time: [{ type: 'required', message: 'Bitte Stunden eintragen' }]
   };
@@ -39,13 +38,12 @@ export class OrderDetailComponent implements OnInit {
     private indexDbService: IndexDBService
   ) {
     this.dateAdapter.setLocale('de');
-    this.columns = ['Date', 'Customer', 'Description', 'Time', 'Delete'];
+    this.columns = ['Date', 'Description', 'Time', 'Delete'];
 
     this.timeRecordForm = this.formBuilder.group({
       time_records: this.formBuilder.array([
         this.formBuilder.group({
           date: ['', Validators.required],
-          customer: ['', Validators.required],
           description: ['', Validators.required],
           time: [0, Validators.required]
         })
@@ -68,7 +66,6 @@ export class OrderDetailComponent implements OnInit {
     this.timeRecords.valueChanges.subscribe(change => {
       let tempTotalTime = 0.0;
       change.forEach(record => {
-        //console.log('Value', record.time);
         tempTotalTime += record.time;
       });
       this.totalTime = tempTotalTime;
@@ -80,7 +77,6 @@ export class OrderDetailComponent implements OnInit {
     control.push(
       this.formBuilder.group({
         date: ['', Validators.required],
-        customer: ['', Validators.required],
         description: ['', Validators.required],
         time: [0, Validators.required]
       })

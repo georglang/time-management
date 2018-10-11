@@ -21,7 +21,6 @@ export class CreateRecordComponent implements OnInit {
   public title = '';
 
   public form_validation_messages = {
-    customer: [{ type: 'required', message: 'Bitte Kunde eintragen' }],
     description: [{ type: 'required', message: 'Bitte Art der Arbeit eintragen' }],
     time: [{ type: 'required', message: 'Bitte Stunden eintragen' }]
   };
@@ -40,13 +39,12 @@ export class CreateRecordComponent implements OnInit {
     private indexDbService: IndexDBService
   ) {
     this.dateAdapter.setLocale('de');
-    this.columns = ['Date', 'Customer', 'Description', 'Time', 'Delete'];
+    this.columns = ['Date', 'Description', 'Time', 'Delete'];
 
     this.timeRecordForm = this.formBuilder.group({
       time_records: this.formBuilder.array([
         this.formBuilder.group({
           date: ['', Validators.required],
-          customer: ['', Validators.required],
           description: ['', Validators.required],
           time: [0, Validators.required]
         })
@@ -76,7 +74,6 @@ export class CreateRecordComponent implements OnInit {
     control.push(
       this.formBuilder.group({
         date: ['', Validators.required],
-        customer: ['', Validators.required],
         description: ['', Validators.required],
         time: [0, Validators.required]
       })

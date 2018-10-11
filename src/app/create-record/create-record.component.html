@@ -23,14 +23,6 @@
             </mat-form-field>
           </td>
           <td>
-            <mat-form-field class="full-width">
-              <input matInput type="text" placeholder="Customer" formControlName="customer" autocomplete="off" required>
-              <mat-error *ngFor="let validation of form_validation_messages.customer">
-                <mat-error class="error-message" *ngIf="item.controls.customer.hasError(validation.type) && (item.controls.customer.dirty || item.controls.customer.touched)">{{validation.message}}</mat-error>
-              </mat-error>
-            </mat-form-field>
-          </td>
-          <td>
             <mat-form-field>
               <input matInput formControlName="description" placeholder="Description" autocomplete="off" required />
               <mat-error *ngFor="let validation of form_validation_messages.description">
@@ -85,12 +77,3 @@
 <button (click)="getRecordsFromDb()">Get Records</button>
 
 <button (click)="insertRecord()">Insert Record</button>
-
-<ul>
-  <li *ngFor="let record of records">
-      <input type="checkbox"/>
-      <span>{{record.customer}}</span>
-      <button type="button" (click)="onDelete(record.id)">Delete</button>
-    <input type="text">
-  </li>
-</ul>
