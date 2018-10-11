@@ -3,7 +3,7 @@ import { RouterModule, Routes, ActivatedRoute, ParamMap  } from '@angular/router
 import { OrderListComponent } from '../order-list/order-list.component';
 import { CreateRecordComponent } from '../create-record/create-record.component';
 import { SearchComponent } from '../search/search.component';
-import { CreateOrderComponent } from '../new-order/new-order.component';
+import { CreateOrderComponent } from '../create-order/create-order.component';
 import { OrderDetailComponent } from '../order-detail/order-detail.component';
 
 const appRoutes = [

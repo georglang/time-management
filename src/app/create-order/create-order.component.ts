@@ -4,9 +4,9 @@ import { IndexDBService } from '../service/index-db.service';
 import { Order } from '../data-classes/order';
 
 @Component({
-  selector: 'app-new-order',
-  templateUrl: './new-order.component.html',
-  styleUrls: ['./new-order.component.sass']
+  selector: 'app-create-order',
+  templateUrl: './create-order.component.html',
+  styleUrls: ['./create-order.component.sass']
 })
 export class CreateOrderComponent implements OnInit {
   public customerForm: FormGroup;
