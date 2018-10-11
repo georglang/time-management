@@ -20,15 +20,22 @@ export class NewOrderComponent implements OnInit {
 
     this.customerForm = this.formBuilder.group({
       companyName: ['', Validators.required],
-      place: ['', Validators.required],
+      location: ['', Validators.required],
       contactPerson: ['']
     });
   }
 
   ngOnInit() { }
 
-  public addRecord(order: Order) {
-    this.indexDbService.addOrder(order);
+  public addOrder(order: Order) {
+    this.indexDbService.addOrder(order)
+      .then((data) => {
+        console.log('Added Order', data);
+
+      })
+      .catch(e => {
+        console.error('IndexDB add Order: ', e);
+      });
     // this.addRecord.emit(this.title);
     // this.indexDbService.addOrder(new Order(
     //   'Forstbetrieb Tschabi',
@@ -38,6 +45,14 @@ export class NewOrderComponent implements OnInit {
   }
 
   public onSubmit() {
-    this.indexDbService.addOrder(this.customerForm.value);
+    console.log('Submit');
+
+
+    // this.addOrder(this.customerForm.value)
+    this.indexDbService.addOrder(this.customerForm.value)
+      .then((data) => {
+        console.log('ADDED ORDER', data);
+
+      });
   }
 }
