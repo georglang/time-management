@@ -1,14 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
 import { IndexDBService } from '../service/index-db.service';
-import { Order } from './../data-classes/order';
+import { Order } from '../data-classes/order';
 
 @Component({
   selector: 'app-new-order',
   templateUrl: './new-order.component.html',
   styleUrls: ['./new-order.component.sass']
 })
-export class NewOrderComponent implements OnInit {
+export class CreateOrderComponent implements OnInit {
   public customerForm: FormGroup;
   public columns: string[];
 

@@ -34,7 +34,7 @@ import { SearchComponent } from './search/search.component';
 import { HeaderComponent } from './header/header.component';
 import { IndexDBService } from './service/index-db.service';
 import { Database } from './database/Database';
-import { NewOrderComponent } from './new-order/new-order.component';
+import { CreateOrderComponent } from './new-order/new-order.component';
 import { OrderDetailComponent } from './order-detail/order-detail.component';
 
 @NgModule({
@@ -44,7 +44,7 @@ import { OrderDetailComponent } from './order-detail/order-detail.component';
     CreateRecordComponent,
     SearchComponent,
     HeaderComponent,
-    NewOrderComponent,
+    CreateOrderComponent,
     OrderDetailComponent,
   ],
   imports: [

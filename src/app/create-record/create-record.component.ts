@@ -88,7 +88,9 @@ export class CreateRecordComponent implements OnInit {
     // const _tempArray = this.timeRecordForm.controls.time_records as FormArray;
     const recordsFromFormInput = this.timeRecordForm.controls.time_records.value;
     recordsFromFormInput.forEach(record => {
-      this.indexDbService.addRecord(record);
+      this.indexDbService.addRecord(record).then((data) => {
+        console.log('Record Created', data);
+      });
     });
   }
 
