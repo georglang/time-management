@@ -26,11 +26,6 @@ export class OrderDetailComponent implements OnInit {
     time: [{ type: 'required', message: 'Bitte Stunden eintragen' }]
   };
 
-  public addRecord(record: TimeRecord) {
-    this.indexDbService.addRecord(record);
-    // this.addRecord.emit(this.title);
-  }
-
   constructor(
     private route: ActivatedRoute,
     private formBuilder: FormBuilder,
@@ -55,13 +50,10 @@ export class OrderDetailComponent implements OnInit {
     this.sub = this.route.params.subscribe(params => {
       this.paramId = +params['id']; // (+) converts string 'id' to a number
     });
-    console.log('ID: ', this.paramId);
 
     this.createRecordForm = this.formBuilder.group({
       customer: []
     });
-
-    console.log('TOTAL TIME', this.totalTime);
 
     this.timeRecords.valueChanges.subscribe(change => {
       let tempTotalTime = 0.0;
@@ -85,47 +77,32 @@ export class OrderDetailComponent implements OnInit {
   }
 
   public onSubmit() {
-    // const _tempArray = this.timeRecordForm.controls.time_records as FormArray;
     const recordsFromFormInput = this.timeRecordForm.controls.time_records.value;
     recordsFromFormInput.forEach(record => {
-      this.indexDbService.addRecord(record);
       this.indexDbService.addRecordToOrder(record, this.paramId);
     });
   }
 
-   // Database Operations
+  // Database Operations
 
-   public insertRecord() {
+  public insertRecord() {
     console.log('Record', this.indexDbService.insertOneRecord());
   }
+
   get timeRecords() {
-    // console.log('Time Records', this.timeRecordForm.get(
-    //   'time_records'
-    // ) as FormArray);
     return this.timeRecordForm.get('time_records') as FormArray;
   }
 
-  public getRecordsFromDb() {
-    // this.indexDbService. .getAllOrders();
-  }
-
   public getOrders() {
-    this.indexDbService.getAllOrders().then((data) => {
+    this.indexDbService.getAllOrders().then(data => {
       console.log('Orders', data);
     });
   }
 
   public getOrderById() {
-    this.indexDbService.getOrderById(this.paramId).then((order) => {
+    this.indexDbService.getOrderById(this.paramId).then(order => {
       this.order = order[0];
       console.log('Order By ID', this.order);
     });
   }
-
-  public getItems() {
-    // console.log('Records', this.timeRecordForm.value as FormArray);
-    // console.log('Single Record', this.timeRecordForm.value
-    // .time_records as FormArray);
-  }
-
 }

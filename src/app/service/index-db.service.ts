@@ -32,15 +32,6 @@ export class IndexDBService {
       });
   }
 
-  public addRecord(record) {
-    return this.timeRecordsDb.records
-      .add(record)
-      .then(result => {})
-      .catch(e => {
-        console.error('IndexDB addRecord: ', e);
-      });
-  }
-
   public addRecordToOrder(record, orderId) {
     return this.timeRecordsDb.orders
       .where('id')
