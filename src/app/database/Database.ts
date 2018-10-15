@@ -9,6 +9,7 @@ export class Database extends Dexie {
   constructor() {
     super('TimeRecords');
     this.version(1).stores({
+      records: '++id, date, workDescription, workingHours',
       orders: '++id, companyName, location, contactPerson, records'
     });
   }
