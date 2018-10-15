@@ -2,14 +2,14 @@ import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
-
-// own modules
-import {AppRoutingModule} from './router/app.routing.module';
-
-
 import { AppComponent } from './app.component';
 import { ServiceWorkerModule } from '@angular/service-worker';
 import { environment } from '../environments/environment';
+
+// own modules
+import {AppRoutingModule} from './router/app.routing.module';
+import { ToastrModule } from 'ngx-toastr';
+
 
 // Angular Material
 import {
@@ -65,7 +65,8 @@ import { OrderDetailComponent } from './order-detail/order-detail.component';
     MatMenuModule,
     MatToolbarModule,
     MatTabsModule,
-    MatTableModule
+    MatTableModule,
+    ToastrModule.forRoot()
   ],
   providers: [
     IndexDBService,
