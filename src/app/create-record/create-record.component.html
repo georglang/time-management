@@ -32,9 +32,9 @@
           </td>
           <td>
             <mat-form-field>
-              <input matInput type="number" step="0.25" value=0.00 formControlName="time" placeholder="Time" autocomplete="off" required />
-              <mat-error *ngFor="let validation of form_validation_messages.time">
-                <mat-error class="error-message" *ngIf="item.controls.time.hasError(validation.type) && (item.controls.time.dirty || item.controls.time.touched)">{{validation.message}}</mat-error>
+              <input matInput type="number" step="0.25" value=0.00 formControlName="workingHours" placeholder="Working Hours" autocomplete="off" required />
+              <mat-error *ngFor="let validation of form_validation_messages.workingHours">
+                <mat-error class="error-message" *ngIf="item.controls.workingHours.hasError(validation.type) && (item.controls.workingHours.dirty || item.controls.workingHours.touched)">{{validation.message}}</mat-error>
               </mat-error>
             </mat-form-field>
           </td>
@@ -77,3 +77,4 @@
 <button (click)="getRecordsFromDb()">Get Records</button>
 
 <button (click)="insertRecord()">Insert Record</button>
+

@@ -20,10 +20,12 @@ export class OrderDetailComponent implements OnInit {
   public columns: string[];
   public totalTime = 0.0;
   private order: Order;
+  public records: TimeRecord[];
+  public hans = [];
 
   public form_validation_messages = {
     description: [{ type: 'required', message: 'Bitte Art der Arbeit eintragen' }],
-    time: [{ type: 'required', message: 'Bitte Stunden eintragen' }]
+    workingHours: [{ type: 'required', message: 'Bitte Stunden eintragen' }]
   };
 
   constructor(
@@ -40,7 +42,7 @@ export class OrderDetailComponent implements OnInit {
         this.formBuilder.group({
           date: ['', Validators.required],
           description: ['', Validators.required],
-          time: [0, Validators.required]
+          workingHours: [0, Validators.required]
         })
       ])
     });
@@ -58,10 +60,12 @@ export class OrderDetailComponent implements OnInit {
     this.timeRecords.valueChanges.subscribe(change => {
       let tempTotalTime = 0.0;
       change.forEach(record => {
-        tempTotalTime += record.time;
+        tempTotalTime += record.workingHours;
       });
       this.totalTime = tempTotalTime;
     });
+
+    this.getOrderById(this.paramId);
   }
 
   public addControl() {
@@ -70,7 +74,7 @@ export class OrderDetailComponent implements OnInit {
       this.formBuilder.group({
         date: ['', Validators.required],
         description: ['', Validators.required],
-        time: [0, Validators.required]
+        workingHours: [0, Validators.required]
       })
     );
     console.log('Control', control);
@@ -99,10 +103,14 @@ export class OrderDetailComponent implements OnInit {
     });
   }
 
-  public getOrderById() {
-    this.indexDbService.getOrderById(this.paramId).then(order => {
-      this.order = order[0];
-      console.log('Order By ID', this.order);
+  public getOrderById(orderId) {
+    this.indexDbService.getOrderById(orderId)
+      .then(order => {
+        console.log('Order', order[0]);
+        this.records = order[0].records;
+        this.records.forEach(record => {
+          console.log('Record', record);
+        });
     });
   }
 }

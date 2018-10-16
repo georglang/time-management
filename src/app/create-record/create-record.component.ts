@@ -22,15 +22,10 @@ export class CreateRecordComponent implements OnInit {
 
   public form_validation_messages = {
     description: [{ type: 'required', message: 'Bitte Art der Arbeit eintragen' }],
-    time: [{ type: 'required', message: 'Bitte Stunden eintragen' }]
+    workingHours: [{ type: 'required', message: 'Bitte Stunden eintragen' }]
   };
 
   public onDelete(id) {}
-
-  public addRecord(record: TimeRecord) {
-    this.indexDbService.addRecord(record);
-    // this.addRecord.emit(this.title);
-  }
 
   constructor(
     private formBuilder: FormBuilder,
@@ -39,14 +34,14 @@ export class CreateRecordComponent implements OnInit {
     private indexDbService: IndexDBService
   ) {
     this.dateAdapter.setLocale('de');
-    this.columns = ['Date', 'Description', 'Time', 'Delete'];
+    this.columns = ['Date', 'Description', 'WorkingHours', 'Delete'];
 
     this.timeRecordForm = this.formBuilder.group({
       time_records: this.formBuilder.array([
         this.formBuilder.group({
           date: ['', Validators.required],
           description: ['', Validators.required],
-          time: [0, Validators.required]
+          workingHours: [0, Validators.required]
         })
       ])
     });
@@ -62,8 +57,8 @@ export class CreateRecordComponent implements OnInit {
     this.timeRecords.valueChanges.subscribe(change => {
       let tempTotalTime = 0.0;
       change.forEach(record => {
-        //console.log('Value', record.time);
-        tempTotalTime += record.time;
+        console.log('Value', record.workingHours);
+        tempTotalTime += record.workingHours;
       });
       this.totalTime = tempTotalTime;
     });
@@ -75,7 +70,7 @@ export class CreateRecordComponent implements OnInit {
       this.formBuilder.group({
         date: ['', Validators.required],
         description: ['', Validators.required],
-        time: [0, Validators.required]
+        workingHours: [0, Validators.required]
       })
     );
     console.log('Control', control);

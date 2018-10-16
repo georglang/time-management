@@ -5,6 +5,8 @@ import { Order } from '../data-classes/order';
 
 @Injectable()
 export class IndexDBService {
+  private records;
+
   constructor(private timeRecordsDb: Database) {}
 
   public insertOneRecord() {
@@ -29,6 +31,15 @@ export class IndexDBService {
       })
       .catch(e => {
         console.error('IndexDB getAllRecords: ', e);
+      });
+  }
+
+  public addRecord(record) {
+    return this.timeRecordsDb.records
+      .add(record)
+      .then(result => {})
+      .catch(e => {
+        console.error('IndexDB addRecord: ', e);
       });
   }
 
@@ -66,7 +77,9 @@ export class IndexDBService {
     return this.timeRecordsDb.orders
       .where('id')
       .equals(paramId)
-      .toArray();
+      .toArray(order => {
+        return order;
+      });
   }
 
   public update(id, data) {

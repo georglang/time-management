@@ -1,13 +1,9 @@
-<button mat-button [matMenuTriggerFor]="menu">Menu</button>
-<mat-menu #menu="matMenu">
-  <button mat-menu-item>Item 1</button>
-  <button mat-menu-item>Item 2</button>
-</mat-menu>
-
-
 <div id="render-container">
+  <span>{{ order?.companyName }}</span> - <span>{{ order?.contactPerson }}</span> - <span>{{ order?.location }}</span>
+
+<hr>
+
   <form [formGroup]="timeRecordForm" (ngSubmit)="onSubmit()">
-    <h2>Time Records</h2>
     <div formArrayName="time_records">
       <table class="table">
         <th *ngFor="let col of columns">
@@ -32,7 +28,7 @@
           </td>
           <td>
             <mat-form-field>
-              <input matInput type="number" step="0.25" value=0.00 formControlName="time" placeholder="Time" autocomplete="off" required />
+              <input matInput type="number" step="0.25" value=0.00 formControlName="workingHours" placeholder="Time" autocomplete="off" required />
               <mat-error *ngFor="let validation of form_validation_messages.time">
                 <mat-error class="error-message" *ngIf="item.controls.time.hasError(validation.type) && (item.controls.time.dirty || item.controls.time.touched)">{{validation.message}}</mat-error>
               </mat-error>
@@ -75,3 +71,13 @@
 
   {{ this.timeRecordForm.value | json }}
 </div>
+
+<hr>
+
+<hr>
+
+<ul *ngFor="let record of records">
+  <li> {{record.workingHours }}</li>
+
+</ul>
+
