@@ -68,13 +68,24 @@ export class OrderDetailComponent implements OnInit {
     this.getOrderById(this.paramId);
   }
 
-  public addControl() {
+  public addEmptyControl() {
     const control = <FormArray>this.timeRecordForm.controls.time_records;
     control.push(
       this.formBuilder.group({
         date: ['', Validators.required],
         description: ['', Validators.required],
         workingHours: [0, Validators.required]
+      })
+    );
+  }
+
+  public addControl(record: TimeRecord) {
+    const control = <FormArray>this.timeRecordForm.controls.time_records;
+    control.push(
+      this.formBuilder.group({
+        date: [record.date, Validators.required],
+        description: [record.description, Validators.required],
+        workingHours: [record.workingHours, Validators.required]
       })
     );
     console.log('Control', control);
@@ -110,6 +121,7 @@ export class OrderDetailComponent implements OnInit {
         this.records = order[0].records;
         this.records.forEach(record => {
           console.log('Record', record);
+          this.addControl(record);
         });
     });
   }
