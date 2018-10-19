@@ -29,7 +29,6 @@ import {
 
 // components
 import { OrderListComponent } from './order-list/order-list.component';
-import { CreateRecordComponent } from './create-record/create-record.component';
 import { SearchComponent } from './search/search.component';
 import { HeaderComponent } from './header/header.component';
 import { IndexDBService } from './service/index-db.service';
@@ -41,7 +40,6 @@ import { OrderDetailComponent } from './order-detail/order-detail.component';
   declarations: [
     AppComponent,
     OrderListComponent,
-    CreateRecordComponent,
     SearchComponent,
     HeaderComponent,
     CreateOrderComponent,

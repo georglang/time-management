@@ -1,5 +1,5 @@
 export interface ITimeRecord {
-  id?: number; // primery key, autoincremented
+  id: string; // primery key, autoincremented
   date: string;
   description: string;
   workingHours: number;
@@ -7,20 +7,18 @@ export interface ITimeRecord {
 }
 
 export class TimeRecord implements ITimeRecord {
-  public id: number;
+  public id: string;
   public date: string;
   public description: string;
   public workingHours: number;
   public location: string;
 
-  constructor(date: string, workDescription: string, workingHours: number, location: string, id?: number) {
+  constructor(date: string, workDescription: string, workingHours: number, location: string, id: string) {
     this.date = date;
     this.description = workDescription;
     this.workingHours = workingHours;
     this.location = location;
-    if (id) {
-      this.id = id;
-    }
+    this.id = id;
   }
 
   public log() {

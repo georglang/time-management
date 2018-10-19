@@ -10,45 +10,63 @@ export class IndexDBService {
   constructor(private timeRecordsDb: Database) {}
 
   public insertOneRecord() {
-    const record = new TimeRecord('Lang', '20.20.20', 10.0, 'Wolfskopf');
-    this.timeRecordsDb.records.add(record).then(() => {
-      return this.timeRecordsDb.records.where('workingHours').below(20).toArray;
-    });
-  }
-
-  insertOneOrder() {
-    const order = new Order('Lang', '20.20.20', 'Arbeit');
-    this.timeRecordsDb.orders.add(order).then(data => {
-      return data;
-    });
-  }
-
-  public getAllRecords(): Promise<any> {
-    return this.timeRecordsDb.records
-      .toArray()
-      .then(result => {
-        return result;
-      })
-      .catch(e => {
-        console.error('IndexDB getAllRecords: ', e);
-      });
+    // const record = new TimeRecord('Lang', '20.20.20', 10.0, 'Wolfskopf');
+    // this.timeRecordsDb.records.add(record).then(() => {
+    //   return this.timeRecordsDb.records.where('workingHours').below(20).toArray;
+    // });
   }
 
   public addRecord(record) {
-    return this.timeRecordsDb.records
-      .add(record)
-      .then(result => {})
-      .catch(e => {
-        console.error('IndexDB addRecord: ', e);
-      });
+    // return this.timeRecordsDb.records
+    //   .add(record)
+    //   .then(result => {})
+    //   .catch(e => {
+    //     console.error('IndexDB addRecord: ', e);
+    //   });
   }
 
+  // public addRecordToOrder(record, orderId) {
+  //   return this.timeRecordsDb.orders
+  //     .where('id')
+  //     .equals(orderId)
+  //     .modify(order => order.records.push(record))
+  //     .then((data) => console.log('DAta', data));
+  // }
+
   public addRecordToOrder(record, orderId) {
-    return this.timeRecordsDb.orders
-      .where('id')
-      .equals(orderId)
-      .modify(order => order.records.push(record));
-  }
+      return this.timeRecordsDb.records
+        .add(record)
+        .then((data) => {
+          console.log('DAta', data);
+          this.timeRecordsDb.orders
+            .where('id')
+            .equals(orderId)
+            .modify((order) => {
+              record.id = data;
+              debugger;
+              order.records.push(record);
+            });
+        });
+    }
+
+
+
+
+  // public addRecordToOrder(record, orderId) {
+  //   return this.timeRecordsDb.records
+  //     .add(record)
+  //     .then((data) => {
+  //       console.log('DAta', data);
+  //       this.timeRecordsDb.orders
+  //         .where('id')
+  //         .equals(orderId)
+  //         .modify((order) => {
+  //           order.recordIds.push(data);
+  //         });
+  //     });
+  // }
+
+
 
   public addOrder(order) {
     order['records'] = [];
