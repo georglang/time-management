@@ -5,7 +5,6 @@ export interface IOrder {
   contactPerson?: string;
   id: string; // primery key, autoincremented by indexedDB
   location: string;
-  recordIds: string[];
   records?: TimeRecord[];
 }
 
@@ -15,20 +14,20 @@ export class Order implements IOrder {
   public id: string;
   public location: string;
   public records: TimeRecord[];
-  public recordIds: string[];
 
   constructor(
     companyName: string,
     location: string,
-    record: TimeRecord,
+    contactPerson?: string,
     id: string,
-    contactPerson?: string
+    record?: TimeRecord
   ) {
     this.companyName = companyName;
     this.location = location;
     this.id = id;
-    this.recordIds = [];
-    this.records.push(record);
+    if (record) {
+      this.records.push(record);
+    }
     if (contactPerson) {
       this.contactPerson = contactPerson;
     }
