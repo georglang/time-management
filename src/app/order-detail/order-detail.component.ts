@@ -108,6 +108,10 @@ export class OrderDetailComponent implements OnInit {
     return this.timeRecordForm.get('time_records') as FormArray;
   }
 
+  public deleteFormGroup(index: number) {
+      this.timeRecords.removeAt(index);
+  }
+
   public getOrders() {
     this.indexDbService.getAllOrders().then(data => {
       console.log('Orders', data);
@@ -118,11 +122,13 @@ export class OrderDetailComponent implements OnInit {
     this.indexDbService.getOrderById(orderId)
       .then(order => {
         console.log('Order', order[0]);
-        this.records = order[0].records;
-        this.records.forEach(record => {
-          console.log('Record', record);
-          this.addControl(record);
-        });
+        if (order[0].hasOwnProperty('records')) {
+          this.records = order[0].records;
+          this.records.forEach(record => {
+            console.log('Record', record);
+            this.addControl(record);
+          });
+        }
     });
   }
 }

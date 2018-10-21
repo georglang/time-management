@@ -36,7 +36,7 @@
           </td>
           <td>
             <button mat-icon-button>
-              <i class="material-icons" (click)="deleteRow(pointIndex)">
+              <i class="material-icons" (click)="deleteFormGroup(pointIndex)">
                 delete
               </i>
             </button>
@@ -58,7 +58,7 @@
 
   <br>
 
-  <button mat-fab class="add-record-btn float-right disabled" (click)="addControl()">
+   <button mat-fab class="add-record-btn float-right disabled" (click)="addEmptyControl()">
     <i class="material-icons">add</i>
   </button>
   <button (click)="createPdfFromJson()">Create Pdf</button>
