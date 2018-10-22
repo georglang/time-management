@@ -18,9 +18,9 @@ export class Order implements IOrder {
   constructor(
     companyName: string,
     location: string,
-    contactPerson?: string,
     id: string,
-    record?: TimeRecord
+    contactPerson?: string,
+    record?: TimeRecord,
   ) {
     this.companyName = companyName;
     this.location = location;
