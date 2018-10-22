@@ -6,8 +6,11 @@ import { Order } from '../data-classes/order';
 @Injectable()
 export class IndexDBService {
   private records;
+  private isAlreadyInDB;
 
-  constructor(private timeRecordsDb: Database) {}
+  constructor(private timeRecordsDb: Database) {
+    this.isAlreadyInDB = false;
+  }
 
   // public addRecordToOrder(record, orderId) {
   //     return this.timeRecordsDb.records
@@ -56,13 +59,17 @@ export class IndexDBService {
           order.records.push(record);
         } else {
           order.records.forEach(recordInDB => {
-            if (record.id !== recordInDB.id) {
-              order.records.push(record);
-            } else if (record.id === undefined) {
-              record.id = this.createUniqueId();
-              order.records.push(record);
+            if (record.id === recordInDB.id) {
+              this.isAlreadyInDB = true;
             }
           });
+
+          console.log('ISALREADY', this.isAlreadyInDB);
+
+
+          if (!this.isAlreadyInDB) {
+            this.records.push(record);
+          }
         }
       });
   }
