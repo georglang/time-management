@@ -9,75 +9,66 @@ export class IndexDBService {
 
   constructor(private timeRecordsDb: Database) {}
 
-  public insertOneRecord() {
-    // const record = new TimeRecord('Lang', '20.20.20', 10.0, 'Wolfskopf');
-    // this.timeRecordsDb.records.add(record).then(() => {
-    //   return this.timeRecordsDb.records.where('workingHours').below(20).toArray;
-    // });
-  }
-
-  public addRecord(record) {
-    // return this.timeRecordsDb.records
-    //   .add(record)
-    //   .then(result => {})
-    //   .catch(e => {
-    //     console.error('IndexDB addRecord: ', e);
-    //   });
-  }
-
   // public addRecordToOrder(record, orderId) {
-  //   return this.timeRecordsDb.orders
-  //     .where('id')
-  //     .equals(orderId)
-  //     .modify(order => order.records.push(record))
-  //     .then((data) => console.log('DAta', data));
-  // }
+  //     return this.timeRecordsDb.records
+  //       .add(record)
+  //       .then((data) => {
+  //         console.log('DAta', data);
+  //         this.timeRecordsDb.orders
+  //           .where('id')
+  //           .equals(orderId)
+  //           .modify((order) => {
+  //             record.id = data;
+  //             if (!order.hasOwnProperty('records')) {
+  //               order.records = [];
+  //             }
+  //             order.records.push(record);
+  //           });
+  //       });
+  //   }
+
+  public getRecordId() {}
+
+  public createUniqueId() {
+    const ID = () => {
+      const array = new Uint32Array(8);
+      window.crypto.getRandomValues(array);
+      let str = '';
+      for (let i = 0; i < array.length; i++) {
+        str += (i < 2 || i > 5 ? '' : '-') + array[i].toString(16).slice(-4);
+      }
+      return str;
+    };
+    return ID();
+  }
 
   public addRecordToOrder(record, orderId) {
-      return this.timeRecordsDb.records
-        .add(record)
-        .then((data) => {
-          console.log('DAta', data);
-          this.timeRecordsDb.orders
-            .where('id')
-            .equals(orderId)
-            .modify((order) => {
-              record.id = data;
-              debugger;
-              order.records.push(record);
-            });
-        });
+    if (record.id === undefined) {
+      record.id = this.createUniqueId();
     }
 
-
-
-
-  // public addRecordToOrder(record, orderId) {
-  //   return this.timeRecordsDb.records
-  //     .add(record)
-  //     .then((data) => {
-  //       console.log('DAta', data);
-  //       this.timeRecordsDb.orders
-  //         .where('id')
-  //         .equals(orderId)
-  //         .modify((order) => {
-  //           order.recordIds.push(data);
-  //         });
-  //     });
-  // }
-
-
+    this.timeRecordsDb.orders
+      .where('id')
+      .equals(orderId)
+      .modify(order => {
+        if (!order.hasOwnProperty('records')) {
+          order.records = [];
+          order.records.push(record);
+        } else {
+          order.records.forEach(recordInDB => {
+            if (record.id !== recordInDB.id) {
+              order.records.push(record);
+            } else if (record.id === undefined) {
+              record.id = this.createUniqueId();
+              order.records.push(record);
+            }
+          });
+        }
+      });
+  }
 
   public addOrder(order) {
-    order['records'] = [];
     return this.timeRecordsDb.orders.add(order);
-    //   .then(data => {
-    //     debugger;
-    //     console.log('Record Added', data);
-    //   })
-    //   .catch(e => {
-    //   console.error('IndexDB addOrder: ', e);
-    // });
   }
 
   public getAllOrders(): Promise<any> {
@@ -98,6 +89,15 @@ export class IndexDBService {
       .toArray(order => {
         return order;
       });
+  }
+
+  public removeRecord(recordId) {
+    console.log('RecordsId', recordId);
+
+    return this.timeRecordsDb.records
+      .where('id')
+      .equals(recordId)
+      .delete();
   }
 
   public update(id, data) {
