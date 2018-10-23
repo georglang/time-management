@@ -6,7 +6,7 @@ import { Order } from '../data-classes/order';
 @Injectable()
 export class IndexDBService {
   private records;
-  private isAlreadyInDB;
+  public isAlreadyInDB: boolean;
 
   constructor(private timeRecordsDb: Database) {
     this.isAlreadyInDB = false;
@@ -46,32 +46,59 @@ export class IndexDBService {
   }
 
   public addRecordToOrder(record, orderId) {
-    if (record.id === undefined) {
-      record.id = this.createUniqueId();
-    }
-
     this.timeRecordsDb.orders
       .where('id')
       .equals(orderId)
-      .modify(order => {
-        if (!order.hasOwnProperty('records')) {
-          order.records = [];
-          order.records.push(record);
+      .toArray(orders => {
+        console.log('Orders');
+        const records = orders[0].records;
+
+        if (records.length === 0) {
+          this.timeRecordsDb.orders
+            .where('id')
+            .equals(orderId)
+            .modify(order => {
+              order.records.push(record);
+            });
         } else {
-          order.records.forEach(recordInDB => {
-            if (record.id === recordInDB.id) {
+          for (let i = 0; i < records.length; i++) {
+            console.log('Record in DB', record);
+            if (record.id === records[i].id) {
               this.isAlreadyInDB = true;
+              console.log('Test in IF', this.isAlreadyInDB);
             }
-          });
-
-          console.log('ISALREADY', this.isAlreadyInDB);
-
+          }
 
           if (!this.isAlreadyInDB) {
-            this.records.push(record);
+            this.timeRecordsDb.orders
+              .where('id')
+              .equals(orderId)
+              .modify(order => {
+                order.records.push(record);
+              });
           }
         }
       });
+
+    // this.timeRecordsDb.orders
+    //   .where('id')
+    //   .equals(orderId)
+    //   .put(order => {
+    //     if (order.records.length === 0) {
+    //       order.records.push(record);
+    //     } else {
+    //       for (let i = 0; i < order.records.length; i++) {
+    //         console.log('Record in DB', record);
+    //         if (record.id === order.records[i].id) {
+    //           this.isAlreadyInDB = true;
+    //           console.log('Test in IF', this.isAlreadyInDB);
+    //         }
+    //       }
+    //       if (!this.isAlreadyInDB) {
+    //         order.records.push(record);
+    //       }
+    //     }
+    //   });
   }
 
   public addOrder(order) {
