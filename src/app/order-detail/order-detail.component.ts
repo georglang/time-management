@@ -114,22 +114,13 @@ export class OrderDetailComponent implements OnInit {
   public onSubmit(timeRecordForm: FormGroup) {
     const recordsFromFormInput = this.timeRecordForm.controls.time_records.value;
     if (recordsFromFormInput !== undefined) {
-      recordsFromFormInput.forEach(record => {
-        if (!record.hasOwnProperty('id') || record.id === '') {
+      for (let index = 0; index < recordsFromFormInput.length; index++) {
+        const record = recordsFromFormInput[index];
+        if ((!record.hasOwnProperty('id')) || (record.id === '')) {
           record.id = this.createUniqueId();
+          this.indexDbService.addRecordToOrder(record, this.paramId);
         }
-        this.indexDbService.addRecordToOrder(record, this.paramId);
-      });
-
-      // for (let index = 0; index < recordsFromFormInput.length; index++) {
-      //   const record = recordsFromFormInput[index];
-      //   if ((!record.hasOwnProperty('id')) || (record.id === '')) {
-      //     record.id = this.createUniqueId();
-      //   }
-      //   console.log('ParamId', this.paramId);
-
-      //   this.indexDbService.addRecordToOrder(record, this.paramId);
-      // }
+      }
     }
   }
 

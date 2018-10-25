@@ -62,7 +62,6 @@ export class IndexDBService {
             });
         } else {
           for (let i = 0; i < records.length; i++) {
-            console.log('Record in DB', record);
             if (record.id === records[i].id) {
               this.isAlreadyInDB = true;
               console.log('Test in IF', this.isAlreadyInDB);
@@ -79,26 +78,6 @@ export class IndexDBService {
           }
         }
       });
-
-    // this.timeRecordsDb.orders
-    //   .where('id')
-    //   .equals(orderId)
-    //   .put(order => {
-    //     if (order.records.length === 0) {
-    //       order.records.push(record);
-    //     } else {
-    //       for (let i = 0; i < order.records.length; i++) {
-    //         console.log('Record in DB', record);
-    //         if (record.id === order.records[i].id) {
-    //           this.isAlreadyInDB = true;
-    //           console.log('Test in IF', this.isAlreadyInDB);
-    //         }
-    //       }
-    //       if (!this.isAlreadyInDB) {
-    //         order.records.push(record);
-    //       }
-    //     }
-    //   });
   }
 
   public addOrder(order) {
