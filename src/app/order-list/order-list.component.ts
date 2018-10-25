@@ -15,11 +15,9 @@ export class OrderListComponent implements OnInit {
 
   getOrders() {
     this.indexDbService.getAllOrders().then(allOrders => {
-      if (allOrders !== undefined) {
-        allOrders.forEach(order => {
-          this.OrderRecords.push(new Order(order.companyName, order.location, order.contactPerson, order.id));
-        });
-      }
+      allOrders.forEach(order => {
+        this.OrderRecords.push(new Order(order.companyName, order.location, order.id, order.contactPerson));
+      });
       this.orders = this.OrderRecords;
     });
   }

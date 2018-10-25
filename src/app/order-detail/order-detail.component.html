@@ -3,7 +3,7 @@
 
 <hr>
 
-  <form [formGroup]="timeRecordForm" (ngSubmit)="onSubmit()">
+  <form [formGroup]="timeRecordForm" (ngSubmit)="onSubmit(timeRecordForm)">
     <div formArrayName="time_records">
       <table class="table">
         <th *ngFor="let col of columns">
@@ -36,7 +36,7 @@
           </td>
           <td>
             <button mat-icon-button>
-              <i class="material-icons" (click)="deleteFormGroup(pointIndex)">
+              <i class="material-icons" (click)="deleteFormGroup(item.value.id)">
                 delete
               </i>
             </button>

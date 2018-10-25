@@ -23,6 +23,8 @@ export class OrderDetailComponent implements OnInit {
   public records: TimeRecord[];
   public hans = [];
 
+  public lastId: number;
+
   public form_validation_messages = {
     description: [{ type: 'required', message: 'Bitte Art der Arbeit eintragen' }],
     workingHours: [{ type: 'required', message: 'Bitte Stunden eintragen' }]
@@ -35,11 +37,12 @@ export class OrderDetailComponent implements OnInit {
     private indexDbService: IndexDBService
   ) {
     this.dateAdapter.setLocale('de');
-    this.columns = ['Date', 'Description', 'Time', 'Delete'];
+    this.columns = ['Id, Date', 'Description', 'Time', 'Delete'];
 
     this.timeRecordForm = this.formBuilder.group({
       time_records: this.formBuilder.array([
         this.formBuilder.group({
+          id: [''],
           date: ['', Validators.required],
           description: ['', Validators.required],
           workingHours: [0, Validators.required]
@@ -59,6 +62,7 @@ export class OrderDetailComponent implements OnInit {
 
     this.timeRecords.valueChanges.subscribe(change => {
       let tempTotalTime = 0.0;
+
       change.forEach(record => {
         tempTotalTime += record.workingHours;
       });
@@ -72,44 +76,88 @@ export class OrderDetailComponent implements OnInit {
     const control = <FormArray>this.timeRecordForm.controls.time_records;
     control.push(
       this.formBuilder.group({
+        id: [''],
         date: ['', Validators.required],
         description: ['', Validators.required],
         workingHours: [0, Validators.required]
       })
     );
+
+    console.log('New Control', control);
   }
 
   public addControl(record: TimeRecord) {
     const control = <FormArray>this.timeRecordForm.controls.time_records;
     control.push(
       this.formBuilder.group({
+        id: [record.id],
         date: [record.date, Validators.required],
         description: [record.description, Validators.required],
         workingHours: [record.workingHours, Validators.required]
       })
     );
-    console.log('Control', control);
   }
 
-  public onSubmit() {
+  public createUniqueId() {
+    const ID = () => {
+      const array = new Uint32Array(8);
+      window.crypto.getRandomValues(array);
+      let str = '';
+      for (let i = 0; i < array.length; i++) {
+        str += (i < 2 || i > 5 ? '' : '-') + array[i].toString(16).slice(-4);
+      }
+      return str;
+    };
+    return ID();
+  }
+
+  public onSubmit(timeRecordForm: FormGroup) {
     const recordsFromFormInput = this.timeRecordForm.controls.time_records.value;
-    recordsFromFormInput.forEach(record => {
-      this.indexDbService.addRecordToOrder(record, this.paramId);
-    });
-  }
+    if (recordsFromFormInput !== undefined) {
+      recordsFromFormInput.forEach(record => {
+        if (!record.hasOwnProperty('id') || record.id === '') {
+          record.id = this.createUniqueId();
+        }
+        this.indexDbService.addRecordToOrder(record, this.paramId);
+      });
 
-  // Database Operations
+      // for (let index = 0; index < recordsFromFormInput.length; index++) {
+      //   const record = recordsFromFormInput[index];
+      //   if ((!record.hasOwnProperty('id')) || (record.id === '')) {
+      //     record.id = this.createUniqueId();
+      //   }
+      //   console.log('ParamId', this.paramId);
 
-  public insertRecord() {
-    console.log('Record', this.indexDbService.insertOneRecord());
+      //   this.indexDbService.addRecordToOrder(record, this.paramId);
+      // }
+    }
   }
 
   get timeRecords() {
+    console.log('Time Record', this.timeRecordForm.get('time_records'));
+
     return this.timeRecordForm.get('time_records') as FormArray;
   }
 
-  public deleteFormGroup(index: number) {
-      this.timeRecords.removeAt(index);
+  public deleteFormGroup(id: string) {
+    console.log('ID', id);
+
+    this.indexDbService.getOrderById(this.paramId).then(order => {
+      if (order.length !== 0) {
+        if (order[0].hasOwnProperty('records')) {
+          this.records = order[0].records;
+
+
+          this.records.forEach(record => {
+            if (record.id === id) {
+            }
+          });
+        }
+      }
+    });
+
+    // this.timeRecords.removeAt(index);
+    // this.indexDbService.removeRecord(index);
   }
 
   public getOrders() {
@@ -119,9 +167,9 @@ export class OrderDetailComponent implements OnInit {
   }
 
   public getOrderById(orderId) {
-    this.indexDbService.getOrderById(orderId)
-      .then(order => {
-        console.log('Order', order[0]);
+    this.indexDbService.getOrderById(orderId).then(order => {
+      console.log('Order', order[0]);
+      if (order.length !== 0) {
         if (order[0].hasOwnProperty('records')) {
           this.records = order[0].records;
           this.records.forEach(record => {
@@ -129,6 +177,7 @@ export class OrderDetailComponent implements OnInit {
             this.addControl(record);
           });
         }
+      }
     });
   }
 }

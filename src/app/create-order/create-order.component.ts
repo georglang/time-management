@@ -37,6 +37,10 @@ export class CreateOrderComponent implements OnInit {
   }
 
   public addOrder(order: Order) {
+    if (!order.hasOwnProperty('records')) {
+      order.records = [];
+    }
+
     this.indexDbService
       .addOrder(order)
       .then(orderId => {
@@ -44,7 +48,7 @@ export class CreateOrderComponent implements OnInit {
         this.showSuccess();
       })
       .catch(e => {
-        console.error('IndexDB add Order: ', e);
+        console.error('IndexedDB add Order: ', e);
       });
   }
 
