@@ -82,8 +82,6 @@ export class OrderDetailComponent implements OnInit {
         workingHours: [0, Validators.required]
       })
     );
-
-    console.log('New Control', control);
   }
 
   public addControl(record: TimeRecord) {
@@ -125,35 +123,18 @@ export class OrderDetailComponent implements OnInit {
   }
 
   get timeRecords() {
-    console.log('Time Record', this.timeRecordForm.get('time_records'));
-
     return this.timeRecordForm.get('time_records') as FormArray;
   }
 
-  public deleteFormGroup(id: string) {
-    console.log('ID', id);
-
-    this.indexDbService.getOrderById(this.paramId).then(order => {
-      if (order.length !== 0) {
-        if (order[0].hasOwnProperty('records')) {
-          this.records = order[0].records;
-
-
-          this.records.forEach(record => {
-            if (record.id === id) {
-            }
-          });
-        }
-      }
-    });
-
-    // this.timeRecords.removeAt(index);
-    // this.indexDbService.removeRecord(index);
+  public deleteFormGroup(recordId: string) {
+    this.indexDbService.removeRecord(recordId, this.paramId)
+      .then((data) => {
+        console.log('Data', data);
+      })
   }
 
   public getOrders() {
     this.indexDbService.getAllOrders().then(data => {
-      console.log('Orders', data);
     });
   }
 

@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Database } from './../database/Database';
 import { TimeRecord } from '../data-classes/time-record';
-import { Order } from '../data-classes/order';
+import { IOrder } from '../data-classes/order';
 
 @Injectable()
 export class IndexDBService {
@@ -11,24 +11,6 @@ export class IndexDBService {
   constructor(private timeRecordsDb: Database) {
     this.isAlreadyInDB = false;
   }
-
-  // public addRecordToOrder(record, orderId) {
-  //     return this.timeRecordsDb.records
-  //       .add(record)
-  //       .then((data) => {
-  //         console.log('DAta', data);
-  //         this.timeRecordsDb.orders
-  //           .where('id')
-  //           .equals(orderId)
-  //           .modify((order) => {
-  //             record.id = data;
-  //             if (!order.hasOwnProperty('records')) {
-  //               order.records = [];
-  //             }
-  //             order.records.push(record);
-  //           });
-  //       });
-  //   }
 
   public getRecordId() {}
 
@@ -50,7 +32,6 @@ export class IndexDBService {
       .where('id')
       .equals(orderId)
       .toArray(orders => {
-        console.log('Orders');
         const records = orders[0].records;
 
         if (records.length === 0) {
@@ -64,7 +45,6 @@ export class IndexDBService {
           for (let i = 0; i < records.length; i++) {
             if (record.id === records[i].id) {
               this.isAlreadyInDB = true;
-              console.log('Test in IF', this.isAlreadyInDB);
             }
           }
 
@@ -104,13 +84,25 @@ export class IndexDBService {
       });
   }
 
-  public removeRecord(recordId) {
-    console.log('RecordsId', recordId);
-
-    return this.timeRecordsDb.records
+  public removeRecord(recordId, orderId) {
+    return this.timeRecordsDb.orders
       .where('id')
-      .equals(recordId)
-      .delete();
+      .equals(orderId)
+      .toArray(order => {
+        const records: TimeRecord[] = order[0].records;
+        for (let index = 0; index < records.length; index++) {
+          const element = records[index];
+          if (element.id === recordId) {
+            records.splice(index, 1);
+            this.timeRecordsDb.orders
+              .where('id')
+              .equals(orderId)
+              .modify(_order => {
+                _order.records = records;
+              });
+          }
+        }
+      });
   }
 
   public update(id, data) {
