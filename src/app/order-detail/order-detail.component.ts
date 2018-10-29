@@ -114,7 +114,7 @@ export class OrderDetailComponent implements OnInit {
     if (recordsFromFormInput !== undefined) {
       for (let index = 0; index < recordsFromFormInput.length; index++) {
         const record = recordsFromFormInput[index];
-        if ((!record.hasOwnProperty('id')) || (record.id === '')) {
+        if (!record.hasOwnProperty('id') || record.id === '') {
           record.id = this.createUniqueId();
           this.indexDbService.addRecordToOrder(record, this.paramId);
         }
@@ -126,16 +126,14 @@ export class OrderDetailComponent implements OnInit {
     return this.timeRecordForm.get('time_records') as FormArray;
   }
 
-  public deleteFormGroup(recordId: string) {
-    this.indexDbService.removeRecord(recordId, this.paramId)
-      .then((data) => {
-        console.log('Data', data);
-      })
+  public deleteRecord(recordId: string, index: number) {
+    this.indexDbService.deleteRecord(recordId, this.paramId).then(data => {
+      this.timeRecords.removeAt(index);
+    });
   }
 
   public getOrders() {
-    this.indexDbService.getAllOrders().then(data => {
-    });
+    this.indexDbService.getAllOrders().then(data => {});
   }
 
   public getOrderById(orderId) {

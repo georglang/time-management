@@ -32,29 +32,31 @@ export class IndexDBService {
       .where('id')
       .equals(orderId)
       .toArray(orders => {
-        const records = orders[0].records;
-
-        if (records.length === 0) {
-          this.timeRecordsDb.orders
-            .where('id')
-            .equals(orderId)
-            .modify(order => {
-              order.records.push(record);
-            });
-        } else {
-          for (let i = 0; i < records.length; i++) {
-            if (record.id === records[i].id) {
-              this.isAlreadyInDB = true;
-            }
-          }
-
-          if (!this.isAlreadyInDB) {
+        if (orders !== undefined) {
+          const records = orders[0].records;
+          if (records.length === 0) {
             this.timeRecordsDb.orders
               .where('id')
               .equals(orderId)
               .modify(order => {
-                order.records.push(record);
+                if (order !== undefined) {
+                  order.records.push(record);
+                }
               });
+          } else {
+            for (let i = 0; i < records.length; i++) {
+              if (record.id === records[i].id) {
+                this.isAlreadyInDB = true;
+              }
+            }
+            if (!this.isAlreadyInDB) {
+              this.timeRecordsDb.orders
+                .where('id')
+                .equals(orderId)
+                .modify(order => {
+                  order.records.push(record);
+                });
+            }
           }
         }
       });
@@ -84,7 +86,7 @@ export class IndexDBService {
       });
   }
 
-  public removeRecord(recordId, orderId) {
+  public deleteRecord(recordId, orderId) {
     return this.timeRecordsDb.orders
       .where('id')
       .equals(orderId)
