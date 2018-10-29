@@ -8,3 +8,35 @@
     </button>
   </mat-list-item>
 </mat-nav-list>
+
+<mat-form-field>
+  <input matInput
+  #searchvalue
+   (keyup)="applyFilter($event.target.value)" placeholder="Filter">
+</mat-form-field>
+
+<p *ngIf="searchvalue.value != 'search here...' && searchvalue.value != ''">
+  Results for '{{searchvalue.value}}'
+</p>
+
+<table matSort  style="width:600px;" mat-table [dataSource]="dataSource" class="mat-elevation-z8">
+
+  <ng-container matColumnDef="customer">
+    <th  mat-sort-header mat-header-cell *matHeaderCellDef> Kunde </th>
+    <td mat-cell *matCellDef="let order"> {{order.companyName}} </td>
+  </ng-container>
+
+  <ng-container matColumnDef="contactPerson">
+    <th  mat-sort-header mat-header-cell *matHeaderCellDef> Ansprechpartner </th>
+    <td mat-cell *matCellDef="let order"> {{order.contactPerson}} </td>
+  </ng-container>
+
+  <ng-container matColumnDef="location">
+    <th  mat-sort-header mat-header-cell *matHeaderCellDef> Ort </th>
+    <td mat-cell *matCellDef="let order"> {{order.location}} </td>
+  </ng-container>
+
+  <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+  <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+
+</table>
