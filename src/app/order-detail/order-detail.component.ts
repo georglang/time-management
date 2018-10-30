@@ -1,10 +1,10 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
 import { IndexDBService } from '../service/index-db.service';
 import { DateAdapter } from '@angular/material';
 import { TimeRecord } from '../data-classes/time-record';
-import { Order } from '../data-classes/order';
+import { IOrder } from '../data-classes/order';
 
 @Component({
   selector: 'app-order-detail',
@@ -19,25 +19,29 @@ export class OrderDetailComponent implements OnInit {
   public createRecordForm: FormGroup;
   public columns: string[];
   public totalTime = 0.0;
-  private order: Order;
+  private order: IOrder;
   public records: TimeRecord[];
   public hans = [];
+  public hasId = false;
 
   public lastId: number;
 
   public form_validation_messages = {
-    description: [{ type: 'required', message: 'Bitte Art der Arbeit eintragen' }],
+    description: [
+      { type: 'required', message: 'Bitte Art der Arbeit eintragen' }
+    ],
     workingHours: [{ type: 'required', message: 'Bitte Stunden eintragen' }]
   };
 
   constructor(
     private route: ActivatedRoute,
+    private router: Router,
     private formBuilder: FormBuilder,
     private dateAdapter: DateAdapter<Date>,
     private indexDbService: IndexDBService
   ) {
     this.dateAdapter.setLocale('de');
-    this.columns = ['Id, Date', 'Description', 'Time', 'Delete'];
+    this.columns = ['Date', 'Description', 'Time', 'Delete'];
 
     this.timeRecordForm = this.formBuilder.group({
       time_records: this.formBuilder.array([
@@ -56,10 +60,6 @@ export class OrderDetailComponent implements OnInit {
       this.paramId = +params['id']; // (+) converts string 'id' to a number
     });
 
-    this.createRecordForm = this.formBuilder.group({
-      customer: []
-    });
-
     this.timeRecords.valueChanges.subscribe(change => {
       let tempTotalTime = 0.0;
 
@@ -70,6 +70,10 @@ export class OrderDetailComponent implements OnInit {
     });
 
     this.getOrderById(this.paramId);
+  }
+
+  public navigateToOrderList() {
+    this.router.navigate(['/']);
   }
 
   public addEmptyControl() {
@@ -110,7 +114,8 @@ export class OrderDetailComponent implements OnInit {
   }
 
   public onSubmit(timeRecordForm: FormGroup) {
-    const recordsFromFormInput = this.timeRecordForm.controls.time_records.value;
+    const recordsFromFormInput = this.timeRecordForm.controls.time_records
+      .value;
     if (recordsFromFormInput !== undefined) {
       for (let index = 0; index < recordsFromFormInput.length; index++) {
         const record = recordsFromFormInput[index];
@@ -126,9 +131,9 @@ export class OrderDetailComponent implements OnInit {
     return this.timeRecordForm.get('time_records') as FormArray;
   }
 
-  public deleteRecord(recordId: string, index: number) {
-    this.indexDbService.deleteRecord(recordId, this.paramId).then(data => {
-      this.timeRecords.removeAt(index);
+  public deleteFormGroup(recordId: string, position: number) {
+    this.indexDbService.removeRecord(recordId, this.paramId).then(data => {
+      this.timeRecords.removeAt(position);
     });
   }
 
@@ -141,11 +146,21 @@ export class OrderDetailComponent implements OnInit {
       console.log('Order', order[0]);
       if (order.length !== 0) {
         if (order[0].hasOwnProperty('records')) {
+          this.order = order[0];
           this.records = order[0].records;
-          this.records.forEach(record => {
-            console.log('Record', record);
-            this.addControl(record);
-          });
+          if (this.records.length > 0) {
+            this.records.forEach(record => {
+              console.log('Record: ', record);
+              if (record.id !== undefined) {
+                this.hasId = true;
+              } else {
+                this.hasId = false;
+              }
+
+              console.log('HAS ID', this.hasId);
+              this.addControl(record);
+            });
+          }
         }
       }
     });

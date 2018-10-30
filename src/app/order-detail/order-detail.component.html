@@ -1,83 +1,65 @@
-<div id="render-container">
-  <span>{{ order?.companyName }}</span> - <span>{{ order?.contactPerson }}</span> - <span>{{ order?.location }}</span>
-
-<hr>
-
-  <form [formGroup]="timeRecordForm" (ngSubmit)="onSubmit(timeRecordForm)">
-    <div formArrayName="time_records">
-      <table class="table">
-        <th *ngFor="let col of columns">
-          {{col}}
-        </th>
-        <tr *ngFor="let item of timeRecords.controls; let pointIndex = index" [formGroupName]="pointIndex">
-          <td>
-            <mat-form-field>
-              <input matInput [matDatepicker]="picker" placeholder="Choose Date" id="date" name="date" formControlName="date"
-                (click)="picker.open()" autocomplete="off" required>
-              <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-              <mat-datepicker #picker></mat-datepicker>
-            </mat-form-field>
-          </td>
-          <td>
-            <mat-form-field>
-              <input matInput formControlName="description" placeholder="Description" autocomplete="off" required />
-              <mat-error *ngFor="let validation of form_validation_messages.description">
-                <mat-error class="error-message" *ngIf="item.controls.description.hasError(validation.type) && (item.controls.description.dirty || item.controls.description.touched)">{{validation.message}}</mat-error>
-              </mat-error>
-            </mat-form-field>
-          </td>
-          <td>
-            <mat-form-field>
-              <input matInput type="number" step="0.25" value=0.00 formControlName="workingHours" placeholder="Time" autocomplete="off" required />
-              <mat-error *ngFor="let validation of form_validation_messages.time">
-                <mat-error class="error-message" *ngIf="item.controls.time.hasError(validation.type) && (item.controls.time.dirty || item.controls.time.touched)">{{validation.message}}</mat-error>
-              </mat-error>
-            </mat-form-field>
-          </td>
-          <td>
-            <button mat-icon-button>
-              <i class="material-icons" (click)="deleteRecord(item.value.id, pointIndex)">
-                delete
-              </i>
-            </button>
-          </td>
-        </tr>
-      </table>
+<div id="detail-component-wrapper">
+  <div class="sub-nav">
+    <div class="sub-nav-btn">
+      <mat-icon (click)="navigateToOrderList()" class="navigate-before-icon float-left">navigate_before</mat-icon>
     </div>
 
-    <input type="text" readonly="true" value="{{totalTime}}" class="float-right">
-
-    <br>
-    <button type="submit" mat-fab class="add-record-btn float-left" [disabled]="!timeRecordForm.valid">
-      <i class="material-icons">send</i>
+    <button class="sub-nav-btn" (click)="documentEditForm.ngSubmit.emit()" [disabled]="!documentEditForm.form.valid">
+      <mat-icon class="order-complete-icon float-right">check</mat-icon>
     </button>
-    <br>
-    <br>
+  </div>
 
-  </form>
+  <div id="detail-component-content">
+    <div class="customer-info">
+      Kunde: {{ order?.companyName }} / Ansprechpartner: {{ order?.contactPerson }} / Ort: {{ order?.location }}
+    </div>
 
-  <br>
-
-   <button mat-fab class="add-record-btn float-right disabled" (click)="addEmptyControl()">
-    <i class="material-icons">add</i>
-  </button>
-  <button (click)="createPdfFromJson()">Create Pdf</button>
-
-  <button (click)="getOrders()">Get Orders</button>
-
-  <button (click)="getOrderById()">Order By Id</button>
-
-  <br>
-
-  {{ this.timeRecordForm.value | json }}
+    <form id="record-form" [formGroup]="timeRecordForm" #documentEditForm="ngForm" (ngSubmit)="onSubmit()">
+      <div formArrayName="time_records">
+        <table class="table">
+          <th *ngFor="let col of columns">
+            {{col}}
+          </th>
+          <tr *ngFor="let item of timeRecords.controls; let pointIndex = index" [formGroupName]="pointIndex" data-id="{{item.value.id}}">
+            <td>
+              <mat-form-field>
+                <input matInput [matDatepicker]="picker" placeholder="Datum wählen" id="date" name="date"
+                  formControlName="date" (click)="picker.open()" autocomplete="off" required>
+                <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                <mat-datepicker #picker></mat-datepicker>
+              </mat-form-field>
+            </td>
+            <td>
+              <mat-form-field>
+                <input matInput formControlName="description" placeholder="Art der Arbeit" autocomplete="off" required />
+                <mat-error *ngFor="let validation of form_validation_messages.description">
+                  <mat-error class="error-message" *ngIf="item.controls.description.hasError(validation.type) && (item.controls.description.dirty || item.controls.description.touched)">{{validation.message}}</mat-error>
+                </mat-error>
+              </mat-form-field>
+            </td>
+            <td>
+              <mat-form-field>
+                <input matInput type="number" step="0.25" formControlName="workingHours" placeholder="Arbeitsstunden"
+                  autocomplete="off" required />
+                <mat-error *ngFor="let validation of form_validation_messages.time">
+                  <mat-error class="error-message" *ngIf="item.controls.time.hasError(validation.type) && (item.controls.time.dirty || item.controls.time.touched)">{{validation.message}}</mat-error>
+                </mat-error>
+              </mat-form-field>
+            </td>
+            <td>
+              <button mat-icon-button>
+                <i class="material-icons" (click)="deleteFormGroup(item.value.id, pointIndex)">
+                  delete
+                </i>
+              </button>
+            </td>
+          </tr>
+        </table>
+      </div>
+      <input type="text" readonly="true" value="{{totalTime}}" class="float-right">
+    </form>
+    <button mat-fab class="add-record-btn float-left disabled" (click)="addEmptyControl()">
+      <i class="material-icons">add</i>
+    </button>
+  </div>
 </div>
-
-<hr>
-
-<hr>
-
-<ul *ngFor="let record of records">
-  <li> {{record.workingHours }}</li>
-
-</ul>
-
