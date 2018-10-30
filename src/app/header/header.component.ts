@@ -7,14 +7,12 @@ import { Component, OnInit } from '@angular/core';
 })
 export class HeaderComponent implements OnInit {
   public navLinks = [
-    { path: '', label: 'Aufträge' },
-    { path: '/create-order', label: 'Neuer Auftrag' },
-    { path: '/search', label: 'Suchen' },
+    { path: '', label: '' }
+    // { path: '/create-order', label: 'Neuer Auftrag' },
+    // { path: '/search', label: 'Suchen' }
   ];
 
-  constructor() { }
+  constructor() {}
 
-  ngOnInit() {
-  }
-
+  ngOnInit() {}
 }
