@@ -31,8 +31,15 @@ export class CreateOrderComponent implements OnInit {
 
   ngOnInit() {}
 
+  public navigateToOrderList() {
+    this.router.navigate(['/']);
+  }
+
   public showSuccess() {
-    const successConfig = { positionClass: 'toast-bottom-center', timeout: 2000 };
+    const successConfig = {
+      positionClass: 'toast-bottom-center',
+      timeout: 2000
+    };
     this.toastr.success('Erfolgreich erstellt', 'Auftrag', successConfig);
   }
 
