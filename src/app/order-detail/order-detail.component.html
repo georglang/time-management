@@ -4,7 +4,7 @@
       <mat-icon (click)="navigateToOrderList()" class="navigate-before-icon float-left">navigate_before</mat-icon>
     </div>
 
-    <button class="sub-nav-btn" (click)="documentEditForm.ngSubmit.emit()" [disabled]="!documentEditForm.form.valid">
+    <button type="button" class="sub-nav-btn" (click)="documentEditForm.ngSubmit.emit()" [disabled]="!documentEditForm.form.valid">
       <mat-icon class="order-complete-icon float-right">check</mat-icon>
     </button>
   </div>
@@ -47,7 +47,7 @@
               </mat-form-field>
             </td>
             <td>
-              <button mat-icon-button>
+              <button type="button" mat-icon-button>
                 <i class="material-icons" (click)="deleteFormGroup(item.value.id, pointIndex)">
                   delete
                 </i>
@@ -58,7 +58,7 @@
       </div>
       <input type="text" readonly="true" value="{{totalTime}}" class="float-right">
     </form>
-    <button mat-fab class="add-record-btn float-left disabled" (click)="addEmptyControl()">
+    <button type="button" mat-fab class="add-record-btn float-left disabled" (click)="addEmptyControl()">
       <i class="material-icons">add</i>
     </button>
   </div>

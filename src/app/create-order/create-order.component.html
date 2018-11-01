@@ -3,7 +3,7 @@
     <mat-icon (click)="navigateToOrderList()" class="navigate-before-icon float-left">navigate_before</mat-icon>
   </div>
 
-  <button class="sub-nav-btn" (click)="documentEditForm.ngSubmit.emit()" [disabled]="!documentEditForm.form.valid">
+  <button type="button" class="sub-nav-btn" (click)="documentEditForm.ngSubmit.emit()" [disabled]="!documentEditForm.form.valid">
     <mat-icon class="order-complete-icon float-right">check</mat-icon>
   </button>
 </div>
@@ -32,7 +32,7 @@
             type="text" />
         </mat-form-field>
       </fieldset>
-      <!-- <button class="btn btn-sm" type="submit">
+      <!-- <button type="button" class="btn btn-sm" type="submit">
         Submit
       </button> -->
     </form>
