@@ -86,33 +86,22 @@ export class IndexDBService {
   }
 
   public modifyOrder(record, orderId) {
-    console.log('Modify RECORD', record);
-
     return this.timeRecordsDb.orders
       .where('id')
       .equals(orderId)
       .toArray(order => {
         const records = order[0].records;
-
         for (let index = 0; index < records.length; index++) {
           const element = records[index];
           if (record.id === element.id) {
             if (!_.isEqual(record, element)) {
               records.splice(index, 1);
-
-              console.log('Spliced RECORDS', records);
-
               order[0].records.push(record);
-              console.log('Order', order[0]);
               this.timeRecordsDb.orders
                 .where('id')
                 .equals(orderId)
                 .modify((value, ref) => {
-                  console.log('Value', value);
-                  console.log('Ref', ref);
                   ref.value.records = records;
-                  console.log('New REF', ref);
-
                 });
             }
           }
