@@ -122,10 +122,14 @@ export class OrderDetailComponent implements OnInit {
         if (!record.hasOwnProperty('id') || record.id === '') {
           record.id = this.createUniqueId();
           this.indexDbService.addRecordToOrder(record, this.paramId);
+        } else {
+          this.indexDbService.modifyOrder(record, this.paramId);
         }
       }
     }
   }
+
+
 
   get timeRecords() {
     return this.timeRecordForm.get('time_records') as FormArray;
@@ -141,6 +145,8 @@ export class OrderDetailComponent implements OnInit {
     this.indexDbService.getAllOrders().then(data => {});
   }
 
+
+
   public getOrderById(orderId) {
     this.indexDbService.getOrderById(orderId).then(order => {
       console.log('Order', order[0]);
@@ -150,7 +156,6 @@ export class OrderDetailComponent implements OnInit {
           this.records = order[0].records;
           if (this.records.length > 0) {
             this.records.forEach(record => {
-              console.log('Record: ', record);
               if (record.id !== undefined) {
                 this.hasId = true;
               } else {
