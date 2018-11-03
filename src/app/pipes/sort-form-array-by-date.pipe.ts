@@ -12,9 +12,9 @@ export class SortFormArrayByDate implements PipeTransform {
         const bValue = b.controls[args].value;
 
         if (aValue < bValue) {
-          return -1;
-        } else if (aValue > bValue) {
           return 1;
+        } else if (aValue > bValue) {
+          return -1;
         } else {
           return 0;
         }
