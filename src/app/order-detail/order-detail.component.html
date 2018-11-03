@@ -20,7 +20,7 @@
           <th *ngFor="let col of columns">
             {{col}}
           </th>
-          <tr *ngFor="let item of timeRecords.controls; let pointIndex = index" [formGroupName]="pointIndex" data-id="{{item.value.id}}">
+          <tr *ngFor="let item of timeRecords.controls | sortFormArrayByDate: 'date'; let pointIndex = index" [formGroupName]="pointIndex" data-id="{{item.value.id}}">
             <td>
               <mat-form-field>
                 <input matInput [matDatepicker]="picker" placeholder="Datum wählen" id="date" name="date"
