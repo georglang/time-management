@@ -10,6 +10,9 @@ import { environment } from '../environments/environment';
 import {AppRoutingModule} from './router/app.routing.module';
 import { ToastrModule } from 'ngx-toastr';
 
+// pipes
+import { SortFormArrayByDate } from './pipes/sort-form-array-by-date.pipe';
+
 
 // Angular Material
 import {
@@ -29,7 +32,6 @@ import {
 
 // components
 import { OrderListComponent } from './order-list/order-list.component';
-import { SearchComponent } from './search/search.component';
 import { HeaderComponent } from './header/header.component';
 import { IndexDBService } from './service/index-db.service';
 import { Database } from './database/Database';
@@ -40,10 +42,10 @@ import { OrderDetailComponent } from './order-detail/order-detail.component';
   declarations: [
     AppComponent,
     OrderListComponent,
-    SearchComponent,
     HeaderComponent,
     CreateOrderComponent,
     OrderDetailComponent,
+    SortFormArrayByDate
   ],
   imports: [
     BrowserModule,
@@ -68,7 +70,8 @@ import { OrderDetailComponent } from './order-detail/order-detail.component';
   ],
   providers: [
     IndexDBService,
-    Database
+    Database,
+    SortFormArrayByDate,
   ],
   bootstrap: [AppComponent]
 })
