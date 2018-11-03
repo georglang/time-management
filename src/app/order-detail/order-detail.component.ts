@@ -21,15 +21,10 @@ export class OrderDetailComponent implements OnInit {
   public totalTime = 0.0;
   private order: IOrder;
   public records: TimeRecord[];
-  public hans = [];
-  public hasId = false;
-
   public lastId: number;
 
   public form_validation_messages = {
-    description: [
-      { type: 'required', message: 'Bitte Art der Arbeit eintragen' }
-    ],
+    description: [{ type: 'required', message: 'Bitte Art der Arbeit eintragen' }],
     workingHours: [{ type: 'required', message: 'Bitte Stunden eintragen' }]
   };
 
@@ -114,8 +109,7 @@ export class OrderDetailComponent implements OnInit {
   }
 
   public onSubmit(timeRecordForm: FormGroup) {
-    const recordsFromFormInput = this.timeRecordForm.controls.time_records
-      .value;
+    const recordsFromFormInput = this.timeRecordForm.controls.time_records.value;
     if (recordsFromFormInput !== undefined) {
       for (let index = 0; index < recordsFromFormInput.length; index++) {
         const record = recordsFromFormInput[index];
@@ -128,8 +122,6 @@ export class OrderDetailComponent implements OnInit {
       }
     }
   }
-
-
 
   get timeRecords() {
     return this.timeRecordForm.get('time_records') as FormArray;
@@ -145,8 +137,6 @@ export class OrderDetailComponent implements OnInit {
     this.indexDbService.getAllOrders().then(data => {});
   }
 
-
-
   public getOrderById(orderId) {
     this.indexDbService.getOrderById(orderId).then(order => {
       console.log('Order', order[0]);
@@ -156,13 +146,6 @@ export class OrderDetailComponent implements OnInit {
           this.records = order[0].records;
           if (this.records.length > 0) {
             this.records.forEach(record => {
-              if (record.id !== undefined) {
-                this.hasId = true;
-              } else {
-                this.hasId = false;
-              }
-
-              console.log('HAS ID', this.hasId);
               this.addControl(record);
             });
           }
