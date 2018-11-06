@@ -37,5 +37,74 @@
 th
   display: none
 
+td
+  border-top: 0px
+
 #record-form
   margin-top: 40px
+
+.customer-info
+  width: 100%
+  height: 48px
+  box-shadow: 0px 2px 15px 0px rgba(0, 0, 0, 0.12)
+  color: #000
+  padding-top: 10px
+  padding-left: 14px
+  .customer
+    font-weight: bold
+    span
+      font-weight: normal
+      padding-left: 6px
+  .contact-person
+    font-weight: bold
+    margin-left: 20px
+    span
+      font-weight: normal
+      padding-left: 6px
+  .location
+    font-weight: bold
+    margin-left: 20px
+    span
+      font-weight: normal
+      padding-left: 6px
+
+#add-record-btn
+  position: absolute
+  bottom: 16px
+  right: 16px
+  background-color: #5fb345
+
+
+.table-responsive-stack
+  tr
+    display: -webkit-box
+    display: -ms-flexbox
+    display: flex
+    -webkit-box-orient: horizontal
+    -webkit-box-direction: normal
+    -ms-flex-direction: row
+    flex-direction: row
+  th
+    display: none
+  td
+    display: block
+    /*
+     flex-grow | flex-shrink | flex-basis */
+    -ms-flex: 1 1 auto
+    flex: 1 1 auto
+  .table-responsive-stack-thead
+    font-weight: bold
+
+@media screen and (max-width: 576px)
+  .table-responsive-stack
+    tr
+      -webkit-box-orient: vertical
+      -webkit-box-direction: normal
+      -ms-flex-direction: column
+      flex-direction: column
+      border-bottom: 3px solid #ccc
+      display: block
+    td
+      float: left\9
+      width: 100%
+  /*  IE9 FIX

@@ -11,20 +11,37 @@
 
   <div id="detail-component-content">
     <div class="customer-info">
-      Kunde: {{ order?.companyName }} / Ansprechpartner: {{ order?.contactPerson }} / Ort: {{ order?.location }}
+      <span class="customer">Kunde:
+        <span>
+          {{ order?.companyName }}
+        </span>
+      </span>
+      <span class="contact-person">
+        Ansprechpartner:
+        <span>
+          {{ order?.contactPerson }}
+        </span>
+      </span>
+      <span class="location">
+        Ort:
+        <span>
+          {{ order?.location }}
+        </span>
+      </span>
     </div>
 
     <form id="record-form" [formGroup]="timeRecordForm" #documentEditForm="ngForm" (ngSubmit)="onSubmit()">
       <div formArrayName="time_records">
-        <table class="table">
+        <table class="table table-bordered table-striped table-responsive-stack"  id="tableOne">
           <th *ngFor="let col of columns">
             {{col}}
           </th>
-          <tr *ngFor="let item of timeRecords.controls | sortFormArrayByDate: 'date'; let pointIndex = index" [formGroupName]="pointIndex" data-id="{{item.value.id}}">
+          <tr *ngFor="let item of timeRecords.controls | sortFormArrayByDate: 'date'; let pointIndex = index" [formGroupName]="pointIndex"
+            data-id="{{item.value.id}}">
             <td>
               <mat-form-field>
-                <input matInput [matDatepicker]="picker" placeholder="Datum wählen" id="date" name="date"
-                  formControlName="date" (click)="picker.open()" autocomplete="off" required>
+                <input matInput [matDatepicker]="picker" placeholder="Datum wählen" id="date" name="date" formControlName="date" (click)="picker.open()"
+                  autocomplete="off" required>
                 <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
                 <mat-datepicker #picker></mat-datepicker>
               </mat-form-field>
@@ -39,8 +56,8 @@
             </td>
             <td>
               <mat-form-field>
-                <input matInput type="number" step="0.25" formControlName="workingHours" placeholder="Arbeitsstunden"
-                  autocomplete="off" required />
+                <input matInput type="number" step="0.25" formControlName="workingHours" placeholder="Arbeitsstunden" autocomplete="off"
+                  required />
                 <mat-error *ngFor="let validation of form_validation_messages.time">
                   <mat-error class="error-message" *ngIf="item.controls.time.hasError(validation.type) && (item.controls.time.dirty || item.controls.time.touched)">{{validation.message}}</mat-error>
                 </mat-error>
@@ -58,7 +75,7 @@
       </div>
       <input type="text" readonly="true" value="{{totalTime}}" class="float-right">
     </form>
-    <button type="button" mat-fab class="add-record-btn float-left disabled" (click)="addEmptyControl()">
+    <button id="add-record-btn" type="button" mat-fab (click)="addEmptyControl()">
       <i class="material-icons">add</i>
     </button>
   </div>

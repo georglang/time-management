@@ -3,8 +3,9 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
 import { IndexDBService } from '../service/index-db.service';
 import { DateAdapter } from '@angular/material';
-import { TimeRecord } from '../data-classes/time-record';
+import { TimeRecord, ITimeRecord } from '../data-classes/time-record';
 import { IOrder } from '../data-classes/order';
+import {MatTableDataSource} from '@angular/material';
 
 @Component({
   selector: 'app-order-detail',
@@ -22,6 +23,8 @@ export class OrderDetailComponent implements OnInit {
   private order: IOrder;
   public records: TimeRecord[];
   public lastId: number;
+  public displayedColumns = ['date', 'description', 'workingHours'];
+  public dataSource;
 
   public form_validation_messages = {
     description: [{ type: 'required', message: 'Bitte Art der Arbeit eintragen' }],
@@ -108,6 +111,7 @@ export class OrderDetailComponent implements OnInit {
     return ID();
   }
 
+  //
   public onSubmit(timeRecordForm: FormGroup) {
     const recordsFromFormInput = this.timeRecordForm.controls.time_records.value;
     if (recordsFromFormInput !== undefined) {
@@ -144,6 +148,14 @@ export class OrderDetailComponent implements OnInit {
         if (order[0].hasOwnProperty('records')) {
           this.order = order[0];
           this.records = order[0].records;
+
+          this.dataSource = new MatTableDataSource<ITimeRecord>(this.records);
+
+          console.log('Records', this.records);
+
+          console.log('Data Source', this.dataSource);
+
+
           if (this.records.length > 0) {
             this.records.forEach(record => {
               this.addControl(record);
