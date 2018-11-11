@@ -1,0 +1,46 @@
+<div id="edit-record-wrapper">
+  <div class="sub-nav">
+    <div class="sub-nav-btn">
+      <mat-icon (click)="navigateToOrderList()" class="navigate-before-icon float-left">navigate_before</mat-icon>
+    </div>
+
+    <button type="button" class="sub-nav-btn" (click)="documentEditForm.ngSubmit.emit()" [disabled]="!documentEditForm.form.valid">
+      <mat-icon class="order-complete-icon float-right">check</mat-icon>
+    </button>
+  </div>
+
+  <div id="create-record-content">
+    <form [formGroup]="createRecordForm" #documentEditForm="ngForm" (ngSubmit)="onSubmit()">
+      <fieldset class="form-group">
+        <mat-form-field>
+          <input matInput [matDatepicker]="picker" placeholder="Datum wählen" id="date" name="date" formControlName="date" (click)="picker.open()"
+            autocomplete="off" required>
+          <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+          <mat-datepicker #picker></mat-datepicker>
+        </mat-form-field>
+      </fieldset>
+
+      <fieldset class="form-group">
+        <mat-form-field>
+          <input matInput formControlName="description" placeholder="Art der Arbeit" autocomplete="off" required />
+          <!-- <mat-error *ngFor="let validation of form_validation_messages.description">
+            <mat-error class="error-message" *ngIf="item.controls.description.hasError(validation.type) && (item.controls.description.dirty || item.controls.description.touched)">{{validation.message}}</mat-error>
+          </mat-error> -->
+        </mat-form-field>
+      </fieldset>
+
+      <fieldset class="form-group">
+        <mat-form-field>
+          <input matInput type="number" step="0.25" formControlName="workingHours" placeholder="Arbeitsstunden" autocomplete="off"
+            required />
+          <!-- <mat-error *ngFor="let validation of form_validation_messages.time">
+            <mat-error class="error-message" *ngIf="item.controls.time.hasError(validation.type) && (item.controls.time.dirty || item.controls.time.touched)">{{validation.message}}</mat-error>
+          </mat-error> -->
+        </mat-form-field>
+      </fieldset>
+      <!-- <button type="button" class="btn btn-sm" type="submit">
+            Submit
+          </button> -->
+    </form>
+  </div>
+</div>
