@@ -92,8 +92,15 @@ td
      flex-grow | flex-shrink | flex-basis */
     -ms-flex: 1 1 auto
     flex: 1 1 auto
-  .table-responsive-stack-thead
-    font-weight: bold
+
+
+.mat-table
+  overflow: auto
+  max-height: 500px
+
+.mobile-label
+  display: none
+
 
 @media screen and (max-width: 576px)
   .table-responsive-stack
@@ -102,9 +109,18 @@ td
       -webkit-box-direction: normal
       -ms-flex-direction: column
       flex-direction: column
-      border-bottom: 3px solid #ccc
       display: block
     td
       float: left\9
       width: 100%
-  /*  IE9 FIX
+
+  .mobile-label
+    width: 80px
+    display: inline-block
+    font-weight: bold
+  .mat-header-row
+    display: none
+  .mat-row
+    flex-direction: column
+    align-items: start
+    padding: 8px 24px

@@ -1,82 +1,220 @@
+<!--
+  <div id="detail-component-wrapper">
+    <div class="sub-nav">
+      <div class="sub-nav-btn">
+        <mat-icon (click)="navigateToOrderList()" class="navigate-before-icon float-left">navigate_before</mat-icon>
+      </div>
+
+      <button type="button" class="sub-nav-btn" (click)="documentEditForm.ngSubmit.emit()" [disabled]="!documentEditForm.form.valid">
+        <mat-icon class="order-complete-icon float-right">check</mat-icon>
+      </button>
+    </div>
+
+    <div id="detail-component-content">
+      <div class="customer-info">
+        <span class="customer">Kunde:
+          <span>
+            {{ order?.companyName }}
+          </span>
+        </span>
+        <span class="contact-person">
+          Ansprechpartner:
+          <span>
+            {{ order?.contactPerson }}
+          </span>
+        </span>
+        <span class="location">
+          Ort:
+          <span>
+            {{ order?.location }}
+          </span>
+        </span>
+      </div>
+
+      <form id="record-form" [formGroup]="timeRecordForm" #documentEditForm="ngForm" (ngSubmit)="onSubmit()">
+        <div formArrayName="time_records">
+          <table class="table table-responsive-stack" id="tableOne">
+            <th *ngFor="let col of columns">
+              {{col}}
+            </th>
+            <tr *ngFor="let item of timeRecords.controls | sortFormArrayByDate: 'date'; let pointIndex = index" [formGroupName]="pointIndex"
+              data-id="{{item.value.id}}">
+              <td>
+                <mat-form-field>
+                  <input matInput [matDatepicker]="picker" placeholder="Datum wählen" id="date" name="date" formControlName="date" (click)="picker.open()"
+                    autocomplete="off" required>
+                  <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                  <mat-datepicker #picker></mat-datepicker>
+                </mat-form-field>
+              </td>
+              <td>
+                <mat-form-field>
+                  <input matInput formControlName="description" placeholder="Art der Arbeit" autocomplete="off" required />
+                  <mat-error *ngFor="let validation of form_validation_messages.description">
+                    <mat-error class="error-message" *ngIf="item.controls.description.hasError(validation.type) && (item.controls.description.dirty || item.controls.description.touched)">{{validation.message}}</mat-error>
+                  </mat-error>
+                </mat-form-field>
+              </td>
+              <td>
+                <mat-form-field>
+                  <input matInput type="number" step="0.25" formControlName="workingHours" placeholder="Arbeitsstunden" autocomplete="off"
+                    required />
+                  <mat-error *ngFor="let validation of form_validation_messages.time">
+                    <mat-error class="error-message" *ngIf="item.controls.time.hasError(validation.type) && (item.controls.time.dirty || item.controls.time.touched)">{{validation.message}}</mat-error>
+                  </mat-error>
+                </mat-form-field>
+              </td>
+              <td>
+                <button type="button" mat-icon-button>
+                  <i class="material-icons" (click)="deleteFormGroup(item.value.id, pointIndex)">
+                    delete
+                  </i>
+                </button>
+              </td>
+            </tr>
+          </table>
+        </div>
+        <input type="text" readonly="true" value="{{totalTime}}" class="float-right">
+      </form>
+      <button id="add-record-btn" type="button" mat-fab (click)="addEmptyControl()">
+        <i class="material-icons">add</i>
+      </button>
+    </div>
+  </div>
+
+  <br>
+  <br>
+
+  <div class="example-container mat-elevation-z8">
+    <mat-table #table [dataSource]="dataSource" [class.isMobile]="isMobile">
+
+      Note that these columns can be defined in any order.
+              The actual rendered columns are set as a property on the row definition"
+      <ng-container matColumnDef="id">
+        <mat-header-cell *matHeaderCellDef> Id</mat-header-cell>
+        <mat-cell *matCellDef="let element">
+          <span class="mobile-label">Id:</span>
+          {{element.id}}
+        </mat-cell>
+      </ng-container>
+
+      <ng-container matColumnDef="date">
+        <mat-header-cell *matHeaderCellDef> Datum</mat-header-cell>
+        <mat-cell *matCellDef="let element">
+          <span class="mobile-label">Datum:</span>
+          {{element.date | date: 'dd.MM.yyyy'}}
+
+        </mat-cell>
+      </ng-container>
+
+      <ng-container matColumnDef="description">
+        <mat-header-cell *matHeaderCellDef>Beschreibung </mat-header-cell>
+        <mat-cell *matCellDef="let element">
+          <span class="mobile-label">Beschreibung:</span>
+          {{element.description}}
+        </mat-cell>
+      </ng-container>
+
+      <ng-container matColumnDef="workingHours">
+        <mat-header-cell *matHeaderCellDef> Arbeitsstunden </mat-header-cell>
+        <mat-cell *matCellDef="let element">
+          <span class="mobile-label">Arbeitsstunden</span>
+          {{element.workingHours}}
+        </mat-cell>
+      </ng-container>
+
+      <ng-container matColumnDef="action">
+        <mat-header-cell *matHeaderCellDef>
+          Action
+        </mat-header-cell>
+        <mat-cell *matCellDef="let element">
+          <button mat-icon-button (click)="editRecord(element.id)">
+            <mat-icon>edit</mat-icon>
+          </button>
+          <button mat-icon-button>
+            <mat-icon>delete</mat-icon>
+          </button>
+        </mat-cell>
+      </ng-container>
+      <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+      <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+    </mat-table>
+
+    <a [routerLink]="['create-record']" routerLinkActive="active">Create</a>
+
+    <button id="" type="button" mat-fab (click)="createNewRecord()">
+      <i class="material-icons">add</i>
+    </button>
+  </div>
+-->
+
 <div id="detail-component-wrapper">
   <div class="sub-nav">
     <div class="sub-nav-btn">
-      <mat-icon (click)="navigateToOrderList()" class="navigate-before-icon float-left">navigate_before</mat-icon>
+      <mat-icon (click)="navigateToOrderList()" class="navigate-before-icon float-left"
+        >navigate_before</mat-icon
+      >
     </div>
 
-    <button type="button" class="sub-nav-btn" (click)="documentEditForm.ngSubmit.emit()" [disabled]="!documentEditForm.form.valid">
+    <button type="button" class="sub-nav-btn">
       <mat-icon class="order-complete-icon float-right">check</mat-icon>
     </button>
   </div>
 
   <div id="detail-component-content">
-    <div class="customer-info">
-      <span class="customer">Kunde:
-        <span>
-          {{ order?.companyName }}
-        </span>
-      </span>
-      <span class="contact-person">
-        Ansprechpartner:
-        <span>
-          {{ order?.contactPerson }}
-        </span>
-      </span>
-      <span class="location">
-        Ort:
-        <span>
-          {{ order?.location }}
-        </span>
-      </span>
-    </div>
 
-    <form id="record-form" [formGroup]="timeRecordForm" #documentEditForm="ngForm" (ngSubmit)="onSubmit()">
-      <div formArrayName="time_records">
-        <table class="table table-bordered table-striped table-responsive-stack"  id="tableOne">
-          <th *ngFor="let col of columns">
-            {{col}}
-          </th>
-          <tr *ngFor="let item of timeRecords.controls | sortFormArrayByDate: 'date'; let pointIndex = index" [formGroupName]="pointIndex"
-            data-id="{{item.value.id}}">
-            <td>
-              <mat-form-field>
-                <input matInput [matDatepicker]="picker" placeholder="Datum wählen" id="date" name="date" formControlName="date" (click)="picker.open()"
-                  autocomplete="off" required>
-                <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-                <mat-datepicker #picker></mat-datepicker>
-              </mat-form-field>
-            </td>
-            <td>
-              <mat-form-field>
-                <input matInput formControlName="description" placeholder="Art der Arbeit" autocomplete="off" required />
-                <mat-error *ngFor="let validation of form_validation_messages.description">
-                  <mat-error class="error-message" *ngIf="item.controls.description.hasError(validation.type) && (item.controls.description.dirty || item.controls.description.touched)">{{validation.message}}</mat-error>
-                </mat-error>
-              </mat-form-field>
-            </td>
-            <td>
-              <mat-form-field>
-                <input matInput type="number" step="0.25" formControlName="workingHours" placeholder="Arbeitsstunden" autocomplete="off"
-                  required />
-                <mat-error *ngFor="let validation of form_validation_messages.time">
-                  <mat-error class="error-message" *ngIf="item.controls.time.hasError(validation.type) && (item.controls.time.dirty || item.controls.time.touched)">{{validation.message}}</mat-error>
-                </mat-error>
-              </mat-form-field>
-            </td>
-            <td>
-              <button type="button" mat-icon-button>
-                <i class="material-icons" (click)="deleteFormGroup(item.value.id, pointIndex)">
-                  delete
-                </i>
-              </button>
-            </td>
-          </tr>
-        </table>
-      </div>
-      <input type="text" readonly="true" value="{{totalTime}}" class="float-right">
-    </form>
-    <button id="add-record-btn" type="button" mat-fab (click)="addEmptyControl()">
-      <i class="material-icons">add</i>
-    </button>
+    <div class="example-container mat-elevation-z8">
+      <mat-table #table [dataSource]="dataSource" [class.isMobile]="isMobile">
+        Note that these columns can be defined in any order. The actual rendered columns are set as
+        a property on the row definition"
+        <ng-container matColumnDef="id">
+          <mat-header-cell *matHeaderCellDef> Id</mat-header-cell>
+          <mat-cell *matCellDef="let element">
+            <span class="mobile-label">Id:</span> {{ element.id }}
+          </mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="date">
+          <mat-header-cell *matHeaderCellDef> Datum</mat-header-cell>
+          <mat-cell *matCellDef="let element">
+            <span class="mobile-label">Datum:</span> {{ element.date | date: 'dd.MM.yyyy' }}
+          </mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="description">
+          <mat-header-cell *matHeaderCellDef>Beschreibung </mat-header-cell>
+          <mat-cell *matCellDef="let element">
+            <span class="mobile-label">Beschreibung:</span> {{ element.description }}
+          </mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="workingHours">
+          <mat-header-cell *matHeaderCellDef> Arbeitsstunden </mat-header-cell>
+          <mat-cell *matCellDef="let element">
+            <span class="mobile-label">Arbeitsstunden</span> {{ element.workingHours }}
+          </mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="action">
+          <mat-header-cell *matHeaderCellDef> Action </mat-header-cell>
+          <mat-cell *matCellDef="let element">
+            <button mat-icon-button (click)="editRecord(element.id)">
+              <mat-icon>edit</mat-icon>
+            </button>
+            <button mat-icon-button><mat-icon>delete</mat-icon></button>
+          </mat-cell>
+        </ng-container>
+        <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+        <mat-row *matRowDef="let row; columns: displayedColumns"></mat-row>
+      </mat-table>
+
+      <button id="" type="button" mat-fab (click)="createNewRecord()">
+        <i class="material-icons">add</i>
+      </button>
+    </div>
   </div>
+
+  <hr>
+  <router-outlet></router-outlet>
+
 </div>
