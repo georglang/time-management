@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { MatSort, MatTableDataSource } from '@angular/material';
 import { IndexDBService } from '../service/index-db.service';
 import { Order } from './../data-classes/order';
@@ -17,7 +17,7 @@ export class OrderListComponent implements OnInit {
   @ViewChild(MatSort)
   sort: MatSort;
 
-  constructor(private indexDbService: IndexDBService, private router: Router) {}
+  constructor(private indexDbService: IndexDBService, private router: Router, private route: ActivatedRoute) {}
 
   public applyFilter(filterValue: string) {
     filterValue = filterValue.trim();
@@ -26,8 +26,8 @@ export class OrderListComponent implements OnInit {
   }
 
   getRecord(row: any) {
-    console.log('Row', row.id);
-    this.router.navigate(['/order-details/' + row.id]);
+    // this.router.navigate(['/order-details/' + row.id], { relativeTo: this.route});
+    this.router.navigate(['/order-details/' + row.id + '/detail']);
   }
 
   createOrder() {
