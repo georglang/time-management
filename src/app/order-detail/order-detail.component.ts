@@ -5,7 +5,7 @@ import { IndexDBService } from '../service/index-db.service';
 import { DateAdapter } from '@angular/material';
 import { TimeRecord, ITimeRecord } from '../data-classes/time-record';
 import { IOrder } from '../data-classes/order';
-import {MatTableDataSource} from '@angular/material';
+import { MatTableDataSource } from '@angular/material';
 
 @Component({
   selector: 'app-order-detail',
@@ -23,7 +23,7 @@ export class OrderDetailComponent implements OnInit {
   private order: IOrder;
   public records: TimeRecord[];
   public lastId: number;
-  public displayedColumns = ['date', 'description', 'workingHours'];
+  public displayedColumns = ['id', 'date', 'description', 'workingHours', 'action'];
   public dataSource;
 
   public form_validation_messages = {
@@ -155,7 +155,6 @@ export class OrderDetailComponent implements OnInit {
 
           console.log('Data Source', this.dataSource);
 
-
           if (this.records.length > 0) {
             this.records.forEach(record => {
               this.addControl(record);
@@ -165,4 +164,20 @@ export class OrderDetailComponent implements OnInit {
       }
     });
   }
+
+  public createNewRecord() {
+    console.log('Create Record ParamId', this.paramId);
+    // this.router.navigate(['create-record'], this.paramId);
+    this.router.navigate(['/order-details/' + this.paramId + /create-record/]);
+
+    //this.router.navigate(['/order-details/' + this.paramId + '/create-record']);
+  }
+
+  public editRecord(id: any) {
+    console.log('Row', id);
+    // this.router.navigate(['edit-record', id]);
+    this.router.navigate(['/order-details/' + this.paramId + /edit-record/ + id]);
+  }
+
+  public deleteRecord() {}
 }
