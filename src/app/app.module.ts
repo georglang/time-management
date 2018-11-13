@@ -27,7 +27,8 @@ import {
   MatMenuModule,
   MatToolbarModule,
   MatTabsModule,
-  MatTableModule
+  MatTableModule,
+  MatDialogModule
 } from '@angular/material';
 
 // components
@@ -37,6 +38,10 @@ import { IndexDBService } from './service/index-db.service';
 import { Database } from './database/Database';
 import { CreateOrderComponent } from './create-order/create-order.component';
 import { OrderDetailComponent } from './order-detail/order-detail.component';
+import { EditRecordComponent } from './edit-record/edit-record.component';
+import { CreateRecordComponent } from './create-record/create-record.component';
+import { OverviewComponent } from './overview/overview.component';
+import { ConfirmDeleteDialogComponent } from './confirm-delete-dialog/confirm-delete-dialog.component';
 
 @NgModule({
   declarations: [
@@ -45,7 +50,11 @@ import { OrderDetailComponent } from './order-detail/order-detail.component';
     HeaderComponent,
     CreateOrderComponent,
     OrderDetailComponent,
-    SortFormArrayByDate
+    SortFormArrayByDate,
+    EditRecordComponent,
+    CreateRecordComponent,
+    OverviewComponent,
+    ConfirmDeleteDialogComponent
   ],
   imports: [
     BrowserModule,
@@ -66,12 +75,16 @@ import { OrderDetailComponent } from './order-detail/order-detail.component';
     MatToolbarModule,
     MatTabsModule,
     MatTableModule,
+    MatDialogModule,
     ToastrModule.forRoot()
   ],
   providers: [
     IndexDBService,
     Database,
     SortFormArrayByDate,
+  ],
+  entryComponents: [
+    ConfirmDeleteDialogComponent
   ],
   bootstrap: [AppComponent]
 })
