@@ -1,11 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
+import { MatTableDataSource, MatDialog, MatDialogConfig } from '@angular/material';
+
 import { IndexDBService } from '../service/index-db.service';
 import { DateAdapter } from '@angular/material';
 import { TimeRecord, ITimeRecord } from '../data-classes/time-record';
 import { IOrder } from '../data-classes/order';
-import { MatTableDataSource } from '@angular/material';
+import { ConfirmDeleteDialogComponent } from './../confirm-delete-dialog/confirm-delete-dialog.component';
+import { ToastrService, Toast } from 'ngx-toastr';
 
 @Component({
   selector: 'app-order-detail',
@@ -36,7 +39,9 @@ export class OrderDetailComponent implements OnInit {
     private router: Router,
     private formBuilder: FormBuilder,
     private dateAdapter: DateAdapter<Date>,
-    private indexDbService: IndexDBService
+    private indexDbService: IndexDBService,
+    private toastrService: ToastrService,
+    public dialog: MatDialog
   ) {
     this.dateAdapter.setLocale('de');
     this.columns = ['Date', 'Description', 'Time', 'Delete'];
@@ -132,7 +137,7 @@ export class OrderDetailComponent implements OnInit {
   }
 
   public deleteFormGroup(recordId: string, position: number) {
-    this.indexDbService.removeRecord(recordId, this.paramId).then(data => {
+    this.indexDbService.deleteRecord(recordId, this.paramId).then(data => {
       this.timeRecords.removeAt(position);
     });
   }
@@ -179,5 +184,48 @@ export class OrderDetailComponent implements OnInit {
     this.router.navigate(['/order-details/' + this.paramId + /edit-record/ + id]);
   }
 
-  public deleteRecord() {}
+  public deleteRecord(recordId) {
+    this.openConfirmDialog(recordId);
+  }
+
+  public showDeleteMessage() {
+    const successConfig = {
+      positionClass: 'toast-bottom-center',
+      timeout: 2000
+    };
+    this.toastrService.error('Erfolgreich gelöscht', 'Eintrag', successConfig);
+  }
+
+  public showSuccessMessage() {
+    const successConfig = {
+      positionClass: 'toast-bottom-center',
+      timeout: 2000
+    };
+    this.toastrService.success('Erfolgreich erstellt', 'Eintrag', successConfig);
+  }
+
+  openConfirmDialog(recordId) {
+    const dialogConfig = new MatDialogConfig();
+    dialogConfig.disableClose = true;
+    dialogConfig.autoFocus = true;
+    dialogConfig.data = {
+      id: 1,
+      title: 'Eintrag Löschen'
+    };
+    const dialogRef = this.dialog.open(ConfirmDeleteDialogComponent, dialogConfig);
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.indexDbService.deleteRecord(this.paramId, recordId).then(data => {
+
+          console.log('Data', data);
+          this.getOrderById(this.paramId);
+          this.showDeleteMessage();
+        });
+
+      }
+
+      console.log('Dialog geschlossen');
+      console.log('RESULT: ', result);
+    });
+  }
 }

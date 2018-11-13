@@ -201,7 +201,7 @@
             <button mat-icon-button (click)="editRecord(element.id)">
               <mat-icon>edit</mat-icon>
             </button>
-            <button mat-icon-button><mat-icon>delete</mat-icon></button>
+            <button mat-icon-button (click)="deleteRecord(element.id)"><mat-icon>delete</mat-icon></button>
           </mat-cell>
         </ng-container>
         <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
