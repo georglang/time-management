@@ -5,7 +5,6 @@ import { CreateOrderComponent } from '../create-order/create-order.component';
 import { OrderDetailComponent } from '../order-detail/order-detail.component';
 import { EditRecordComponent } from '../edit-record/edit-record.component';
 import { CreateRecordComponent } from '../create-record/create-record.component';
-import { OverviewComponent } from '../overview/overview.component';
 
 const appRoutes = [
   { path: '', component: OrderListComponent },
