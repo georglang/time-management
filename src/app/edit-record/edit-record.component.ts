@@ -1,15 +1,16 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Inject } from '@angular/core';
 import { FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { IndexDBService } from './../service/index-db.service';
 import { TimeRecord } from './../data-classes/time-record';
-import { DateAdapter } from '@angular/material';
+import { DateAdapter, MAT_DIALOG_DATA } from '@angular/material';
 
 @Component({
   selector: 'app-edit-record',
   templateUrl: './edit-record.component.html',
   styleUrls: ['./edit-record.component.sass']
 })
+
 export class EditRecordComponent implements OnInit {
   public editRecordForm: FormGroup;
   private recordId: string;
@@ -43,13 +44,19 @@ export class EditRecordComponent implements OnInit {
       this.orderId = parseInt(url, 2);
     });
 
-    if (this.recordId !== undefined && this.orderId !== undefined) {
-      this.getOrderById(this.orderId, this.recordId);
-    }
+    this.getOrderById(this.orderId, this.recordId);
+    this.getRecordById(this.orderId, this.recordId);
   }
 
   public navigateToOrderList() {
     this.router.navigate(['/order-details', this.orderId]);
+  }
+
+  public getRecordById(orderId: number, recordId: string) {
+    this.indexedDB.getRecordById(orderId, recordId)
+      .then((record) => {
+      console.log('REEEEECORD', record);
+    });
   }
 
   public getOrderById(orderId: number, recordId: string) {
