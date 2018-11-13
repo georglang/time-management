@@ -73,7 +73,11 @@ export class CreateRecordComponent implements OnInit {
         } else {
           record.id = '1';
         }
-        this.indexDbService.addRecordToOrder(record, this.paramId);
+        this.indexDbService.addRecordToOrder(record, this.paramId)
+          .then((data) => {
+            this.showSuccess();
+            this.navigateToOrderList();
+          });
       });
     } else {
       this.indexDbService.modifyOrder(record, this.paramId);
