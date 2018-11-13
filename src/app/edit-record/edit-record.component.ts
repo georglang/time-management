@@ -12,6 +12,7 @@ import _ from 'lodash';
 export class EditRecordComponent implements OnInit {
   public editRecordForm: FormGroup;
   private paramId;
+  private orderIdFromUrl;
 
   constructor(
     private formBuilder: FormBuilder,
@@ -31,16 +32,19 @@ export class EditRecordComponent implements OnInit {
     this.route.params.subscribe(params => {
       this.paramId = +params['id'];
       console.log('Params', this.paramId);
-
     });
 
-    this.route.data.subscribe(params => console.log('Params', params));
+    this.route.parent.url.subscribe((urlPath) => {
+      this.orderIdFromUrl = urlPath[urlPath.length - 1].path;
+      console.log('URL Path', this.orderIdFromUrl);
+
+    });
 
     this.getOrderById(1, this.paramId);
   }
 
   public navigateToOrderList() {
-    this.router.navigate(['/order-details', this.paramId]);
+    this.router.navigate(['/order-details', this.orderIdFromUrl]);
   }
 
   onSubmit() {
