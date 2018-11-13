@@ -13,8 +13,6 @@ export class IndexDBService {
     this.isAlreadyInDB = false;
   }
 
-  public getRecordId() {}
-
   public createUniqueId() {
     const ID = () => {
       const array = new Uint32Array(8);
@@ -29,7 +27,7 @@ export class IndexDBService {
   }
 
   public addRecordToOrder(record, orderId) {
-    this.timeRecordsDb.orders
+    return this.timeRecordsDb.orders
       .where('id')
       .equals(orderId)
       .toArray(orders => {
@@ -76,6 +74,21 @@ export class IndexDBService {
       });
   }
 
+  public getRecordById(orderId: number, recordId: string): Promise<any> {
+    return this.getAllRecords(orderId);
+
+    //   .then(records => {
+    //   console.log('AAAALLLL RECORDS', records);
+    //   console.log('RecordId', recordId);
+
+    //   records.forEach(record => {
+    //     if (record.id === recordId) {
+    //       return record;
+    //     }
+    //   });
+    // });
+  }
+
   public getOrderById(paramId: number) {
     return this.timeRecordsDb.orders
       .where('id')
@@ -109,7 +122,7 @@ export class IndexDBService {
       });
   }
 
-  public removeRecord(recordId, orderId) {
+  public deleteRecord(orderId, recordId) {
     return this.timeRecordsDb.orders
       .where('id')
       .equals(orderId)
@@ -126,6 +139,19 @@ export class IndexDBService {
                 _order.records = records;
               });
           }
+        }
+      });
+  }
+
+  public getAllRecords(orderId) {
+    return this.timeRecordsDb.orders
+      .where('id')
+      .equals(orderId)
+      .toArray(order => {
+        console.log('GetAll REcords', order);
+        if (order.length !== 0) {
+          const records: TimeRecord[] = order[0].records;
+          return records;
         }
       });
   }
