@@ -17,7 +17,11 @@ export class OrderListComponent implements OnInit {
   @ViewChild(MatSort)
   sort: MatSort;
 
-  constructor(private indexDbService: IndexDBService, private router: Router, private route: ActivatedRoute) {}
+  constructor(
+    private indexDbService: IndexDBService,
+    private router: Router,
+    private route: ActivatedRoute,
+  ) { }
 
   public applyFilter(filterValue: string) {
     filterValue = filterValue.trim();
@@ -27,7 +31,7 @@ export class OrderListComponent implements OnInit {
 
   getRecord(row: any) {
     // this.router.navigate(['/order-details/' + row.id], { relativeTo: this.route});
-    this.router.navigate(['/order-details/' + row.id + '/detail']);
+    this.router.navigate(['/order-details/' + row.id]);
   }
 
   createOrder() {
