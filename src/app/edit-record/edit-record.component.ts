@@ -2,7 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { IndexDBService } from './../service/index-db.service';
-import _ from 'lodash';
+import { TimeRecord } from './../data-classes/time-record';
+import { DateAdapter } from '@angular/material';
 
 @Component({
   selector: 'app-edit-record',
@@ -11,15 +12,19 @@ import _ from 'lodash';
 })
 export class EditRecordComponent implements OnInit {
   public editRecordForm: FormGroup;
-  private paramId;
-  private orderIdFromUrl;
+  private recordId: string;
+  private orderId: number;
+  private record: TimeRecord;
 
   constructor(
     private formBuilder: FormBuilder,
     private router: Router,
     private route: ActivatedRoute,
-    private indexedDB: IndexDBService
-  ) { }
+    private indexedDB: IndexDBService,
+    private dateAdapter: DateAdapter<Date>
+  ) {
+    this.dateAdapter.setLocale('de');
+  }
 
   ngOnInit() {
     this.editRecordForm = this.formBuilder.group({
@@ -30,43 +35,50 @@ export class EditRecordComponent implements OnInit {
     });
 
     this.route.params.subscribe(params => {
-      this.paramId = +params['id'];
-      console.log('Params', this.paramId);
+      this.recordId = params['id'];
     });
 
-    this.route.parent.url.subscribe((urlPath) => {
-      this.orderIdFromUrl = urlPath[urlPath.length - 1].path;
-      console.log('URL Path', this.orderIdFromUrl);
-
+    this.route.parent.url.subscribe(urlPath => {
+      const url = urlPath[urlPath.length - 1].path;
+      this.orderId = parseInt(url, 2);
     });
 
-    this.getOrderById(1, this.paramId);
+    if (this.recordId !== undefined && this.orderId !== undefined) {
+      this.getOrderById(this.orderId, this.recordId);
+    }
   }
 
   public navigateToOrderList() {
-    this.router.navigate(['/order-details', this.orderIdFromUrl]);
+    this.router.navigate(['/order-details', this.orderId]);
   }
 
-  onSubmit() {
+  public getOrderById(orderId: number, recordId: string) {
+    this.indexedDB.getOrderById(orderId).then(order => {
+      if (order.length !== 0) {
+        if (order[0].hasOwnProperty('records')) {
+          const _order = order[0];
+          if (order !== undefined) {
+            const records = order[0].records;
+            if (records.length !== 0) {
+              records.forEach(element => {
+                if (element.id === recordId) {
+                  this.setControl(element);
+                  return element;
+                }
+              });
+            }
+          }
+        }
+      }
+    });
   }
 
-  public getOrderById(orderId, recordId) {
-
-console.log('RecordId', recordId);
-
-
-    this.indexedDB.getOrderById(1)
-      .then((order => {
-        const records = order[0].records;
-        console.log('Records', records);
-
-        const test = _.find(records, ['id', recordId]);
-        console.log('Record', test);
-        const foundRecord = records.find(record => record.id === recordId);
-        console.log('Found', foundRecord);
-
-
-      }));
+  public setControl(record: TimeRecord) {
+    this.editRecordForm.controls['id'].setValue(record.id);
+    this.editRecordForm.controls['date'].setValue(record.date);
+    this.editRecordForm.controls['description'].setValue(record.description);
+    this.editRecordForm.controls['workingHours'].setValue(record.workingHours);
   }
 
+  onSubmit() {}
 }
