@@ -162,9 +162,14 @@
   </div>
 
   <div id="detail-component-content">
-
     <div class="example-container mat-elevation-z8">
-      <mat-table #table [dataSource]="dataSource" matSort *ngIf="dataSource.data.length > 0" [class.isMobile]="isMobile">
+      <mat-table
+        #table
+        [dataSource]="dataSource"
+        matSort
+        *ngIf="dataSource.data.length > 0"
+        [class.isMobile]="isMobile"
+      >
         <ng-container matColumnDef="id">
           <mat-header-cell *matHeaderCellDef> Id</mat-header-cell>
           <mat-cell *matCellDef="let element">
@@ -199,7 +204,9 @@
             <button mat-icon-button (click)="editRecord(element.id)">
               <mat-icon>edit</mat-icon>
             </button>
-            <button mat-icon-button (click)="deleteRecord(element.id)"><mat-icon>delete</mat-icon></button>
+            <button mat-icon-button (click)="deleteRecord(element.id)">
+              <mat-icon>delete</mat-icon>
+            </button>
           </mat-cell>
         </ng-container>
         <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
@@ -207,14 +214,9 @@
       </mat-table>
 
       <div *ngIf="dataSource.data.length === 0">Keine Einträge gefunden</div>
-
-      <button id="" type="button" mat-fab (click)="createNewRecord()">
-        <i class="material-icons">add</i>
-      </button>
     </div>
+    <button id="create-record-btn" type="button" mat-fab (click)="createNewRecord()">
+      <i class="material-icons">add</i>
+    </button>
   </div>
-
-  <hr>
-  <router-outlet></router-outlet>
-
 </div>
