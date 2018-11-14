@@ -27,7 +27,7 @@ export class OrderDetailComponent implements OnInit {
   public records: TimeRecord[];
   public lastId: number;
   public displayedColumns = ['id', 'date', 'description', 'workingHours', 'action'];
-  public dataSource;
+  public dataSource: MatTableDataSource<ITimeRecord>;
 
   public form_validation_messages = {
     description: [{ type: 'required', message: 'Bitte Art der Arbeit eintragen' }],
@@ -45,6 +45,7 @@ export class OrderDetailComponent implements OnInit {
   ) {
     this.dateAdapter.setLocale('de');
     this.columns = ['Date', 'Description', 'Time', 'Delete'];
+    this.dataSource = new MatTableDataSource<ITimeRecord>();
 
     this.timeRecordForm = this.formBuilder.group({
       time_records: this.formBuilder.array([
@@ -154,13 +155,9 @@ export class OrderDetailComponent implements OnInit {
           this.order = order[0];
           this.records = order[0].records;
 
-          this.dataSource = new MatTableDataSource<ITimeRecord>(this.records);
-
-          console.log('Records', this.records);
-
-          console.log('Data Source', this.dataSource);
-
-          if (this.records.length > 0) {
+          if (this.records.length !== 0) {
+            this.dataSource = new MatTableDataSource<ITimeRecord>(this.records);
+          } else {
             this.records.forEach(record => {
               this.addControl(record);
             });

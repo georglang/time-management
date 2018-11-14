@@ -164,9 +164,7 @@
   <div id="detail-component-content">
 
     <div class="example-container mat-elevation-z8">
-      <mat-table #table [dataSource]="dataSource" [class.isMobile]="isMobile">
-        Note that these columns can be defined in any order. The actual rendered columns are set as
-        a property on the row definition"
+      <mat-table #table [dataSource]="dataSource" matSort *ngIf="dataSource.data.length > 0" [class.isMobile]="isMobile">
         <ng-container matColumnDef="id">
           <mat-header-cell *matHeaderCellDef> Id</mat-header-cell>
           <mat-cell *matCellDef="let element">
@@ -207,6 +205,8 @@
         <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
         <mat-row *matRowDef="let row; columns: displayedColumns"></mat-row>
       </mat-table>
+
+      <div *ngIf="dataSource.data.length === 0">Keine Einträge gefunden</div>
 
       <button id="" type="button" mat-fab (click)="createNewRecord()">
         <i class="material-icons">add</i>
