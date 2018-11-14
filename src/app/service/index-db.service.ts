@@ -98,7 +98,7 @@ export class IndexDBService {
       });
   }
 
-  public modifyOrder(record, orderId) {
+  public modifyOrder(orderId, record) {
     return this.timeRecordsDb.orders
       .where('id')
       .equals(orderId)
@@ -156,11 +156,27 @@ export class IndexDBService {
       });
   }
 
-  public update(id, data) {
-    // return this.table.update(id, data);
-  }
-
-  public remove(id) {
-    // return this.table.delete(id);
+  public updateRecord(updatedRecord: TimeRecord, orderId: number) {
+    return this.timeRecordsDb.orders
+      .where('id')
+      .equals(orderId)
+      .toArray(order => {
+        const records = order[0].records;
+        for (let index = 0; index < records.length; index++) {
+          const element = records[index];
+          if (updatedRecord.id === element.id) {
+            if (!_.isEqual(updatedRecord, element)) {
+              records.splice(index, 1);
+              order[0].records.push(updatedRecord);
+              this.timeRecordsDb.orders
+                .where('id')
+                .equals(orderId)
+                .modify((value, ref) => {
+                  ref.value.records = records;
+                });
+            }
+          }
+        }
+      });
   }
 }

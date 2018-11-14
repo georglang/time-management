@@ -3,26 +3,26 @@ import { FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { IndexDBService } from './../service/index-db.service';
 import { TimeRecord } from './../data-classes/time-record';
-import { DateAdapter, MAT_DIALOG_DATA } from '@angular/material';
+import { DateAdapter } from '@angular/material';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-edit-record',
   templateUrl: './edit-record.component.html',
   styleUrls: ['./edit-record.component.sass']
 })
-
 export class EditRecordComponent implements OnInit {
   public editRecordForm: FormGroup;
   private recordId: string;
   private orderId: number;
-  private record: TimeRecord;
 
   constructor(
     private formBuilder: FormBuilder,
     private router: Router,
     private route: ActivatedRoute,
     private indexedDB: IndexDBService,
-    private dateAdapter: DateAdapter<Date>
+    private dateAdapter: DateAdapter<Date>,
+    private toastrService: ToastrService
   ) {
     this.dateAdapter.setLocale('de');
   }
@@ -53,8 +53,7 @@ export class EditRecordComponent implements OnInit {
   }
 
   public getRecordById(orderId: number, recordId: string) {
-    this.indexedDB.getRecordById(orderId, recordId)
-      .then((record) => {
+    this.indexedDB.getRecordById(orderId, recordId).then(record => {
       console.log('REEEEECORD', record);
     });
   }
@@ -87,5 +86,24 @@ export class EditRecordComponent implements OnInit {
     this.editRecordForm.controls['workingHours'].setValue(record.workingHours);
   }
 
-  onSubmit() {}
+  public showSuccessMessage() {
+    const successConfig = {
+      positionClass: 'toast-bottom-center',
+      timeout: 2000
+    };
+    this.toastrService.success('Erfolgreich aktualisiert', 'Eintrag', successConfig);
+  }
+
+  public onSubmit(editRecordForm: FormGroup) {
+    const newRecord = new TimeRecord(
+      this.editRecordForm.controls.date.value,
+      this.editRecordForm.controls.description.value,
+      this.editRecordForm.controls.workingHours.value,
+      this.editRecordForm.controls.id.value
+    );
+
+    this.indexedDB.updateRecord(newRecord, this.orderId).then(data => {
+      this.showSuccessMessage();
+    });
+  }
 }
