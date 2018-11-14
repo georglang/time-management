@@ -10,7 +10,7 @@
   </div>
 
   <div id="create-record-content">
-    <form [formGroup]="createRecordForm" #documentEditForm="ngForm" (ngSubmit)="onSubmit()">
+    <form id="create-record-form" [formGroup]="createRecordForm" #documentEditForm="ngForm" (ngSubmit)="onSubmit()">
       <fieldset class="form-group">
         <mat-form-field>
           <input matInput [matDatepicker]="picker" placeholder="Datum wählen" id="date" name="date" formControlName="date" (click)="picker.open()"
