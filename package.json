@@ -31,7 +31,10 @@
     "dexie-relationships": "^1.2.10",
     "jquery": "^3.3.1",
     "jspdf": "^1.4.1",
+    "lodash": "^4.17.11",
+    "moment": "^2.22.2",
     "ngx-toastr": "^9.1.0",
+    "pdfjs": "^2.1.0",
     "rxjs": "~6.3.3",
     "zone.js": "~0.8.26"
   },
