@@ -30,7 +30,6 @@ export class OrderListComponent implements OnInit {
   }
 
   getRecord(row: any) {
-    // this.router.navigate(['/order-details/' + row.id], { relativeTo: this.route});
     this.router.navigate(['/order-details/' + row.id]);
   }
 
