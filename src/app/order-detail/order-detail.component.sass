@@ -108,6 +108,19 @@ td
   right: 16px
   bottom: 16px
 
+#order-details-header
+  margin: auto
+  height: 60px
+  width: 90%
+  box-shadow: 1px 7px 24px -4px rgba(0, 0, 0, 0.61)
+  margin-top: 20px
+
+#contact-person
+  margin-left: 20px
+
+#location
+  margin-left: 40px
+
 @media screen and (max-width: 576px)
   .table-responsive-stack
     tr
@@ -121,7 +134,7 @@ td
       width: 100%
 
   .mobile-label
-    width: 80px
+    width: 140px
     display: inline-block
     font-weight: bold
   .mat-header-row
@@ -130,3 +143,6 @@ td
     flex-direction: column
     align-items: start
     padding: 8px 24px
+
+  mat-cell:first-of-type, mat-header-cell:first-of-type
+    padding-left: 0px
