@@ -1,6 +1,6 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
-import { FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatTableDataSource, MatDialog, MatDialogConfig } from '@angular/material';
 
 import { IndexDBService } from '../service/index-db.service';
@@ -28,61 +28,32 @@ export class OrderDetailComponent implements OnInit {
   private paramId;
   private sub;
   @Input() customer;
-
-  public timeRecordForm: FormGroup;
-  public createRecordForm: FormGroup;
+  public order: IOrder;
   public columns: string[];
   public totalTime = 0.0;
-  private order: IOrder;
   public records: TimeRecord[];
-  public lastId: number;
   public displayedColumns = ['id', 'date', 'description', 'workingHours', 'action'];
   public dataSource: MatTableDataSource<ITimeRecord>;
   private pdf: jsPDF;
 
-  public form_validation_messages = {
-    description: [{ type: 'required', message: 'Bitte Art der Arbeit eintragen' }],
-    workingHours: [{ type: 'required', message: 'Bitte Stunden eintragen' }]
-  };
-
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private formBuilder: FormBuilder,
     private dateAdapter: DateAdapter<Date>,
     private indexDbService: IndexDBService,
     private toastrService: ToastrService,
     public dialog: MatDialog,
-    private customerService: CustomerService
+    private formBuilder: FormBuilder,
+
   ) {
     this.dateAdapter.setLocale('de');
     this.columns = ['Date', 'Description', 'Time', 'Delete'];
     this.dataSource = new MatTableDataSource<ITimeRecord>();
-
-    this.timeRecordForm = this.formBuilder.group({
-      time_records: this.formBuilder.array([
-        this.formBuilder.group({
-          id: [''],
-          date: ['', Validators.required],
-          description: ['', Validators.required],
-          workingHours: [0, Validators.required]
-        })
-      ])
-    });
   }
 
   ngOnInit() {
     this.sub = this.route.params.subscribe(params => {
       this.paramId = +params['id']; // (+) converts string 'id' to a number
-    });
-
-    this.timeRecords.valueChanges.subscribe(change => {
-      let tempTotalTime = 0.0;
-
-      change.forEach(record => {
-        tempTotalTime += record.workingHours;
-      });
-      this.totalTime = tempTotalTime;
     });
 
     this.getOrderById(this.paramId);
@@ -92,71 +63,12 @@ export class OrderDetailComponent implements OnInit {
     this.router.navigate(['/']);
   }
 
-  public addEmptyControl() {
-    const control = <FormArray>this.timeRecordForm.controls.time_records;
-    control.push(
-      this.formBuilder.group({
-        id: [''],
-        date: ['', Validators.required],
-        description: ['', Validators.required],
-        workingHours: [0, Validators.required]
-      })
-    );
-  }
-
-  public addControl(record: TimeRecord) {
-    const control = <FormArray>this.timeRecordForm.controls.time_records;
-    control.push(
-      this.formBuilder.group({
-        id: [record.id],
-        date: [record.date, Validators.required],
-        description: [record.description, Validators.required],
-        workingHours: [record.workingHours, Validators.required]
-      })
-    );
-  }
-
-  public createUniqueId() {
-    const ID = () => {
-      const array = new Uint32Array(8);
-      window.crypto.getRandomValues(array);
-      let str = '';
-      for (let i = 0; i < array.length; i++) {
-        str += (i < 2 || i > 5 ? '' : '-') + array[i].toString(16).slice(-4);
-      }
-      return str;
-    };
-    return ID();
-  }
-
-  //
-  public onSubmit(timeRecordForm: FormGroup) {
-    const recordsFromFormInput = this.timeRecordForm.controls.time_records.value;
-    if (recordsFromFormInput !== undefined) {
-      for (let index = 0; index < recordsFromFormInput.length; index++) {
-        const record = recordsFromFormInput[index];
-        if (!record.hasOwnProperty('id') || record.id === '') {
-          record.id = this.createUniqueId();
-          this.indexDbService.addRecordToOrder(record, this.paramId);
-        } else {
-          this.indexDbService.modifyOrder(record, this.paramId);
-        }
-      }
-    }
-  }
-
-  get timeRecords() {
-    return this.timeRecordForm.get('time_records') as FormArray;
+  public onSubmit() {
   }
 
   public deleteFormGroup(recordId: string, position: number) {
     this.indexDbService.deleteRecord(recordId, this.paramId).then(data => {
-      this.timeRecords.removeAt(position);
     });
-  }
-
-  public getOrders() {
-    this.indexDbService.getAllOrders().then(data => {});
   }
 
   public getOrderById(orderId) {
@@ -169,10 +81,6 @@ export class OrderDetailComponent implements OnInit {
 
           if (this.records.length !== 0) {
             this.dataSource = new MatTableDataSource<ITimeRecord>(this.records);
-          } else {
-            this.records.forEach(record => {
-              this.addControl(record);
-            });
           }
         }
       }
@@ -180,16 +88,10 @@ export class OrderDetailComponent implements OnInit {
   }
 
   public createNewRecord() {
-    console.log('Create Record ParamId', this.paramId);
-    // this.router.navigate(['create-record'], this.paramId);
     this.router.navigate(['/order-details/' + this.paramId + /create-record/]);
-
-    //this.router.navigate(['/order-details/' + this.paramId + '/create-record']);
   }
 
   public editRecord(id: any) {
-    console.log('Row', id);
-    // this.router.navigate(['edit-record', id]);
     this.router.navigate(['/order-details/' + this.paramId + /edit-record/ + id]);
   }
 
