@@ -1,40 +1,67 @@
 <div class="sub-nav">
   <div class="sub-nav-btn">
-    <mat-icon (click)="navigateToOrderList()" class="navigate-before-icon float-left">navigate_before</mat-icon>
+    <mat-icon (click)="navigateToOrderList()" class="navigate-before-icon float-left"
+      >navigate_before</mat-icon
+    >
   </div>
 
-  <button type="button" class="sub-nav-btn" (click)="documentEditForm.ngSubmit.emit()" [disabled]="!documentEditForm.form.valid">
+  <button
+    type="button"
+    class="sub-nav-btn"
+    (click)="documentEditForm.ngSubmit.emit()"
+    [disabled]="!documentEditForm.form.valid"
+  >
     <mat-icon class="order-complete-icon float-right">check</mat-icon>
   </button>
 </div>
-
 
 <div class="container-fluid">
   <div id="create-order-form">
     <form [formGroup]="createOrderForm" #documentEditForm="ngForm" (ngSubmit)="onSubmit()">
       <fieldset class="form-group">
         <mat-form-field>
-          <input matInput set control name formControlName="companyName" placeholder="Firmenname" class="form-control form-control-sm"
-            type="text">
+          <input
+            matInput
+            set
+            control
+            name
+            formControlName="companyName"
+            placeholder="Firmenname"
+            class="form-control form-control-sm"
+            type="text"
+          />
         </mat-form-field>
       </fieldset>
 
       <fieldset class="form-group">
         <mat-form-field>
-          <input matInput set control name formControlName="contactPerson" placeholder="Ansprechpartner" class="form-control form-control-sm"
-            type="text" />
+          <input
+            matInput
+            set
+            control
+            name
+            formControlName="contactPerson"
+            placeholder="Ansprechpartner"
+            class="form-control form-control-sm"
+            type="text"
+          />
         </mat-form-field>
       </fieldset>
 
       <fieldset class="form-group">
         <mat-form-field>
-          <input matInput set control name formControlName="location" placeholder="Ort" class="form-control form-control-sm"
-            type="text" />
+          <input
+            matInput
+            set
+            control
+            name
+            formControlName="location"
+            placeholder="Ort"
+            class="form-control form-control-sm"
+            type="text"
+          />
         </mat-form-field>
       </fieldset>
-      <!-- <button type="button" class="btn btn-sm" type="submit">
-        Submit
-      </button> -->
     </form>
   </div>
 </div>
