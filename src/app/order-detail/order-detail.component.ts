@@ -28,7 +28,7 @@ export class OrderDetailComponent implements OnInit {
   public columns: string[];
   public totalTime = 0.0;
   public records: TimeRecord[];
-  public displayedColumns = ['id', 'date', 'description', 'workingHours', 'action'];
+  public displayedColumns = ['date', 'description', 'workingHours', 'action'];
   public dataSource: MatTableDataSource<ITimeRecord>;
 
   constructor(
