@@ -21,8 +21,9 @@
         <span>Ort:</span><span id="location">{{ order?.location }}</span>
       </div>
       <div id="sum-of-working-hours">
-          <span><strong>Gesamtstunden:</strong></span><span >{{ sumOfWorkingHours }}</span>
-        </div>
+        <span><strong>Gesamtstunden:</strong></span
+        ><span>{{ sumOfWorkingHours }}</span>
+      </div>
     </div>
 
     <div class="order-detail-table-wrapper">
@@ -31,55 +32,72 @@
         [dataSource]="dataSource"
         matSort
         *ngIf="dataSource.data.length > 0"
-        [class.isMobile]="isMobile"
       >
         <ng-container matColumnDef="id">
           <mat-header-cell *matHeaderCellDef> Id</mat-header-cell>
           <mat-cell *matCellDef="let element">
-            <span class="mobile-label">Id:</span> {{ element.id }}
+            <div>Id:</div> {{ element.id }}
           </mat-cell>
         </ng-container>
 
         <ng-container matColumnDef="date">
           <mat-header-cell *matHeaderCellDef> Datum</mat-header-cell>
           <mat-cell *matCellDef="let element">
-            <span class="mobile-label">Datum:</span> {{ element.date | date: 'dd.MM.yyyy' }}
+            <div class="disable-on-mobile">{{ element.date | date: 'dd.MM.yyyy' }}</div>
+            <mat-form-field>
+              <input
+                matInput
+                placeholder="Datum"
+                value="{{ element.date | date: 'dd.MM.yyyy' }}"
+                readonly
+              />
+            </mat-form-field>
           </mat-cell>
         </ng-container>
 
         <ng-container matColumnDef="description">
           <mat-header-cell *matHeaderCellDef>Beschreibung </mat-header-cell>
           <mat-cell *matCellDef="let element">
-            <span class="mobile-label">Beschreibung:</span> {{ element.description }}
+            <div class="disable-on-mobile">{{ element.description }}</div>
+            <mat-form-field>
+              <input matInput placeholder="Beschreibung" value="{{ element.description }}" readonly />
+            </mat-form-field>
           </mat-cell>
         </ng-container>
 
         <ng-container matColumnDef="workingHours">
           <mat-header-cell *matHeaderCellDef> Arbeitsstunden </mat-header-cell>
           <mat-cell *matCellDef="let element">
-            <span class="mobile-label">Arbeitsstunden</span> {{ element.workingHours }}
+            <div class="disable-on-mobile">{{ element.workingHours }}</div>
+            <mat-form-field>
+              <input matInput placeholder="Arbeitsstunden" value="{{ element.workingHours }}" readonly />
+            </mat-form-field>
           </mat-cell>
         </ng-container>
 
         <ng-container matColumnDef="action">
-          <mat-header-cell *matHeaderCellDef> Action </mat-header-cell>
-          <mat-cell *matCellDef="let element">
-            <button mat-icon-button (click)="editRecord(element.id)">
-              <mat-icon>edit</mat-icon>
-            </button>
-            <button mat-icon-button (click)="deleteRecord(element.id)">
-              <mat-icon>delete</mat-icon>
-            </button>
-          </mat-cell>
+          <mat-header-cell *matHeaderCellDef> Bearbeiten / Löschen </mat-header-cell>
+          <div class="test">
+            <mat-cell *matCellDef="let element">
+              <div id="delete-and-edit-btn-wrapper">
+                <button mat-icon-button (click)="editRecord(element.id)">
+                  <mat-icon>edit</mat-icon>
+                </button>
+                <button mat-icon-button (click)="deleteRecord(element.id)">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </div>
+            </mat-cell>
+          </div>
         </ng-container>
-        <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+        <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>x
         <mat-row *matRowDef="let row; columns: displayedColumns"></mat-row>
       </mat-table>
 
       <h5 id="no-records-found" *ngIf="dataSource.data.length === 0">Keine Einträge gefunden</h5>
     </div>
-    <button id="create-record-btn" type="button" mat-fab (click)="createNewRecord()">
-      <i class="material-icons">add</i>
-    </button>
   </div>
 </div>
+<button id="create-record-btn" type="button" mat-fab (click)="createNewRecord()">
+  <i class="material-icons">add</i>
+</button>

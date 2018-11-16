@@ -84,9 +84,6 @@ td
   max-height: 500px
   padding-bottom: 20px
 
-.mobile-label
-  display: none
-
 #create-record-btn
   background-color: #5fb345
   position: absolute
@@ -120,6 +117,14 @@ td
 #no-records-found
   margin-left: 30px
 
+#delete-and-edit-btn-wrapper
+  width: 104px
+  right: 0px
+  position: absolute
+
+.mat-form-field
+  display: none
+
 @media screen and (max-width: 576px)
   .table-responsive-stack
     tr
@@ -132,16 +137,25 @@ td
       float: left\9
       width: 100%
 
-  .mobile-label
-    width: 140px
-    display: inline-block
-    font-weight: bold
   .mat-header-row
     display: none
   .mat-row
     flex-direction: column
     align-items: start
-    padding: 8px 24px
+    padding: 8px
 
   mat-cell:first-of-type, mat-header-cell:first-of-type
     padding-left: 0px
+
+  .disable-on-mobile
+    display: none
+
+  .mat-form-field
+    display: block
+    font-size: 16px
+
+  .mat-cell
+    margin-left: 20px
+
+  .mat-row
+    min-height: 28px
