@@ -41,7 +41,7 @@ export class EditRecordComponent implements OnInit {
 
     this.route.parent.url.subscribe(urlPath => {
       const url = urlPath[urlPath.length - 1].path;
-      this.orderId = parseInt(url, 2);
+      this.orderId = parseInt(url, 10);
     });
 
     this.getOrderById(this.orderId, this.recordId);
