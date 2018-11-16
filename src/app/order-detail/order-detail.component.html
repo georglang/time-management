@@ -7,7 +7,7 @@
     </div>
 
     <button type="button" class="sub-nav-btn" (click)="print()">
-      <mat-icon class="order-complete-icon float-right">print</mat-icon>
+      <mat-icon class="print-icon float-right">print</mat-icon>
     </button>
   </div>
 
@@ -20,9 +20,12 @@
       <div>
         <span>Ort:</span><span id="location">{{ order?.location }}</span>
       </div>
+      <div>
+          <span><strong>Gesamtstunden:</strong></span><span id="sum-of-working-hours">{{ sumOfWorkingHours }}</span>
+        </div>
     </div>
 
-    <div class="example-container mat-elevation-z8">
+    <div class="order-detail-table-wrapper">
       <mat-table
         #table
         [dataSource]="dataSource"

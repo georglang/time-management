@@ -21,7 +21,7 @@ moment.locale('de');
 })
 export class OrderDetailComponent implements OnInit {
   private paramId;
-  private sub;
+  public sumOfWorkingHours;
 
   @Input() customer;
   public order: IOrder;
@@ -42,13 +42,13 @@ export class OrderDetailComponent implements OnInit {
     this.dateAdapter.setLocale('de');
     this.columns = ['Date', 'Description', 'Time', 'Delete'];
     this.dataSource = new MatTableDataSource<ITimeRecord>();
+    this.sumOfWorkingHours = 0;
   }
 
   ngOnInit() {
-    this.sub = this.route.params.subscribe(params => {
+    this.route.params.subscribe(params => {
       this.paramId = +params['id']; // (+) converts string 'id' to a number
     });
-
     this.getOrderById(this.paramId);
   }
 
@@ -60,6 +60,12 @@ export class OrderDetailComponent implements OnInit {
     this.indexDbService.deleteRecord(recordId, this.paramId).then(data => {});
   }
 
+  public getSumOfWorkingHours() {
+    this.records.forEach(record => {
+      this.sumOfWorkingHours += record.workingHours;
+    });
+  }
+
   public getOrderById(orderId) {
     this.indexDbService.getOrderById(orderId).then(order => {
       if (order.length !== 0) {
@@ -69,7 +75,7 @@ export class OrderDetailComponent implements OnInit {
 
           if (this.records.length !== 0) {
             console.log('Records', this.records);
-
+            this.getSumOfWorkingHours();
             this.dataSource = new MatTableDataSource<ITimeRecord>(this.records);
           }
         }
