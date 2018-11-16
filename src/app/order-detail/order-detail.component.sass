@@ -8,6 +8,11 @@
   -ms-flex-align: center
   align-items: center
   box-shadow: 0px 2px 15px 0px rgba(0, 0, 0, 0.12)
+  width: 100%
+  position: fixed
+  top: 50px
+  z-index: 1030
+
 
 .sub-nav-btn
   height: 50px
@@ -31,9 +36,6 @@
 .order-completed
   color: #1c9021
 
-#detail-component-content
-  margin: 30px
-
 th
   display: none
 
@@ -50,7 +52,9 @@ td
   background-color: #5fb345
 
 #customer-info
+  margin-top: 12px
   margin-bottom: 30px
+  padding-left: 24px
   tr
     td
       padding-left: 10px
@@ -76,7 +80,7 @@ td
 
 
 .mat-table
-  overflow: auto
+  // overflow: auto
   max-height: 500px
   padding-bottom: 20px
 
@@ -106,7 +110,9 @@ td
   margin-left: 34px
 
 #sum-of-working-hours
-  margin-left: 10px
+  margin-top: 10px
+  span:nth-child(2)
+    margin-left: 10px
 
 #order-detail-table-wrapper
   box-shadow: 0px 2px 15px 0px rgba(0, 0, 0, 0.12)
