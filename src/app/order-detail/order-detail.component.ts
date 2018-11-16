@@ -61,6 +61,7 @@ export class OrderDetailComponent implements OnInit {
   }
 
   public getSumOfWorkingHours() {
+    this.sumOfWorkingHours = 0;
     this.records.forEach(record => {
       this.sumOfWorkingHours += record.workingHours;
     });
@@ -74,9 +75,8 @@ export class OrderDetailComponent implements OnInit {
           this.records = order[0].records;
 
           if (this.records.length !== 0) {
-            console.log('Records', this.records);
-            this.getSumOfWorkingHours();
             this.dataSource = new MatTableDataSource<ITimeRecord>(this.records);
+            this.getSumOfWorkingHours();
           }
         }
       }
@@ -125,6 +125,7 @@ export class OrderDetailComponent implements OnInit {
         this.indexDbService.deleteRecord(this.paramId, recordId).then(data => {
           this.getOrderById(this.paramId);
           this.showDeleteMessage();
+          this.getSumOfWorkingHours();
         });
       }
     });
