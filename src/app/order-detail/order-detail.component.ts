@@ -9,7 +9,7 @@ import { IOrder } from '../data-classes/order';
 import { ConfirmDeleteDialogComponent } from './../confirm-delete-dialog/confirm-delete-dialog.component';
 import { ToastrService, Toast } from 'ngx-toastr';
 
-import * as jsPDF from 'jspdf';
+declare var jsPDF: any;
 import 'jspdf-autotable';
 import * as moment from 'moment';
 moment.locale('de');
@@ -98,7 +98,7 @@ export class OrderDetailComponent implements OnInit {
   public showDeleteMessage() {
     const successConfig = {
       positionClass: 'toast-bottom-center',
-      timeout: 2000
+      timeout: 500
     };
     this.toastrService.error('Erfolgreich gelöscht', 'Eintrag', successConfig);
   }
@@ -106,7 +106,7 @@ export class OrderDetailComponent implements OnInit {
   public showSuccessMessage() {
     const successConfig = {
       positionClass: 'toast-bottom-center',
-      timeout: 2000
+      timeout: 500
     };
     this.toastrService.success('Erfolgreich erstellt', 'Eintrag', successConfig);
   }
