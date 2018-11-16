@@ -1,6 +1,5 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatTableDataSource, MatDialog, MatDialogConfig } from '@angular/material';
 
 import { IndexDBService } from '../service/index-db.service';
@@ -10,14 +9,10 @@ import { IOrder } from '../data-classes/order';
 import { ConfirmDeleteDialogComponent } from './../confirm-delete-dialog/confirm-delete-dialog.component';
 import { ToastrService, Toast } from 'ngx-toastr';
 
-// import * as jsPDF from 'jspdf';
-// import * from 'jspdf-autotable';
 import * as jsPDF from 'jspdf';
 import 'jspdf-autotable';
-// declare let jsPDF;
-
-
 import * as moment from 'moment';
+moment.locale('de');
 
 @Component({
   selector: 'app-order-detail',
@@ -27,6 +22,7 @@ import * as moment from 'moment';
 export class OrderDetailComponent implements OnInit {
   private paramId;
   private sub;
+
   @Input() customer;
   public order: IOrder;
   public columns: string[];
@@ -34,7 +30,6 @@ export class OrderDetailComponent implements OnInit {
   public records: TimeRecord[];
   public displayedColumns = ['id', 'date', 'description', 'workingHours', 'action'];
   public dataSource: MatTableDataSource<ITimeRecord>;
-  private pdf: jsPDF;
 
   constructor(
     private route: ActivatedRoute,
@@ -43,7 +38,6 @@ export class OrderDetailComponent implements OnInit {
     private indexDbService: IndexDBService,
     private toastrService: ToastrService,
     public dialog: MatDialog,
-    private formBuilder: FormBuilder,
 
   ) {
     this.dateAdapter.setLocale('de');
@@ -63,9 +57,6 @@ export class OrderDetailComponent implements OnInit {
     this.router.navigate(['/']);
   }
 
-  public onSubmit() {
-  }
-
   public deleteFormGroup(recordId: string, position: number) {
     this.indexDbService.deleteRecord(recordId, this.paramId).then(data => {
     });
@@ -73,7 +64,6 @@ export class OrderDetailComponent implements OnInit {
 
   public getOrderById(orderId) {
     this.indexDbService.getOrderById(orderId).then(order => {
-      console.log('Order', order[0]);
       if (order.length !== 0) {
         if (order[0].hasOwnProperty('records')) {
           this.order = order[0];
@@ -96,7 +86,7 @@ export class OrderDetailComponent implements OnInit {
   }
 
   public deleteRecord(recordId) {
-    this.openConfirmDialog(recordId);
+    this.openDeleteRecordDialog(recordId);
   }
 
   public showDeleteMessage() {
@@ -115,7 +105,7 @@ export class OrderDetailComponent implements OnInit {
     this.toastrService.success('Erfolgreich erstellt', 'Eintrag', successConfig);
   }
 
-  public openConfirmDialog(recordId) {
+  public openDeleteRecordDialog(recordId) {
     const dialogConfig = new MatDialogConfig();
     dialogConfig.disableClose = true;
     dialogConfig.autoFocus = true;
@@ -127,24 +117,18 @@ export class OrderDetailComponent implements OnInit {
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
         this.indexDbService.deleteRecord(this.paramId, recordId).then(data => {
-
-          console.log('Data', data);
           this.getOrderById(this.paramId);
           this.showDeleteMessage();
         });
-
       }
-
-      console.log('Dialog geschlossen');
-      console.log('RESULT: ', result);
     });
   }
 
   public print() {
+    const pdf = new jsPDF();
 
-    const pdf = new jsPDF('p', 'pt', 'a4');
     const margins = {
-      top: 70,
+      top: 10,
       bottom: 40,
       left: 30,
       width: 550
@@ -176,14 +160,16 @@ export class OrderDetailComponent implements OnInit {
   });
 
     pdf.fromHTML(document.getElementById('customer-info'),
-      margins.left, // x coord
+      margins.left,
       margins.top,
       {
         width: margins.width// max width of content on PDF
       });
 
+    const filename = 'Regienstunden ' + moment().format('DD.MM.YYYY HH.mm');
+    pdf.save(filename);
     const iframe = document.createElement('iframe');
-    iframe.setAttribute('style','position:absolute;right:0; top:0; bottom:0; height:100%; width:650px; padding:20px;');
+    iframe.setAttribute('style', 'position:absolute;right:0; top:0; bottom:0; height:100%; width:650px; padding:20px;');
     document.body.appendChild(iframe);
 
     iframe.src = pdf.output('datauristring');
