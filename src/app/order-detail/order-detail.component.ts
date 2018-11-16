@@ -37,8 +37,7 @@ export class OrderDetailComponent implements OnInit {
     private dateAdapter: DateAdapter<Date>,
     private indexDbService: IndexDBService,
     private toastrService: ToastrService,
-    public dialog: MatDialog,
-
+    public dialog: MatDialog
   ) {
     this.dateAdapter.setLocale('de');
     this.columns = ['Date', 'Description', 'Time', 'Delete'];
@@ -58,8 +57,7 @@ export class OrderDetailComponent implements OnInit {
   }
 
   public deleteFormGroup(recordId: string, position: number) {
-    this.indexDbService.deleteRecord(recordId, this.paramId).then(data => {
-    });
+    this.indexDbService.deleteRecord(recordId, this.paramId).then(data => {});
   }
 
   public getOrderById(orderId) {
@@ -70,6 +68,8 @@ export class OrderDetailComponent implements OnInit {
           this.records = order[0].records;
 
           if (this.records.length !== 0) {
+            console.log('Records', this.records);
+
             this.dataSource = new MatTableDataSource<ITimeRecord>(this.records);
           }
         }
@@ -138,38 +138,37 @@ export class OrderDetailComponent implements OnInit {
     const columns = [
       { title: 'Datum', dataKey: 'date' },
       { title: 'Beschreibung', dataKey: 'description' },
-      { title: 'Arbeitsstunden', dataKey: 'workingHours' },
+      { title: 'Arbeitsstunden', dataKey: 'workingHours' }
     ];
 
-    const recordsToPrint = this.records;
-
-    recordsToPrint.forEach((record) => {
-      delete record['id'];
-      const date = record['date'];
-      const formattedDate = moment(date).format('DD.MM.YYYY');
-      record.date = formattedDate;
+    const recordsToPrint = [];
+    this.records.forEach(record => {
+      const formattedDate = moment(record['date']).format('DD.MM.YYYY');
+      recordsToPrint.push(
+        new TimeRecord(formattedDate, record['description'], record['workingHours'])
+      );
     });
 
+    const costomerInfo = document.getElementById('customer-info');
+    pdf.fromHTML(costomerInfo, 40, 40);
+
     pdf.autoTable(columns, recordsToPrint, {
-      bodyStyles: { valign: 'top'},
-      styles: { overflow: 'linebreak', columnWidth: 'wrap'},
+      bodyStyles: { valign: 'top' },
+      styles: { overflow: 'linebreak', columnWidth: 'wrap' },
       columnStyles: {
-        description: {columnWidth: 'auto'}
+        description: { columnWidth: 'auto' }
       },
-      margin: {top: 60, left: 30},
-  });
+      margin: { top: 60, left: 30 }
+    });
 
-    pdf.fromHTML(document.getElementById('customer-info'),
-      margins.left,
-      margins.top,
-      {
-        width: margins.width// max width of content on PDF
-      });
-
-    const filename = 'Regienstunden ' + moment().format('DD.MM.YYYY HH.mm');
+    const dateNow = moment().format('DD.MM.YYYY HH.MM');
+    const filename = 'Regienstunden ' + dateNow + '.pdf';
     pdf.save(filename);
     const iframe = document.createElement('iframe');
-    iframe.setAttribute('style', 'position:absolute;right:0; top:0; bottom:0; height:100%; width:650px; padding:20px;');
+    iframe.setAttribute(
+      'style',
+      'position:absolute;right:0; top:0; bottom:0; height:100%; width:650px; padding:20px;'
+    );
     document.body.appendChild(iframe);
 
     iframe.src = pdf.output('datauristring');
