@@ -76,7 +76,7 @@
         <mat-row *matRowDef="let row; columns: displayedColumns"></mat-row>
       </mat-table>
 
-      <div *ngIf="dataSource.data.length === 0">Keine Einträge gefunden</div>
+      <h5 id="no-records-found" *ngIf="dataSource.data.length === 0">Keine Einträge gefunden</h5>
     </div>
     <button id="create-record-btn" type="button" mat-fab (click)="createNewRecord()">
       <i class="material-icons">add</i>
