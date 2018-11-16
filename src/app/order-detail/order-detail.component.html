@@ -12,16 +12,15 @@
   </div>
 
   <div id="detail-component-content">
-    <table id="customer-info">
-      <tr>
-        <td>Kunde:</td>
-        <td>{{ order?.companyName }} {{ order?.contactPerson }}</td>
-      </tr>
-      <tr>
-        <td>Ort:</td>
-        <td>{{ order?.location }}</td>
-      </tr>
-    </table>
+    <div id="customer-info">
+      <div>
+        <span>Kunde:</span
+        ><span id="customer">{{ order?.companyName }} {{ order?.contactPerson }}</span>
+      </div>
+      <div>
+        <span>Ort:</span><span id="location">{{ order?.location }}</span>
+      </div>
+    </div>
 
     <div class="example-container mat-elevation-z8">
       <mat-table

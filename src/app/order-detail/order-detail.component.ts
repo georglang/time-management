@@ -127,13 +127,6 @@ export class OrderDetailComponent implements OnInit {
   public print() {
     const pdf = new jsPDF();
 
-    const margins = {
-      top: 10,
-      bottom: 40,
-      left: 30,
-      width: 550
-    };
-
     pdf.setFontSize(18);
     const columns = [
       { title: 'Datum', dataKey: 'date' },
@@ -150,15 +143,15 @@ export class OrderDetailComponent implements OnInit {
     });
 
     const costomerInfo = document.getElementById('customer-info');
-    pdf.fromHTML(costomerInfo, 40, 40);
+    pdf.fromHTML(costomerInfo, 12, 12);
 
     pdf.autoTable(columns, recordsToPrint, {
       bodyStyles: { valign: 'top' },
+      margin: { left: 10, top: 40 },
       styles: { overflow: 'linebreak', columnWidth: 'wrap' },
       columnStyles: {
         description: { columnWidth: 'auto' }
-      },
-      margin: { top: 60, left: 30 }
+      }
     });
 
     const dateNow = moment().format('DD.MM.YYYY HH.MM');
