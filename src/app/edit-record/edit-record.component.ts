@@ -89,7 +89,7 @@ export class EditRecordComponent implements OnInit {
   public showSuccessMessage() {
     const successConfig = {
       positionClass: 'toast-bottom-center',
-      timeout: 2000
+      timeout: 500
     };
     this.toastrService.success('Erfolgreich aktualisiert', 'Eintrag', successConfig);
   }
@@ -104,6 +104,7 @@ export class EditRecordComponent implements OnInit {
 
     this.indexedDB.updateRecord(newRecord, this.orderId).then(data => {
       this.showSuccessMessage();
+      this.navigateToOrderList();
     });
   }
 }
