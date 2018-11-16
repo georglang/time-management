@@ -76,17 +76,6 @@ export class IndexDBService {
 
   public getRecordById(orderId: number, recordId: string): Promise<any> {
     return this.getAllRecords(orderId);
-
-    //   .then(records => {
-    //   console.log('AAAALLLL RECORDS', records);
-    //   console.log('RecordId', recordId);
-
-    //   records.forEach(record => {
-    //     if (record.id === recordId) {
-    //       return record;
-    //     }
-    //   });
-    // });
   }
 
   public getOrderById(paramId: number) {
@@ -148,7 +137,6 @@ export class IndexDBService {
       .where('id')
       .equals(orderId)
       .toArray(order => {
-        console.log('GetAll REcords', order);
         if (order.length !== 0) {
           const records: TimeRecord[] = order[0].records;
           return records;

@@ -53,9 +53,7 @@ export class EditRecordComponent implements OnInit {
   }
 
   public getRecordById(orderId: number, recordId: string) {
-    this.indexedDB.getRecordById(orderId, recordId).then(record => {
-      console.log('REEEEECORD', record);
-    });
+    this.indexedDB.getRecordById(orderId, recordId).then(record => {});
   }
 
   public getOrderById(orderId: number, recordId: string) {

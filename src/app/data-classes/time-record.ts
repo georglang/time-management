@@ -1,5 +1,5 @@
 export interface ITimeRecord {
-  id?: string; // primery key, autoincremented
+  id?: string;
   date: string;
   description: string;
   workingHours: number;
@@ -17,9 +17,5 @@ export class TimeRecord implements ITimeRecord {
     this.description = description;
     this.workingHours = workingHours;
     this.id = id;
-  }
-
-  public log() {
-    console.log('RESULT: ', JSON.stringify(this));
   }
 }
