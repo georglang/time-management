@@ -27,16 +27,12 @@
     </div>
 
     <div class="order-detail-table-wrapper">
-      <mat-table
-        #table
-        [dataSource]="dataSource"
-        matSort
-        *ngIf="dataSource.data.length > 0"
-      >
+      <mat-table #table [dataSource]="dataSource" matSort *ngIf="dataSource.data.length > 0">
         <ng-container matColumnDef="id">
           <mat-header-cell *matHeaderCellDef> Id</mat-header-cell>
           <mat-cell *matCellDef="let element">
-            <div>Id:</div> {{ element.id }}
+            <div>Id:</div>
+            {{ element.id }}
           </mat-cell>
         </ng-container>
 
@@ -60,7 +56,12 @@
           <mat-cell *matCellDef="let element">
             <div class="disable-on-mobile">{{ element.description }}</div>
             <mat-form-field>
-              <input matInput placeholder="Beschreibung" value="{{ element.description }}" readonly />
+              <input
+                matInput
+                placeholder="Beschreibung"
+                value="{{ element.description }}"
+                readonly
+              />
             </mat-form-field>
           </mat-cell>
         </ng-container>
@@ -70,7 +71,12 @@
           <mat-cell *matCellDef="let element">
             <div class="disable-on-mobile">{{ element.workingHours }}</div>
             <mat-form-field>
-              <input matInput placeholder="Arbeitsstunden" value="{{ element.workingHours }}" readonly />
+              <input
+                matInput
+                placeholder="Arbeitsstunden"
+                value="{{ element.workingHours }}"
+                readonly
+              />
             </mat-form-field>
           </mat-cell>
         </ng-container>
@@ -98,6 +104,8 @@
     </div>
   </div>
 </div>
-<button id="create-record-btn" type="button" mat-fab (click)="createNewRecord()">
-  <i class="material-icons">add</i>
-</button>
+<div id="bottom-nav">
+  <button id="create-record-btn" type="button" mat-fab (click)="createNewRecord()">
+    <i class="material-icons">add</i>
+  </button>
+</div>
