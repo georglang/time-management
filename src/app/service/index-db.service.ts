@@ -127,6 +127,7 @@ export class IndexDBService {
               .equals(orderId)
               .modify(_order => {
                 _order.records = records;
+                this.cloudFirestore.updateRecord(orderId, _order.records);
               });
           }
         }
