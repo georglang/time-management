@@ -3,13 +3,14 @@ import { Database } from './../database/Database';
 import { TimeRecord } from '../data-classes/time-record';
 import _ from 'lodash';
 import { IOrder } from '../data-classes/order';
+import { CloudFirestoreService } from './cloud-firestore.service';
 
 @Injectable()
 export class IndexDBService {
   private records;
   public isAlreadyInDB: boolean;
 
-  constructor(private timeRecordsDb: Database) {
+  constructor(private timeRecordsDb: Database, private cloudFirestore: CloudFirestoreService) {
     this.isAlreadyInDB = false;
   }
 
@@ -161,6 +162,12 @@ export class IndexDBService {
                 .equals(orderId)
                 .modify((value, ref) => {
                   ref.value.records = records;
+
+                  this.cloudFirestore
+                    .updateRecord(orderId.toString(), order[0].records)
+                    .then(data => {
+                      console.log('Updated in firestore');
+                    });
                 });
             }
           }

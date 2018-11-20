@@ -5,6 +5,7 @@ import 'firebase/database';
 
 import { IOrder } from './../data-classes/order';
 import { config } from './../firebase-credentials/FirebaseCredentials.js';
+import { TimeRecord } from '../data-classes/time-record';
 
 @Injectable({
   providedIn: 'root'
@@ -25,7 +26,6 @@ export class CloudFirestoreService {
     });
   }
 
-
   public addOrder(order: IOrder) {
     this.firestoreDB
       .collection('orders')
@@ -38,7 +38,7 @@ export class CloudFirestoreService {
       });
   }
 
-  public getOrder() {
+  public getOrders() {
     return this.firestoreDB
       .collection('orders')
       .get()
@@ -46,6 +46,27 @@ export class CloudFirestoreService {
         orders.forEach(order => {
           console.log('Order', order);
           console.log(order.id, ' => ', order.data());
+          console.log('RECORDS', order.data().records);
+        });
+      });
+  }
+
+  public updateRecord(orderId: string, newRecords: any) {
+    const records = newRecords.map(obj => {
+      return Object.assign({}, obj);
+    });
+    return this.firestoreDB
+      .collection('orders')
+      .get()
+      .then(orders => {
+        orders.forEach(order => {
+          if (order.data().id === 1) {
+            const orderRef = this.firestoreDB.collection('orders').doc(order.id);
+            orderRef.update({
+              records: records
+            });
+            return order;
+          }
         });
       });
   }

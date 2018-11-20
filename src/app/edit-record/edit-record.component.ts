@@ -100,9 +100,10 @@ export class EditRecordComponent implements OnInit {
       this.editRecordForm.controls.id.value
     );
 
-    this.indexedDB.updateRecord(newRecord, this.orderId).then(data => {
-      this.showSuccessMessage();
-      this.navigateToOrderList();
+    this.indexedDB.updateRecord(newRecord, this.orderId)
+      .then(data => {
+        this.showSuccessMessage();
+        this.navigateToOrderList();
     });
   }
 }
