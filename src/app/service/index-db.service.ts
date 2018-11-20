@@ -63,6 +63,7 @@ export class IndexDBService {
   }
 
   public addOrder(order) {
+    this.cloudFirestore.addOrder(order);
     return this.timeRecordsDb.orders.add(order);
   }
 
