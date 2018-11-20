@@ -40,6 +40,7 @@ export class IndexDBService {
             .equals(orderId)
             .modify(order => {
               order.records.push(record);
+              this.cloudFirestore.updateRecord(orderId, order.records);
             });
         } else {
           for (let i = 0; i < records.length; i++) {
@@ -54,6 +55,7 @@ export class IndexDBService {
               .equals(orderId)
               .modify(order => {
                 order.records.push(record);
+                this.cloudFirestore.updateRecord(orderId, order.records);
               });
           }
         }
