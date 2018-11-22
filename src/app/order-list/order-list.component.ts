@@ -32,6 +32,7 @@ export class OrderListComponent implements OnInit {
     this.connectionService.monitor().subscribe(isConnected => {
       this.isOnline = isConnected;
     });
+    this.getOrders();
   }
 
   public applyFilter(filterValue: string) {
