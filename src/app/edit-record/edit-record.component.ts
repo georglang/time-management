@@ -92,7 +92,7 @@ export class EditRecordComponent implements OnInit {
     this.toastrService.success('Erfolgreich aktualisiert', 'Eintrag', successConfig);
   }
 
-  public onSubmit(editRecordForm: FormGroup) {
+  public onSubmit() {
     const newRecord = new TimeRecord(
       this.editRecordForm.controls.date.value,
       this.editRecordForm.controls.description.value,
