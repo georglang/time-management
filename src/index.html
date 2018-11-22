@@ -11,7 +11,12 @@
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
     <meta name="theme-color" content="#1976d2" />
     <script src="https://www.gstatic.com/firebasejs/5.5.8/firebase.js"></script>
-
+    <script src="https://www.gstatic.com/firebasejs/5.5.5/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/5.5.5/firebase-firestore.js"></script>
+  </head>
+  <body>
+    <app-root></app-root>
+    <noscript>Please enable JavaScript to continue using this application.</noscript>
     <script type="module">
       import { config } from './src/app/firebase-credentials/FirebaseCredentials.js';
       console.log('Config', config);
@@ -25,11 +30,5 @@
         messagingSenderId: config.messagingSenderId
       });
     </script>
-    <script src="https://www.gstatic.com/firebasejs/5.5.5/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/5.5.5/firebase-firestore.js"></script>
-  </head>
-  <body>
-    <app-root></app-root>
-    <noscript>Please enable JavaScript to continue using this application.</noscript>
   </body>
 </html>
