@@ -12,6 +12,7 @@ import { ToastrService, Toast } from 'ngx-toastr';
 declare var jsPDF: any;
 import 'jspdf-autotable';
 import * as moment from 'moment';
+import { ConnectionService } from 'ng-connection-service';
 moment.locale('de');
 
 @Component({
@@ -20,10 +21,11 @@ moment.locale('de');
   styleUrls: ['./order-detail.component.sass']
 })
 export class OrderDetailComponent implements OnInit {
-  private paramId;
-  public sumOfWorkingHours;
 
   @Input() customer;
+  private paramId;
+  private isOnline;
+  public sumOfWorkingHours;
   public order: IOrder;
   public columns: string[];
   public totalTime = 0.0;
@@ -37,17 +39,26 @@ export class OrderDetailComponent implements OnInit {
     private dateAdapter: DateAdapter<Date>,
     private indexDbService: IndexDBService,
     private toastrService: ToastrService,
-    public dialog: MatDialog
+    public dialog: MatDialog,
+    private readonly connectionService: ConnectionService
   ) {
     this.dateAdapter.setLocale('de');
     this.columns = ['Date', 'Description', 'Time', 'Delete'];
     this.dataSource = new MatTableDataSource<ITimeRecord>();
     this.sumOfWorkingHours = 0;
+
+    if (window.indexedDB) {
+      console.log('IndexedDB is supported');
+    }
   }
 
   ngOnInit() {
     this.route.params.subscribe(params => {
       this.paramId = +params['id']; // (+) converts string 'id' to a number
+    });
+
+    this.connectionService.monitor().subscribe(isConnected => {
+      this.isOnline = isConnected;
     });
     this.getOrderById(this.paramId);
   }

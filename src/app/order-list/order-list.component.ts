@@ -3,6 +3,8 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { MatSort, MatTableDataSource } from '@angular/material';
 import { IndexDBService } from '../service/index-db.service';
 import { Order } from './../data-classes/order';
+import { CloudFirestoreService } from '../service/cloud-firestore.service';
+import { ConnectionService } from 'ng-connection-service';
 
 @Component({
   selector: 'app-order-list',
@@ -13,6 +15,7 @@ export class OrderListComponent implements OnInit {
   public orders: Order[] = [];
   public dataSource = new MatTableDataSource();
   public displayedColumns = ['customer', 'contactPerson', 'location', 'icon'];
+  private isOnline: boolean;
 
   @ViewChild(MatSort)
   sort: MatSort;
@@ -21,7 +24,15 @@ export class OrderListComponent implements OnInit {
     private indexDbService: IndexDBService,
     private router: Router,
     private route: ActivatedRoute,
+    private cloudFirestoreService: CloudFirestoreService,
+    private connectionService: ConnectionService
   ) { }
+
+  ngOnInit() {
+    this.connectionService.monitor().subscribe(isConnected => {
+      this.isOnline = isConnected;
+    });
+  }
 
   public applyFilter(filterValue: string) {
     filterValue = filterValue.trim();
@@ -53,7 +64,22 @@ export class OrderListComponent implements OnInit {
     });
   }
 
-  ngOnInit() {
-    this.getOrders();
+  public insertToCloudDB() {
+    this.indexDbService.getAllOrders()
+      .then(orders => {
+        console.log('Orders', orders);
+        orders.forEach(order => {
+          this.cloudFirestoreService.addOrder(order);
+        });
+      });
   }
+
+  public getFromCloudDB() {
+    this.cloudFirestoreService.getOrders()
+      .then((orders) => {
+        console.log('Orders', orders);
+      });
+  }
+
+
 }
