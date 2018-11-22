@@ -39,15 +39,23 @@
 
     <h5 id="no-orders-found" *ngIf="dataSource.data.length === 0">Keine Aufträge gefunden</h5>
 
-    <button
-      type="button"
-      id="create-order-btn"
-      type="submit"
-      mat-fab
-      class="float-right"
-      (click)="createOrder()"
-    >
-      <i class="material-icons">add</i>
-    </button>
+
   </div>
 </div>
+<div id="bottom-nav">
+    <button
+    type="button"
+    id="create-order-btn"
+    type="submit"
+    mat-fab
+    class="float-right"
+    (click)="createOrder()"
+  >
+    <i class="material-icons">add</i>
+  </button>
+</div>
+
+<button (click)="insertToCloudDB()">Insert To Cloud DB</button>
+<button (click)="getFromCloudDB()">Get From Cloud DB</button>
+
+<button (click)="getOrder()">GET ORDER</button>
