@@ -60,7 +60,7 @@ export class CloudFirestoreService {
       .get()
       .then(orders => {
         orders.forEach(order => {
-          if (order.data().id === 1) {
+          if (order.data().id === orderId) {
             const orderRef = this.firestoreDB.collection('orders').doc(order.id);
             orderRef.update({
               records: records
