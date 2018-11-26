@@ -26,13 +26,49 @@ export class OrderListComponent implements OnInit {
     private route: ActivatedRoute,
     private cloudFirestoreService: CloudFirestoreService,
     private connectionService: ConnectionService
-  ) { }
+  ) {}
 
   ngOnInit() {
+    const orderIds = [];
     this.connectionService.monitor().subscribe(isConnected => {
       this.isOnline = isConnected;
+      console.log('Is Connected', this.isOnline);
     });
-    this.getOrders();
+
+    if (this.isConnected) {
+      this.cloudFirestoreService
+        .getOrders()
+        .then(ordersOnline => {
+          this.indexDbService.getAllOrders().then(cachedOrders => {
+            cachedOrders.forEach(cachedOrder => {
+              orderIds.push(cachedOrder.dbId);
+            });
+            ordersOnline.forEach(order => {
+              this.orders.push(
+                new Order(
+                  order.data().companyName,
+                  order.data().location,
+                  order.data().id,
+                  order.data().contactPerson
+                )
+              );
+              this.dataSource = new MatTableDataSource(this.orders);
+              if (!orderIds.includes(order.dbId)) {
+                this.indexDbService.addOrder(order.data()).then(data => {});
+              }
+            });
+          });
+        })
+        .catch(error => {
+          console.log('No orders found');
+        });
+    } else {
+      this.getOrdersFromIndexedDB();
+    }
+  }
+
+  public isConnected() {
+    return navigator.onLine;
   }
 
   public applyFilter(filterValue: string) {
@@ -49,16 +85,11 @@ export class OrderListComponent implements OnInit {
     this.router.navigate(['/create-order']);
   }
 
-  getOrders() {
+  getOrdersFromIndexedDB() {
     this.indexDbService.getAllOrders().then(allOrders => {
       allOrders.forEach(order => {
         this.orders.push(
-          new Order(
-            order.companyName,
-            order.location,
-            order.id,
-            order.contactPerson
-          )
+          new Order(order.companyName, order.location, order.id, order.contactPerson)
         );
       });
       this.dataSource = new MatTableDataSource(this.orders);
@@ -66,21 +97,17 @@ export class OrderListComponent implements OnInit {
   }
 
   public insertToCloudDB() {
-    this.indexDbService.getAllOrders()
-      .then(orders => {
-        console.log('Orders', orders);
-        orders.forEach(order => {
-          this.cloudFirestoreService.addOrder(order);
-        });
+    this.indexDbService.getAllOrders().then(orders => {
+      console.log('Orders', orders);
+      orders.forEach(order => {
+        this.cloudFirestoreService.addOrder(order);
       });
+    });
   }
 
   public getFromCloudDB() {
-    this.cloudFirestoreService.getOrders()
-      .then((orders) => {
-        console.log('Orders', orders);
-      });
+    this.cloudFirestoreService.getOrders().then(orders => {
+      console.log('Orders', orders);
+    });
   }
-
-
 }
