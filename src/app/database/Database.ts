@@ -4,8 +4,8 @@ import { ITimeRecord } from '../data-classes/time-record';
 import { IOrder } from '../data-classes/order';
 
 export class Database extends Dexie {
-  public records: Dexie.Table<ITimeRecord, 'string'>;
   public orders: Dexie.Table<IOrder, 'string'>;
+  public outboxForOrders: Dexie.Table<IOrder, 'string'>;
 
   constructor() {
     super('TimeRecords', { addons: [relationships] });
