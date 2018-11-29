@@ -23,7 +23,7 @@
     "@angular/material": "^7.0.2",
     "@angular/platform-browser": "^7.0.1",
     "@angular/platform-browser-dynamic": "^7.0.1",
-    "@angular/pwa": "^0.8.7",
+    "@angular/pwa": "^0.8.8",
     "@angular/router": "^7.0.1",
     "@angular/service-worker": "^7.0.1",
     "@types/jspdf": "^1.1.31",
