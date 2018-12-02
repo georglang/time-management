@@ -10,7 +10,8 @@ export class Database extends Dexie {
   constructor() {
     super('TimeRecords', { addons: [relationships] });
     this.version(1).stores({
-      orders: '++id, companyName, location, contactPerson, records'
+      orders: '++id, companyName, location, contactPerson, records',
+      outboxForOrders: '++id, companyName, location, contactPerson, records'
     });
   }
 }
