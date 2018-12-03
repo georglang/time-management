@@ -4,6 +4,7 @@ import { FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
 import { IndexDBService } from '../service/index-db.service';
 import { Order } from '../data-classes/order';
 import { ToastrService } from 'ngx-toastr';
+import { CloudFirestoreService } from './../service/cloud-firestore.service';
 
 @Component({
   selector: 'app-create-order',
@@ -13,12 +14,14 @@ import { ToastrService } from 'ngx-toastr';
 export class CreateOrderComponent implements OnInit {
   public createOrderForm: FormGroup;
   public columns: string[];
+  private isOnline;
 
   constructor(
     private formBuilder: FormBuilder,
     private indexDbService: IndexDBService,
     private router: Router,
-    private toastr: ToastrService
+    private toastr: ToastrService,
+    private firebaseService: CloudFirestoreService
   ) {
     this.columns = ['Firma', 'Ansprechpartner', 'Ort'];
 
@@ -30,6 +33,10 @@ export class CreateOrderComponent implements OnInit {
   }
 
   ngOnInit() {}
+
+  public isConnected() {
+    return navigator.onLine;
+  }
 
   public navigateToOrderList() {
     this.router.navigate(['/']);
@@ -48,15 +55,30 @@ export class CreateOrderComponent implements OnInit {
       order.records = [];
     }
 
-    this.indexDbService
-      .addOrder(order)
-      .then(orderId => {
-        this.router.navigate(['/order-details/' + orderId]);
-        this.showSuccess();
-      })
-      .catch(e => {
-        console.error('IndexedDB add Order: ', e);
-      });
+    if (this.isConnected()) {
+      this.firebaseService
+        .addOrder(order)
+        .then(id => {
+          console.log('Document written with ID: ', id);
+          this.showSuccess();
+          this.router.navigate(['/order-details/' + id]);
+        })
+        .catch(e => {
+          console.error('can´t create order to firebase', e);
+        });
+    } else {
+      this.indexDbService.addOrderToOutbox(order);
+    }
+
+    // this.indexDbService
+    //   .addOrder(order)
+    //   .then(orderId => {
+    //     this.router.navigate(['/order-details/' + orderId]);
+    //     this.showSuccess();
+    //   })
+    //   .catch(e => {
+    //     console.error('IndexedDB add Order: ', e);
+    //   });
   }
 
   public onSubmit() {
