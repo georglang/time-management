@@ -4,6 +4,8 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { AppComponent } from './app.component';
 import { ServiceWorkerModule } from '@angular/service-worker';
+import { AngularFireModule } from 'angularfire2';
+import { AngularFirestoreModule } from 'angularfire2/firestore';
 import { environment } from '../environments/environment';
 
 // own modules
@@ -42,6 +44,8 @@ import { EditRecordComponent } from './edit-record/edit-record.component';
 import { CreateRecordComponent } from './create-record/create-record.component';
 import { ConfirmDeleteDialogComponent } from './confirm-delete-dialog/confirm-delete-dialog.component';
 
+const firebaseConfig = environment.firebaseConfig;
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -57,7 +61,6 @@ import { ConfirmDeleteDialogComponent } from './confirm-delete-dialog/confirm-de
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
-    ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production }),
     AppRoutingModule,
     ReactiveFormsModule,
     FormsModule,
@@ -74,8 +77,10 @@ import { ConfirmDeleteDialogComponent } from './confirm-delete-dialog/confirm-de
     MatTabsModule,
     MatTableModule,
     MatDialogModule,
-    ToastrModule.forRoot()
-  ],
+    ToastrModule.forRoot(),
+    ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production }),
+    AngularFireModule.initializeApp(environment.firebaseConfig),
+    AngularFirestoreModule.enablePersistence()  ],
   providers: [
     IndexDBService,
     Database,
