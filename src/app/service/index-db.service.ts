@@ -62,12 +62,16 @@ export class IndexDBService {
       });
   }
 
+  // add record to table orders
   public addOrder(order) {
-    return this.timeRecordsDb.orders.add(order)
-      .then(data => {
-        this.cloudFirestore.addOrder(order);
-        return data;
+    return this.timeRecordsDb.orders.add(order).then(data => {
+      return data;
     });
+  }
+
+  // add record to orderOutbox
+  public addOrderToOutbox(order: IOrder) {
+    this.timeRecordsDb.outboxForOrders.add(order).then(data => {});
   }
 
   public getAllOrders(): Promise<any> {
@@ -78,6 +82,17 @@ export class IndexDBService {
       })
       .catch(e => {
         console.error('IndexDB getAllOrders: ', e);
+      });
+  }
+
+  public getOrdersFromOutbox(): Promise<any> {
+    return this.timeRecordsDb.outboxForOrders
+      .toArray()
+      .then(orders => {
+        return orders;
+      })
+      .catch(e => {
+        console.error('indexedDB: can´t get orders form outbox');
       });
   }
 
@@ -92,6 +107,17 @@ export class IndexDBService {
       .toArray(order => {
         return order;
       });
+  }
+
+  public deleteOrderFromOutbox(orderId: string) {
+    return this.timeRecordsDb.outboxForOrders
+      .where('id')
+      .equals(orderId)
+      .delete()
+      .then(function (deleteCount) {
+        console.log( 'Deleted' + deleteCount + 'objects');
+    });
+
   }
 
   public modifyOrder(orderId, record) {
