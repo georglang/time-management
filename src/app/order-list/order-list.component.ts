@@ -2,9 +2,11 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { MatSort, MatTableDataSource } from '@angular/material';
 import { IndexDBService } from '../service/index-db.service';
-import { Order } from './../data-classes/order';
+import { IOrder, Order } from './../data-classes/order';
 import { CloudFirestoreService } from '../service/cloud-firestore.service';
 import { ConnectionService } from 'ng-connection-service';
+import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators/';
 
 @Component({
   selector: 'app-order-list',
@@ -12,10 +14,12 @@ import { ConnectionService } from 'ng-connection-service';
   styleUrls: ['./order-list.component.sass']
 })
 export class OrderListComponent implements OnInit {
-  public orders: Order[] = [];
+  public orders: IOrder[];
   public dataSource = new MatTableDataSource();
   public displayedColumns = ['customer', 'contactPerson', 'location', 'icon'];
-  private isOnline: boolean;
+  public isOnline: boolean;
+
+  private ordersObs: Observable<IOrder[]>;
 
   @ViewChild(MatSort)
   sort: MatSort;
@@ -30,40 +34,48 @@ export class OrderListComponent implements OnInit {
 
   ngOnInit() {
     const orderIds = [];
+
+    // if state changes from offline to online synchronize ordersOutbox with server
     this.connectionService.monitor().subscribe(isConnected => {
-      this.isOnline = isConnected;
-      console.log('Is Connected', this.isOnline);
+      this.indexDbService.getOrdersFromOutbox().then(orders => {
+        if (orders.length !== 0) {
+          orders.forEach(order => {
+            this.cloudFirestoreService.addOrder(order)
+              .then(id => {
+                this.indexDbService.deleteOrderFromOutbox(id + '')
+                  .then((data) => {
+                    console.log('deleted form outbox', data);
+                  });
+              });
+          });
+        }
+      });
     });
 
-    if (this.isConnected) {
-      this.cloudFirestoreService
-        .getOrders()
-        .then(ordersOnline => {
-          this.indexDbService.getAllOrders().then(cachedOrders => {
-            cachedOrders.forEach(cachedOrder => {
+    if (this.isConnected()) {
+      this.ordersObs = this.cloudFirestoreService.getOrders();
+      this.ordersObs.subscribe(orders => {
+        this.orders = orders;
+        if (this.orders.length !== 0) {
+          this.indexDbService.getAllOrders().then(ordersInIndexedDB => {
+            ordersInIndexedDB.forEach(cachedOrder => {
               orderIds.push(cachedOrder.dbId);
             });
-            ordersOnline.forEach(order => {
-              this.orders.push(
-                new Order(
-                  order.data().companyName,
-                  order.data().location,
-                  order.data().id,
-                  order.data().contactPerson
-                )
-              );
-              this.dataSource = new MatTableDataSource(this.orders);
-              if (!orderIds.includes(order.dbId)) {
-                this.indexDbService.addOrder(order.data()).then(data => {});
-              }
-            });
           });
-        })
-        .catch(error => {
-          console.log('No orders found');
-        });
+
+          this.orders.forEach(order => {
+            if (!orderIds.includes(order.dbId)) {
+              this.indexDbService.addOrder(order);
+            }
+          });
+        }
+        this.dataSource = new MatTableDataSource(this.orders);
+      });
     } else {
-      this.getOrdersFromIndexedDB();
+      console.log('No internet connection');
+      this.indexDbService.getAllOrders().then(data => {
+        this.dataSource = new MatTableDataSource(data);
+      });
     }
   }
 
@@ -81,33 +93,7 @@ export class OrderListComponent implements OnInit {
     this.router.navigate(['/order-details/' + row.id]);
   }
 
-  createOrder() {
+  navigateToCreateOrder() {
     this.router.navigate(['/create-order']);
-  }
-
-  getOrdersFromIndexedDB() {
-    this.indexDbService.getAllOrders().then(allOrders => {
-      allOrders.forEach(order => {
-        this.orders.push(
-          new Order(order.companyName, order.location, order.id, order.contactPerson)
-        );
-      });
-      this.dataSource = new MatTableDataSource(this.orders);
-    });
-  }
-
-  public insertToCloudDB() {
-    this.indexDbService.getAllOrders().then(orders => {
-      console.log('Orders', orders);
-      orders.forEach(order => {
-        this.cloudFirestoreService.addOrder(order);
-      });
-    });
-  }
-
-  public getFromCloudDB() {
-    this.cloudFirestoreService.getOrders().then(orders => {
-      console.log('Orders', orders);
-    });
   }
 }
