@@ -27,7 +27,7 @@ export class CreateRecordComponent implements OnInit {
       id: [''],
       date: ['', Validators.required],
       description: ['', Validators.required],
-      workingHours: [0, Validators.required]
+      workingHours: ['', Validators.required]
     });
 
     this.route.params.subscribe(params => {
@@ -73,6 +73,7 @@ export class CreateRecordComponent implements OnInit {
         } else {
           record.id = '1';
         }
+
         this.indexDbService.addRecordToOrder(record, this.paramId)
           .then((data) => {
             this.showSuccess();
