@@ -39,12 +39,12 @@
         <ng-container matColumnDef="date">
           <mat-header-cell *matHeaderCellDef> Datum</mat-header-cell>
           <mat-cell *matCellDef="let element">
-            <div class="disable-on-mobile">{{ element.date | date: 'dd.MM.yyyy' }}</div>
+            <div class="disable-on-mobile">{{ element.date.seconds | date: 'dd.MM.yyyy' }}</div>
             <mat-form-field>
               <input
                 matInput
                 placeholder="Datum"
-                value="{{ element.date | date: 'dd.MM.yyyy' }}"
+                value="{{ element.date.seconds | date: 'dd.MM.yyyy' }}"
                 readonly
               />
             </mat-form-field>
@@ -109,3 +109,6 @@
     <i class="material-icons">add</i>
   </button>
 </div>
+
+<h2>{{isOnline}}</h2>
+
