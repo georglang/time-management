@@ -31,7 +31,9 @@ export class CreateRecordComponent implements OnInit {
     });
 
     this.route.params.subscribe(params => {
-      this.paramId = +params['id'];
+      this.paramId = params.id;
+      console.log('ParamId', this.paramId);
+
     });
   }
 
@@ -63,6 +65,7 @@ export class CreateRecordComponent implements OnInit {
   public addRecord(record: TimeRecord, orderId: number) {
     console.log('Record', record);
     if (!record.hasOwnProperty('id') || record.id === '') {
+
       this.indexDbService.getAllRecords(orderId).then(records => {
         console.log('Records', records);
 
@@ -70,18 +73,23 @@ export class CreateRecordComponent implements OnInit {
           const lastId = records[records.length - 1].id;
           const idAsNumber = Number(lastId);
           record.id = String(idAsNumber + 1);
+
+          console.log('Record Id: ', record.id);
         } else {
           record.id = '1';
         }
 
+
         this.indexDbService.addRecordToOrder(record, this.paramId)
           .then((data) => {
+            console.log('DATA', data);
+
             this.showSuccess();
             this.navigateToOrderList();
           });
       });
     } else {
-      this.indexDbService.modifyOrder(record, this.paramId);
+      this.indexDbService.modifyOrder(this.paramId, record);
     }
   }
 
