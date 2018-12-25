@@ -7,6 +7,7 @@ export interface IOrder {
   location: string;
   records?: TimeRecord[];
   dbId?: string;
+  createdAt: Date;
 }
 
 export class Order implements IOrder {
@@ -16,14 +17,16 @@ export class Order implements IOrder {
   public location: string;
   public records: TimeRecord[];
   public dbId: string;
+  public createdAt: Date;
 
   constructor(
     companyName: string,
     location: string,
-    id: string,
+    createdAt: Date,
+    id?: string,
     contactPerson?: string,
     record?: TimeRecord,
-    dbId?: string
+    dbId?: string,
   ) {
     this.companyName = companyName;
     this.location = location;
@@ -37,5 +40,6 @@ export class Order implements IOrder {
     if (dbId) {
       this.dbId = dbId;
     }
+    this.createdAt = new Date();
   }
 }
