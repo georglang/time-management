@@ -5,6 +5,7 @@ import { IndexDBService } from '../service/index-db.service';
 import { Order } from '../data-classes/order';
 import { ToastrService } from 'ngx-toastr';
 import { CloudFirestoreService } from './../service/cloud-firestore.service';
+import { TimeRecord } from '../data-classes/time-record';
 
 @Component({
   selector: 'app-create-order',
@@ -50,14 +51,26 @@ export class CreateOrderComponent implements OnInit {
     this.toastr.success('Erfolgreich erstellt', 'Auftrag', successConfig);
   }
 
-  public addOrder(order: Order) {
-    if (!order.hasOwnProperty('records')) {
-      order.records = [];
+  public addOrder(formInput: any) {
+
+    const newOrder = new Order(
+      formInput.companyName,
+      formInput.location,
+      new Date(),
+      '',
+      formInput.contactPerson
+    );
+
+    console.log('newOrder', newOrder);
+
+    if (!newOrder.hasOwnProperty('records')) {
+      newOrder.records = [];
     }
+
 
     if (this.isConnected()) {
       this.firebaseService
-        .addOrder(order)
+        .addOrder(newOrder)
         .then(id => {
           console.log('Document written with ID: ', id);
           this.showSuccess();
@@ -67,18 +80,8 @@ export class CreateOrderComponent implements OnInit {
           console.error('can´t create order to firebase', e);
         });
     } else {
-      this.indexDbService.addOrderToOutbox(order);
+      this.indexDbService.addOrderToOutbox(newOrder);
     }
-
-    // this.indexDbService
-    //   .addOrder(order)
-    //   .then(orderId => {
-    //     this.router.navigate(['/order-details/' + orderId]);
-    //     this.showSuccess();
-    //   })
-    //   .catch(e => {
-    //     console.error('IndexedDB add Order: ', e);
-    //   });
   }
 
   public onSubmit() {

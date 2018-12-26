@@ -3,6 +3,7 @@ export interface ITimeRecord {
   date: string;
   description: string;
   workingHours: number;
+  createdAt: Date;
 }
 
 export class TimeRecord implements ITimeRecord {
@@ -11,8 +12,9 @@ export class TimeRecord implements ITimeRecord {
   public description: string;
   public workingHours: number;
   public location: string;
+  public createdAt: Date;
 
-  constructor(date: string, description: string, workingHours: number, id?: string) {
+  constructor(date: string, description: string, workingHours: number, createdAt: Date, id?: string) {
     this.date = date;
     this.description = description;
     this.workingHours = workingHours;
