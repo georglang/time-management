@@ -4,6 +4,7 @@ import { FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
 import { IndexDBService } from '../service/index-db.service';
 import { TimeRecord } from '../data-classes/time-record';
 import { ToastrService, Toast } from 'ngx-toastr';
+import { CloudFirestoreService } from './../service/cloud-firestore.service';
 
 @Component({
   selector: 'app-create-record',
@@ -19,7 +20,8 @@ export class CreateRecordComponent implements OnInit {
     private route: ActivatedRoute,
     private formBuilder: FormBuilder,
     private indexDbService: IndexDBService,
-    private toastr: ToastrService
+    private toastr: ToastrService,
+    private firebaseService: CloudFirestoreService
   ) {}
 
   ngOnInit() {
@@ -35,6 +37,10 @@ export class CreateRecordComponent implements OnInit {
       console.log('ParamId', this.paramId);
 
     });
+  }
+
+  public isConnected() {
+    return navigator.onLine;
   }
 
   public navigateToOrderList() {
@@ -62,38 +68,47 @@ export class CreateRecordComponent implements OnInit {
     return ID();
   }
 
-  public addRecord(record: TimeRecord, orderId: number) {
-    console.log('Record', record);
-    if (!record.hasOwnProperty('id') || record.id === '') {
+  public createRecord(record: TimeRecord, orderId: string) {
+    record.createdAt = new Date();
+    console.log('createRecord()', record, orderId);
 
-      this.indexDbService.getAllRecords(orderId).then(records => {
-        console.log('Records', records);
-
-        if (records.length !== 0) {
-          const lastId = records[records.length - 1].id;
-          const idAsNumber = Number(lastId);
-          record.id = String(idAsNumber + 1);
-
-          console.log('Record Id: ', record.id);
-        } else {
-          record.id = '1';
-        }
-
-
-        this.indexDbService.addRecordToOrder(record, this.paramId)
-          .then((data) => {
-            console.log('DATA', data);
-
-            this.showSuccess();
-            this.navigateToOrderList();
-          });
-      });
-    } else {
-      this.indexDbService.modifyOrder(this.paramId, record);
+    if (this.isConnected()) {
+      this.firebaseService.addTimeRecord(orderId, record);
     }
+
+
+
+
+    // if (!record.hasOwnProperty('id') || record.id === '') {
+
+    //   this.indexDbService.getAllRecords(orderId).then(records => {
+    //     console.log('Records', records);
+
+    //     if (records.length !== 0) {
+    //       const lastId = records[records.length - 1].id;
+    //       const idAsNumber = Number(lastId);
+    //       record.id = String(idAsNumber + 1);
+
+    //       console.log('Record Id: ', record.id);
+    //     } else {
+    //       record.id = '1';
+    //     }
+
+
+    //     this.indexDbService.addRecordToOrder(record, this.paramId)
+    //       .then((data) => {
+    //         console.log('DATA', data);
+
+    //         this.showSuccess();
+    //         this.navigateToOrderList();
+    //       });
+    //   });
+    // } else {
+    //   this.indexDbService.modifyOrder(this.paramId, record);
+    // }
   }
 
   public onSubmit() {
-    this.addRecord(this.createRecordForm.value, this.paramId);
+    this.createRecord(this.createRecordForm.value, this.paramId);
   }
 }
