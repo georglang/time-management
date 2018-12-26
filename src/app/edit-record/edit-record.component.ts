@@ -14,7 +14,7 @@ import { ToastrService } from 'ngx-toastr';
 export class EditRecordComponent implements OnInit {
   public editRecordForm: FormGroup;
   private recordId: string;
-  private orderId: number;
+  private orderId: string;
 
   constructor(
     private formBuilder: FormBuilder,
@@ -37,11 +37,14 @@ export class EditRecordComponent implements OnInit {
 
     this.route.params.subscribe(params => {
       this.recordId = params['id'];
+      console.log('Record Id', this.recordId);
+
     });
 
     this.route.parent.url.subscribe(urlPath => {
-      const url = urlPath[urlPath.length - 1].path;
-      this.orderId = parseInt(url, 10);
+      console.log('URL PATH: ', urlPath);
+      this.orderId = urlPath[1].path;
+
     });
 
     this.getOrderById(this.orderId, this.recordId);
@@ -52,11 +55,11 @@ export class EditRecordComponent implements OnInit {
     this.router.navigate(['/order-details', this.orderId]);
   }
 
-  public getRecordById(orderId: number, recordId: string) {
+  public getRecordById(orderId: string, recordId: string) {
     this.indexedDB.getRecordById(orderId, recordId).then(record => {});
   }
 
-  public getOrderById(orderId: number, recordId: string) {
+  public getOrderById(orderId: string, recordId: string) {
     this.indexedDB.getOrderById(orderId).then(order => {
       if (order.length !== 0) {
         if (order[0].hasOwnProperty('records')) {
@@ -97,6 +100,7 @@ export class EditRecordComponent implements OnInit {
       this.editRecordForm.controls.date.value,
       this.editRecordForm.controls.description.value,
       this.editRecordForm.controls.workingHours.value,
+      new Date(),
       this.editRecordForm.controls.id.value
     );
 
