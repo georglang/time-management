@@ -35,41 +35,47 @@ export class OrderListComponent implements OnInit {
   ngOnInit() {
     const orderIds = [];
 
+    this.cloudFirestoreService.getCompleteData();
+
     // if state changes from offline to online synchronize ordersOutbox with server
     this.connectionService.monitor().subscribe(isConnected => {
       this.indexDbService.getOrdersFromOutbox().then(orders => {
         if (orders.length !== 0) {
           orders.forEach(order => {
-            this.cloudFirestoreService.addOrder(order)
-              .then(id => {
-                this.indexDbService.deleteOrderFromOutbox(id + '')
-                  .then((data) => {
-                    console.log('deleted form outbox', data);
-                  });
+            this.cloudFirestoreService.addOrder(order).then(id => {
+              this.indexDbService.deleteOrderFromOutbox(id + '').then(data => {
+                console.log('deleted form outbox', data);
               });
+            });
           });
         }
       });
     });
 
+    // If internet connection persists, get data from firebase instead from indexedDB
     if (this.isConnected()) {
       this.ordersObs = this.cloudFirestoreService.getOrders();
       this.ordersObs.subscribe(orders => {
         this.orders = orders;
-        if (this.orders.length !== 0) {
-          this.indexDbService.getAllOrders().then(ordersInIndexedDB => {
-            ordersInIndexedDB.forEach(cachedOrder => {
-              orderIds.push(cachedOrder.dbId);
-            });
-          });
+        this.orders.forEach(order => {
+          this.cloudFirestoreService.getRecords(order.id).subscribe(records => {
+            order.records = records;
+            if (this.orders.length !== 0) {
+              this.indexDbService.getAllOrders().then(ordersInIndexedDB => {
+                ordersInIndexedDB.forEach(cachedOrder => {
+                  orderIds.push(cachedOrder.id);
+                });
 
-          this.orders.forEach(order => {
-            if (!orderIds.includes(order.dbId)) {
-              this.indexDbService.addOrder(order);
+                this.orders.forEach(_order => {
+                  if (!orderIds.includes(_order.id)) {
+                    this.indexDbService.addOrder(order);
+                  }
+                });
+              });
             }
+            this.dataSource = new MatTableDataSource(this.orders);
           });
-        }
-        this.dataSource = new MatTableDataSource(this.orders);
+        });
       });
     } else {
       console.log('No internet connection');
