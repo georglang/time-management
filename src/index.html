@@ -17,18 +17,5 @@
   <body>
     <app-root></app-root>
     <noscript>Please enable JavaScript to continue using this application.</noscript>
-    <script type="module">
-      import { config } from './src/app/firebase-credentials/FirebaseCredentials.js';
-      console.log('Config', config);
-      // Initialize Firebase
-      firebase.initializeApp({
-        apiKey: config.apiKey,
-        authDomain: config.authDomain,
-        databaseURL: config.databaseURL,
-        projectId: config.projectId,
-        storageBucket: config.storageBucket,
-        messagingSenderId: config.messagingSenderId
-      });
-    </script>
   </body>
 </html>
