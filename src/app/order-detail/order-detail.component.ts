@@ -9,6 +9,8 @@ import { IOrder } from '../data-classes/order';
 import { ConfirmDeleteDialogComponent } from './../confirm-delete-dialog/confirm-delete-dialog.component';
 import { ToastrService, Toast } from 'ngx-toastr';
 
+import { CloudFirestoreService } from './../service/cloud-firestore.service';
+
 declare var jsPDF: any;
 import 'jspdf-autotable';
 import * as moment from 'moment';
@@ -21,12 +23,12 @@ moment.locale('de');
   styleUrls: ['./order-detail.component.sass']
 })
 export class OrderDetailComponent implements OnInit {
-
   @Input() customer;
   private paramId;
-  private isOnline;
+  public isOnline;
   public sumOfWorkingHours;
   public order: IOrder;
+  private orderId;
   public columns: string[];
   public totalTime = 0.0;
   public records: TimeRecord[];
@@ -40,7 +42,8 @@ export class OrderDetailComponent implements OnInit {
     private indexDbService: IndexDBService,
     private toastrService: ToastrService,
     public dialog: MatDialog,
-    private readonly connectionService: ConnectionService
+    private readonly connectionService: ConnectionService,
+    private firestoreService: CloudFirestoreService
   ) {
     this.dateAdapter.setLocale('de');
     this.columns = ['Date', 'Description', 'Time', 'Delete'];
@@ -54,13 +57,15 @@ export class OrderDetailComponent implements OnInit {
 
   ngOnInit() {
     this.route.params.subscribe(params => {
-      this.paramId = +params['id']; // (+) converts string 'id' to a number
+      this.paramId = params['id']; // (+) converts string 'id' to a number
     });
 
     this.connectionService.monitor().subscribe(isConnected => {
       this.isOnline = isConnected;
     });
+
     this.getOrderById(this.paramId);
+    this.getRecords(this.paramId);
   }
 
   public navigateToOrderList() {
@@ -68,27 +73,50 @@ export class OrderDetailComponent implements OnInit {
   }
 
   public deleteFormGroup(recordId: string, position: number) {
-    this.indexDbService.deleteRecord(recordId, this.paramId).then(data => {});
+    debugger;
+    this.indexDbService.deleteRecord(recordId, this.paramId).then(data => { });
+    this.firestoreService.deleteRecord(this.orderId, recordId);
   }
 
   public getSumOfWorkingHours() {
     this.sumOfWorkingHours = 0;
-    this.records.forEach(record => {
-      this.sumOfWorkingHours += record.workingHours;
-    });
+
+    if (this.records !== undefined) {
+      this.records.forEach(record => {
+        this.sumOfWorkingHours += record.workingHours;
+      });
+    }
   }
 
-  public getOrderById(orderId) {
-    this.indexDbService.getOrderById(orderId).then(order => {
+  public isConnected() {
+    return navigator.onLine;
+  }
+
+  public getRecords(orderId: string, ) {
+    if (this.isConnected()) {
+      this.firestoreService.getRecords(orderId).subscribe((records => {
+        console.log('Get Records', records);
+        if (records.length !== 0) {
+          this.dataSource = new MatTableDataSource<ITimeRecord>(records);
+          this.getSumOfWorkingHours();
+        }
+      }));
+    } else {
+      console.log('Get Data from Indexed DB');
+    }
+  }
+
+  public getOrderById(orderId: string) {
+
+    this.indexDbService.getOrderById(this.orderId).then(order => {
+      console.log('Order', order);
+
       if (order.length !== 0) {
         if (order[0].hasOwnProperty('records')) {
           this.order = order[0];
           this.records = order[0].records;
-
-          if (this.records.length !== 0) {
             this.dataSource = new MatTableDataSource<ITimeRecord>(this.records);
             this.getSumOfWorkingHours();
-          }
         }
       }
     });
@@ -138,6 +166,11 @@ export class OrderDetailComponent implements OnInit {
           this.showDeleteMessage();
           this.getSumOfWorkingHours();
         });
+
+        console.log('DIALOG', this.paramId);
+
+        this.firestoreService.deleteRecord(this.paramId, recordId);
+
       }
     });
   }
@@ -156,7 +189,7 @@ export class OrderDetailComponent implements OnInit {
     this.records.forEach(record => {
       const formattedDate = moment(record['date']).format('DD.MM.YYYY');
       recordsToPrint.push(
-        new TimeRecord(formattedDate, record['description'], record['workingHours'])
+        new TimeRecord(formattedDate, record['description'], record['workingHours'], new Date())
       );
     });
 
