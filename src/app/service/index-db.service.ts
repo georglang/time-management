@@ -9,9 +9,14 @@ import { CloudFirestoreService } from './cloud-firestore.service';
 export class IndexDBService {
   private records;
   public isAlreadyInDB: boolean;
+  private isOnline;
 
   constructor(private timeRecordsDb: Database, private cloudFirestore: CloudFirestoreService) {
     this.isAlreadyInDB = false;
+  }
+
+  private isConnected() {
+    return navigator.onLine;
   }
 
   public createUniqueId() {
@@ -28,37 +33,71 @@ export class IndexDBService {
   }
 
   public addRecordToOrder(record, orderId) {
-    return this.timeRecordsDb.orders
-      .where('id')
-      .equals(orderId)
-      .toArray(orders => {
-        const records = orders[0].records;
+    console.log('Add record To Order ++++', record, orderId);
+    console.log('IS ONLINE', this.isConnected());
 
-        if (records.length === 0) {
-          this.timeRecordsDb.orders
-            .where('id')
-            .equals(orderId)
-            .modify(order => {
-              order.records.push(record);
-              this.cloudFirestore.updateRecord(orderId, order.records);
-            });
-        } else {
-          for (let i = 0; i < records.length; i++) {
-            if (record.id === records[i].id) {
-              this.isAlreadyInDB = true;
+    if (this.isConnected()) {
+      return this.timeRecordsDb.orders
+        .where('id')
+        .equals(orderId)
+        .toArray(orders => {
+          console.log('TOO ARRAy', orders);
+
+          if (orders !== undefined) {
+            const records = orders[0].records;
+            console.log('ordersss 0', orders);
+            if (records.length === 0) {
+              orders[0].records.push(record);
+              console.log('IN IF' );
+
+            } else {
+              console.log('IN ELSE' );
+
+              for (let i = 0; i < records.length; i++) {
+                if (record.id === records[i].id) {
+                  this.isAlreadyInDB = true;
+                }
+              }
+              if (!this.isAlreadyInDB) {
+                orders[0].records.push(record);
+              }
             }
+            this.cloudFirestore.updateRecord(orderId, orders[0].records);
+          }
+        });
+    } else {
+      // add to Outbox
+      return this.timeRecordsDb.outboxForOrders
+        .where('id')
+        .equals(orderId)
+        .toArray(orders => {
+          if (orders !== undefined) {
+            const records = orders[0].records;
+            if (records.length === 0) {
+              orders[0].records.push(record);
+            } else {
+              for (let i = 0; i < records.length; i++) {
+                if (record.id === records[i].id) {
+                  this.isAlreadyInDB = true;
+                }
+              }
+              if (!this.isAlreadyInDB) {
+                orders[0].records.push(record);
+              }
+            }
+            this.cloudFirestore.updateRecord(orderId, orders[0].records);
           }
 
-          if (!this.isAlreadyInDB) {
-            this.timeRecordsDb.orders
-              .where('id')
-              .equals(orderId)
-              .modify(order => {
-                order.records.push(record);
-                this.cloudFirestore.updateRecord(orderId, order.records);
-              });
-          }
-        }
+        });
+    }
+  }
+
+  public getOrderByIdFromOutbox(paramId: number) {
+    return this.timeRecordsDb.outboxForOrders
+      .where('id')
+      .equals(paramId)
+      .toArray(order => {
+        return order;
       });
   }
 
@@ -96,11 +135,11 @@ export class IndexDBService {
       });
   }
 
-  public getRecordById(orderId: number, recordId: string): Promise<any> {
+  public getRecordById(orderId: string, recordId: string): Promise<any> {
     return this.getAllRecords(orderId);
   }
 
-  public getOrderById(paramId: number) {
+  public getOrderById(paramId: string) {
     return this.timeRecordsDb.orders
       .where('id')
       .equals(paramId)
@@ -114,10 +153,9 @@ export class IndexDBService {
       .where('id')
       .equals(orderId)
       .delete()
-      .then(function (deleteCount) {
-        console.log( 'Deleted' + deleteCount + 'objects');
-    });
-
+      .then(function(deleteCount) {
+        console.log('Deleted' + deleteCount + 'objects');
+      });
   }
 
   public modifyOrder(orderId, record) {
@@ -126,6 +164,9 @@ export class IndexDBService {
       .equals(orderId)
       .toArray(order => {
         const records = order[0].records;
+        if (records.length === 0) {
+          order[0].records.push(record);
+        }
         for (let index = 0; index < records.length; index++) {
           const element = records[index];
           if (record.id === element.id) {
@@ -178,7 +219,7 @@ export class IndexDBService {
       });
   }
 
-  public updateRecord(updatedRecord: TimeRecord, orderId: number) {
+  public updateRecord(updatedRecord: TimeRecord, orderId: string) {
     return this.timeRecordsDb.orders
       .where('id')
       .equals(orderId)
@@ -197,10 +238,10 @@ export class IndexDBService {
                   ref.value.records = records;
 
                   this.cloudFirestore
-                    .updateRecord(orderId.toString(), order[0].records)
-                    .then(data => {
-                      console.log('Updated in firestore');
-                    });
+                    .updateRecord(orderId.toString(), order[0].records);
+                    // .then(data => {
+                    //   console.log('Updated in firestore');
+                    // });
                 });
             }
           }
