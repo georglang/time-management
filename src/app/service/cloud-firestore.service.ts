@@ -79,7 +79,6 @@ export class CloudFirestoreService {
             const pointRef: Observable<any> = this.afs.collection('records').valueChanges();
 
             const pointsObserver = pointRef.subscribe(records => {
-              debugger;
               console.log('pointsObserver', records);
 
               return {};
@@ -87,33 +86,7 @@ export class CloudFirestoreService {
           })
         )
       );
-
-    // let eventProducerRef = await db.collection('event_prods');
-    // let allEventProducers = eventProducerRef.get().then(
-    //   producer => {
-    //     producer.forEach(snapshot => {
-    //       const docRef = eventProducerRef.doc(snapshot.id)
-    //       const subcollection = docRef.collection('eventGroups')
-    //     })
-    //   }
-    // )
   }
-
-  //   getCurrentLeaderboard() {
-  //     return this.afs.collection('users').snapshotChanges().map(actions => {
-  //       return actions.map(a => {
-  //         const data = a.payload.doc.data()
-  //         const id = a.payload.doc.id;
-  //         const pointRef: Observable<any> = this.afs.object(`users/${id}/game`).valueChanges() // <--- Here
-
-  //         const pointsObserver = pointRef.subscribe(points => { //<--- And Here
-  //           return { id, first_name: data.first_name, point:points };
-  //         })
-  //     })
-  //  }
-  //  ....
-  //  Usage:
-  //  getCurrentLeaderboard.subscribe(points => this.points = points);
 
   public getOrders() {
     this.orders = this.ordersCollection
@@ -130,24 +103,35 @@ export class CloudFirestoreService {
       .pipe(map(actions => actions.map(this.documentToDomainObject)));
   }
 
+  public getRecordById(orderId: string, recordId: string) {
+    return this.ordersCollection
+      .doc(orderId)
+      .collection('records')
+      .snapshotChanges()
+      .pipe(
+        map(actions => {
+          return actions.map(a => {
+            const object = a.payload.doc.data() as TimeRecord;
+            object.id = a.payload.doc.id;
+            return object;
+          });
+        })
+      );
+  }
+
+  documentToDomainObject = _ => {
+    const object = _.payload.doc.data();
+    object.id = _.payload.doc.id;
+    return object;
+  }
+
+
   public deleteRecord(orderId: string, recordId) {
     this.ordersCollection
       .doc(orderId)
-      .collection('records').doc(recordId).delete();
-
-      // .snapshotChanges()
-      // .pipe(
-      //   map(actions =>
-
-      //   actions.map(this.deleteRecordHelper)
-      // )).subscribe(records => {
-      //   records.forEach(record => {
-      //     if (record.id === recordId) {
-      //       console.log('Data ++++', record);
-
-      //     }
-      //   });
-      // });
+      .collection('records')
+      .doc(recordId)
+      .delete();
   }
 
   public addOrder(order: IOrder) {
@@ -171,8 +155,8 @@ export class CloudFirestoreService {
   public addTimeRecord(orderId: string, record: ITimeRecord) {
     console.log('Record', record);
 
-    const recordId = this.afs.createId();
-    record.id = recordId;
+    // const recordId = this.afs.createId();
+    // record.id = recordId;
 
     console.log('Record with id', record);
 
@@ -182,7 +166,9 @@ export class CloudFirestoreService {
       .collection('records')
       .add(record)
       .then(data => {
-        console.log('Added Record to Firestore', data);
+        console.log('Added Record to Firestore', data.id);
+        record.id = data.id;
+        console.log('RRRRRECORD', record);
       });
 
     // documentReference = this.ordersDocument.ref.collection('orders').where('id', '==', orderId);
@@ -198,17 +184,9 @@ export class CloudFirestoreService {
     //   });
   }
 
-  documentToDomainObject = _ => {
+  public recordById = _ => {
     const object = _.payload.doc.data();
-    object.id = _.payload.doc.id;
-    return object;
-  }
-
-  deleteRecordHelper = _ => {
-    const object = _.payload.doc.data();
-    object.id = _.payload.doc.id;
-    return object;
-  }
+  };
 
   public updateRecord(orderId: string, newRecords: any) {
     const records = newRecords.map(obj => {
