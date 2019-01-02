@@ -2,9 +2,13 @@ import { Component, OnInit, Inject } from '@angular/core';
 import { FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { IndexDBService } from './../service/index-db.service';
-import { TimeRecord } from './../data-classes/time-record';
+import { TimeRecord, ITimeRecord } from './../data-classes/time-record';
 import { DateAdapter } from '@angular/material';
 import { ToastrService } from 'ngx-toastr';
+import { CloudFirestoreService } from './../service/cloud-firestore.service';
+
+import * as moment from 'moment';
+
 
 @Component({
   selector: 'app-edit-record',
@@ -15,6 +19,8 @@ export class EditRecordComponent implements OnInit {
   public editRecordForm: FormGroup;
   private recordId: string;
   private orderId: string;
+  private record: ITimeRecord;
+  private formatedDate: string;
 
   constructor(
     private formBuilder: FormBuilder,
@@ -22,7 +28,8 @@ export class EditRecordComponent implements OnInit {
     private route: ActivatedRoute,
     private indexedDB: IndexDBService,
     private dateAdapter: DateAdapter<Date>,
-    private toastrService: ToastrService
+    private toastrService: ToastrService,
+    private cloudFirestoreService: CloudFirestoreService
   ) {
     this.dateAdapter.setLocale('de');
   }
@@ -38,17 +45,21 @@ export class EditRecordComponent implements OnInit {
     this.route.params.subscribe(params => {
       this.recordId = params['id'];
       console.log('Record Id', this.recordId);
-
     });
 
     this.route.parent.url.subscribe(urlPath => {
       console.log('URL PATH: ', urlPath);
       this.orderId = urlPath[1].path;
-
     });
 
     this.getOrderById(this.orderId, this.recordId);
+
+    console.log('Record: ');
     this.getRecordById(this.orderId, this.recordId);
+  }
+
+  public isConnected() {
+    return navigator.onLine;
   }
 
   public navigateToOrderList() {
@@ -56,7 +67,19 @@ export class EditRecordComponent implements OnInit {
   }
 
   public getRecordById(orderId: string, recordId: string) {
-    this.indexedDB.getRecordById(orderId, recordId).then(record => {});
+    if (this.isConnected) {
+      return this.cloudFirestoreService.getRecordById(orderId, recordId).subscribe(records => {
+        records.forEach(element => {
+          if (element.id === recordId) {
+            this.setControl(element);
+            return element;
+          }
+        });
+      });
+    } else {
+      console.warn('No internet connection: Get Data from IndexedDB');
+      this.indexedDB.getRecordById(orderId, recordId).then(record => {});
+    }
   }
 
   public getOrderById(orderId: string, recordId: string) {
@@ -81,8 +104,14 @@ export class EditRecordComponent implements OnInit {
   }
 
   public setControl(record: TimeRecord) {
-    this.editRecordForm.controls['id'].setValue(record.id);
+    const date: any = record.date;
+
+    record.date = moment.unix(date.seconds).format('MM.DD.YYYY');
+    console.log('record.date', record.date);
+    this.formatedDate = record.date;
+    this.editRecordForm.get('date').setValue(record.date);
     this.editRecordForm.controls['date'].setValue(record.date);
+
     this.editRecordForm.controls['description'].setValue(record.description);
     this.editRecordForm.controls['workingHours'].setValue(record.workingHours);
   }
@@ -104,10 +133,9 @@ export class EditRecordComponent implements OnInit {
       this.editRecordForm.controls.id.value
     );
 
-    this.indexedDB.updateRecord(newRecord, this.orderId)
-      .then(data => {
-        this.showSuccessMessage();
-        this.navigateToOrderList();
+    this.indexedDB.updateRecord(newRecord, this.orderId).then(data => {
+      this.showSuccessMessage();
+      this.navigateToOrderList();
     });
   }
 }
