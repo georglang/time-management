@@ -31,7 +31,7 @@ export class OrderDetailComponent implements OnInit {
   private orderId;
   public columns: string[];
   public totalTime = 0.0;
-  public records: TimeRecord[];
+  public records: TimeRecord[] = [];
   public displayedColumns = ['date', 'description', 'workingHours', 'action'];
   public dataSource: MatTableDataSource<ITimeRecord>;
 
@@ -73,7 +73,6 @@ export class OrderDetailComponent implements OnInit {
   }
 
   public deleteFormGroup(recordId: string, position: number) {
-    debugger;
     this.indexDbService.deleteRecord(recordId, this.paramId).then(data => { });
     this.firestoreService.deleteRecord(this.orderId, recordId);
   }
@@ -94,9 +93,15 @@ export class OrderDetailComponent implements OnInit {
 
   public getRecords(orderId: string, ) {
     if (this.isConnected()) {
-      this.firestoreService.getRecords(orderId).subscribe((records => {
-        console.log('Get Records', records);
+      this.firestoreService.getRecords(orderId)
+        .subscribe((records => {
+
         if (records.length !== 0) {
+
+          records.forEach(record => {
+            record.date = moment.unix(record.date.seconds).format('MM.DD.YYYY');
+            this.records.push(record);
+          });
           this.dataSource = new MatTableDataSource<ITimeRecord>(records);
           this.getSumOfWorkingHours();
         }
@@ -109,8 +114,6 @@ export class OrderDetailComponent implements OnInit {
   public getOrderById(orderId: string) {
 
     this.indexDbService.getOrderById(this.orderId).then(order => {
-      console.log('Order', order);
-
       if (order.length !== 0) {
         if (order[0].hasOwnProperty('records')) {
           this.order = order[0];
