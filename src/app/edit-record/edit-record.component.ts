@@ -9,7 +9,6 @@ import { CloudFirestoreService } from './../service/cloud-firestore.service';
 
 import * as moment from 'moment';
 
-
 @Component({
   selector: 'app-edit-record',
   templateUrl: './edit-record.component.html',
@@ -19,8 +18,7 @@ export class EditRecordComponent implements OnInit {
   public editRecordForm: FormGroup;
   private recordId: string;
   private orderId: string;
-  private record: ITimeRecord;
-  private formatedDate: string;
+  public formatedDate: string;
 
   constructor(
     private formBuilder: FormBuilder,
@@ -105,15 +103,12 @@ export class EditRecordComponent implements OnInit {
 
   public setControl(record: TimeRecord) {
     const date: any = record.date;
-
-    record.date = moment.unix(date.seconds).format('MM.DD.YYYY');
-    console.log('record.date', record.date);
-    this.formatedDate = record.date;
-    this.editRecordForm.get('date').setValue(record.date);
-    this.editRecordForm.controls['date'].setValue(record.date);
-
-    this.editRecordForm.controls['description'].setValue(record.description);
-    this.editRecordForm.controls['workingHours'].setValue(record.workingHours);
+    this.editRecordForm.setValue({
+      id: record.id,
+      date: new Date(moment.unix(date.seconds).format('MM.DD.YYYY')),
+      description: record.description,
+      workingHours: record.workingHours
+    });
   }
 
   public showSuccessMessage() {
