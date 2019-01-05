@@ -13,11 +13,11 @@ import { Observable } from 'rxjs';
   styleUrls: ['./order-list.component.sass']
 })
 export class OrderListComponent implements OnInit {
-  public orders: any[]; // because of firebase auto generated id, IOrder coudn´t be used
+  public orders: any[]; // IOrder coudn´t be used because of firebase auto generated id,
   public dataSource = new MatTableDataSource();
   public displayedColumns = ['customer', 'contactPerson', 'location', 'icon'];
   public isOnline: boolean;
-
+  private ordersFromIndexedDB: any = [];
   private ordersObs: Observable<IOrder[]>;
 
   @ViewChild(MatSort)
@@ -31,26 +31,32 @@ export class OrderListComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    const orderIds: any = [];
-
     // if state changes from offline to online synchronize ordersOutbox with server
-    this.connectionService.monitor().subscribe(() => {
-      this.indexDbService.getOrdersFromOutbox().then(orders => {
-        if (orders.length !== 0) {
-          orders.forEach(order => {
-            this.cloudFirestoreService.addOrder(order).then(id => {
-              this.indexDbService.deleteOrderFromOutbox(id + '').then(data => {
-                console.log('deleted form outbox', data);
+    // and delete orders in outbox
+    this.connectionService.monitor().subscribe(isConnected => {
+      this.isOnline = isConnected;
+      if (this.isOnline) {
+        this.indexDbService.getOrdersFromOutbox().then(orders => {
+          if (orders.length !== 0) {
+            orders.forEach(order => {
+              const id = order.id;
+              delete order.id;
+              this.cloudFirestoreService.addOrder(order).then(() => {
+                this.indexDbService.deleteOrderFromOutbox(id);
               });
             });
-          });
-        }
-      });
+          }
+        });
+      }
     });
+    this.getOrders();
+  }
 
-    // if internet connection persists, get data from firebase and save it to indexedDB
-    // the firebase unique id will be used as indexedDB key
-    if (this.isConnected()) {
+  // if internet connection persists, get data from firebase and save it to indexedDB
+  // the firebase unique id will be used as indexedDB key
+  public getOrders() {
+    const orderIds: string[] = [];
+    if (this.isOnline) {
       this.ordersObs = this.cloudFirestoreService.getOrders();
       this.ordersObs.subscribe(orders => {
         this.orders = orders;
@@ -71,15 +77,24 @@ export class OrderListComponent implements OnInit {
         });
       });
     } else {
-      console.error('No internet connection');
-      this.indexDbService.getAllOrders().then(data => {
-        this.dataSource = new MatTableDataSource(data);
-      });
+      console.warn('No internet connection');
+      // data from indexedDB orders and outboxForOrders tables will be fetched
+      this.indexDbService
+        .getAllOrders()
+        .then(ordersTable => {
+          ordersTable.forEach(order => {
+            this.ordersFromIndexedDB.push(order);
+          });
+        })
+        .then(() => {
+          this.indexDbService.getOrdersFromOutbox().then(ordersOutboxTable => {
+            ordersOutboxTable.forEach(order => {
+              this.ordersFromIndexedDB.push(order);
+            });
+            this.dataSource = new MatTableDataSource(this.ordersFromIndexedDB);
+          });
+        });
     }
-  }
-
-  public isConnected() {
-    return navigator.onLine;
   }
 
   public applyFilter(filterValue: string) {
