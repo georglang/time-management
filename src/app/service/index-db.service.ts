@@ -19,82 +19,53 @@ export class IndexDBService {
 
   public addRecordToOrder(record, orderId) {
     return this.timeRecordsDb.orders
-        .where('id')
-        .equals(orderId)
-        .toArray(orders => {
-          if (orders !== undefined) {
-            const records = orders[0].records;
-            // if the order has no record
-            if (records === undefined) {
-              orders[0].records = [];
+      .where('id')
+      .equals(orderId)
+      .toArray(orders => {
+        if (orders !== undefined) {
+          const records = orders[0].records;
+          // if order has no record
+          if (records === undefined) {
+            orders[0].records = [];
+          }
+          orders[0].records.push(record);
+          this.timeRecordsDb.orders
+            .where('id')
+            .equals(orderId)
+            .modify(orders[0]);
+        }
+      });
+  }
+
+  public addRecordToOutboxOrder(record, orderId) {
+    return this.timeRecordsDb.outboxForOrders
+      .where('id')
+      .equals(orderId)
+      .toArray(orders => {
+        if (orders !== undefined) {
+          const records = orders[0].records;
+          if (records === undefined) {
+            orders[0].records = [];
+            orders[0].records.push(record);
+          } else {
+            if (record.id === undefined) {
               orders[0].records.push(record);
-            } else {
-              if (record.id === undefined) {
-                orders[0].records.push(record);
+            }
+
+
+
+            for (let i = 0; i < records.length; i++) {
+              if (record.id === records[i].id) {
+                this.isAlreadyInDB = true;
               }
-              this.timeRecordsDb.orders
-              .where('id')
-              .equals(orderId)
-              .modify(orders[0]);
+            }
+            if (!this.isAlreadyInDB) {
+              orders[0].records.push(record);
             }
           }
-        });
-
-    if (this.isConnected()) {
-
-    //   return this.timeRecordsDb.orders
-    //     .where('id')
-    //     .equals(orderId)
-    //     .toArray(orders => {
-    //       console.log('TOO ARRAy', orders);
-
-    //       if (orders !== undefined) {
-    //         const records = orders[0].records;
-    //         console.log('ordersss 0', orders);
-    //         if (records.length === 0) {
-    //           orders[0].records.push(record);
-    //           console.log('IN IF' );
-
-    //         } else {
-    //           console.log('IN ELSE' );
-
-    //           for (let i = 0; i < records.length; i++) {
-    //             if (record.id === records[i].id) {
-    //               this.isAlreadyInDB = true;
-    //             }
-    //           }
-    //           if (!this.isAlreadyInDB) {
-    //             orders[0].records.push(record);
-    //           }
-    //         }
-    //         this.cloudFirestore.updateRecord(orderId, orders[0].records);
-    //       }
-    //     });
-    // } else {
-    //   add to Outbox
-    //   return this.timeRecordsDb.outboxForOrders
-    //     .where('id')
-    //     .equals(orderId)
-    //     .toArray(orders => {
-    //       if (orders !== undefined) {
-    //         const records = orders[0].records;
-    //         if (records.length === 0) {
-    //           orders[0].records.push(record);
-    //         } else {
-    //           for (let i = 0; i < records.length; i++) {
-    //             if (record.id === records[i].id) {
-    //               this.isAlreadyInDB = true;
-    //             }
-    //           }
-    //           if (!this.isAlreadyInDB) {
-    //             orders[0].records.push(record);
-    //           }
-    //         }
-    //         this.cloudFirestore.updateRecord(orderId, orders[0].records);
-    //       }
-
-    //     });
-    // }
+          this.cloudFirestore.updateRecord(orderId, orders[0].records);
+        }
+      });
   }
 
   public getOrderByIdFromOutbox(paramId: number) {
