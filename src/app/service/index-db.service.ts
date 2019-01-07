@@ -17,6 +17,12 @@ export class IndexDBService {
     return navigator.onLine;
   }
 
+  // add order offline
+  public addOrderToOutbox(order: IOrder) {
+    this.timeRecordsDb.outboxForOrders.add(order);
+  }
+
+  // evtl. noch createdAt mit einbeziehen, damit keine doppelten eintraege vorhanden sind
   public addRecordToOrder(record, orderId) {
     return this.timeRecordsDb.orders
       .where('id')
@@ -37,34 +43,24 @@ export class IndexDBService {
       });
   }
 
-  public addRecordToOutboxOrder(record, orderId) {
+  public addRecordToOrderOutbox(record, orderId) {
     return this.timeRecordsDb.outboxForOrders
       .where('id')
-      .equals(orderId)
-      .toArray(orders => {
-        if (orders !== undefined) {
-          const records = orders[0].records;
-          if (records === undefined) {
-            orders[0].records = [];
-            orders[0].records.push(record);
-          } else {
-            if (record.id === undefined) {
-              orders[0].records.push(record);
-            }
-
-
-
-            for (let i = 0; i < records.length; i++) {
-              if (record.id === records[i].id) {
-                this.isAlreadyInDB = true;
-              }
-            }
-            if (!this.isAlreadyInDB) {
-              orders[0].records.push(record);
-            }
-          }
-          this.cloudFirestore.updateRecord(orderId, orders[0].records);
-        }
+      .equals(+orderId)
+      .first()
+      .then(data => {
+        data.records.push(record);
+        console.log('Data', data);
+        this.timeRecordsDb.outboxForOrders
+          .where('id')
+          .equals(+orderId)
+          .modify(data)
+          .then(updated => {
+            console.log('Data', updated);
+          })
+          .catch(e => {
+            console.warn('indexedDB: can´t add record to order in outbox');
+          });
       });
   }
 
@@ -82,11 +78,6 @@ export class IndexDBService {
     return this.timeRecordsDb.orders.add(order).then(data => {
       return data;
     });
-  }
-
-  // add record to orderOutbox
-  public addOrderToOutbox(order: IOrder) {
-    this.timeRecordsDb.outboxForOrders.add(order).then(data => {});
   }
 
   public getAllOrders(): Promise<any> {
