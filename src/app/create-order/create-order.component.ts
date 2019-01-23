@@ -2,10 +2,9 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
 import { IndexDBService } from '../service/index-db.service';
-import { Order } from '../data-classes/order';
+import { Order, IOrder } from '../data-classes/order';
 import { ToastrService } from 'ngx-toastr';
 import { CloudFirestoreService } from './../service/cloud-firestore.service';
-import { TimeRecord } from '../data-classes/time-record';
 
 @Component({
   selector: 'app-create-order',
@@ -15,7 +14,7 @@ import { TimeRecord } from '../data-classes/time-record';
 export class CreateOrderComponent implements OnInit {
   public createOrderForm: FormGroup;
   public columns: string[];
-  private isOnline;
+  private newOrder: IOrder;
 
   constructor(
     private formBuilder: FormBuilder,
@@ -51,28 +50,20 @@ export class CreateOrderComponent implements OnInit {
     this.toastr.success('Erfolgreich erstellt', 'Auftrag', successConfig);
   }
 
-  public addOrder(formInput: any) {
-
-    const newOrder = new Order(
+  public createOrder(formInput: any) {
+    this.newOrder = new Order(
       formInput.companyName,
       formInput.location,
       new Date(),
-      '',
       formInput.contactPerson
     );
 
-    console.log('newOrder', newOrder);
-
-    if (!newOrder.hasOwnProperty('records')) {
-      newOrder.records = [];
-    }
-
+    this.newOrder.records = [];
 
     if (this.isConnected()) {
       this.firebaseService
-        .addOrder(newOrder)
+        .addOrder(this.newOrder)
         .then(id => {
-          console.log('Document written with ID: ', id);
           this.showSuccess();
           this.router.navigate(['/order-details/' + id]);
         })
@@ -80,11 +71,13 @@ export class CreateOrderComponent implements OnInit {
           console.error('can´t create order to firebase', e);
         });
     } else {
-      this.indexDbService.addOrderToOutbox(newOrder);
+      this.indexDbService.addOrderToOutbox(this.newOrder).catch(error => {
+        console.error('could´t add order to outbox');
+      });
     }
   }
 
   public onSubmit() {
-    this.addOrder(this.createOrderForm.value);
+    this.createOrder(this.createOrderForm.value);
   }
 }
