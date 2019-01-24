@@ -5,6 +5,7 @@ import { IndexDBService } from '../service/index-db.service';
 import { Order, IOrder } from '../data-classes/order';
 import { ToastrService } from 'ngx-toastr';
 import { CloudFirestoreService } from './../service/cloud-firestore.service';
+import _ from 'lodash';
 
 @Component({
   selector: 'app-create-order',
@@ -15,6 +16,8 @@ export class CreateOrderComponent implements OnInit {
   public createOrderForm: FormGroup;
   public columns: string[];
   private newOrder: IOrder;
+  private orderIds: number[] = [];
+  private isAlreadyInOutbox = true;
 
   constructor(
     private formBuilder: FormBuilder,
@@ -42,12 +45,20 @@ export class CreateOrderComponent implements OnInit {
     this.router.navigate(['/']);
   }
 
-  public showSuccess() {
+  public toastMessageShowSuccess() {
     const successConfig = {
       positionClass: 'toast-bottom-center',
       timeout: 2000
     };
     this.toastr.success('Erfolgreich erstellt', 'Auftrag', successConfig);
+  }
+
+  public toastMessageRecordAlreadyExists() {
+    const successConfig = {
+      positionClass: 'toast-bottom-center',
+      timeout: 2000
+    };
+    this.toastr.error('Existiert bereits', 'Auftrag', successConfig);
   }
 
   public createOrder(formInput: any) {
@@ -64,15 +75,43 @@ export class CreateOrderComponent implements OnInit {
       this.firebaseService
         .addOrder(this.newOrder)
         .then(id => {
-          this.showSuccess();
+          this.toastMessageShowSuccess();
           this.router.navigate(['/order-details/' + id]);
         })
         .catch(e => {
           console.error('can´t create order to firebase', e);
         });
     } else {
-      this.indexDbService.addOrderToOutbox(this.newOrder).catch(error => {
-        console.error('could´t add order to outbox');
+      // check if new record is already in indexedDB outbox
+      // if not, add to outbox otherwise ignore
+      this.indexDbService.getOrdersFromOutbox().then(ordersInOutbox => {
+        if (ordersInOutbox.length !== 0) {
+          const orders = [];
+          const newOrder = {
+            companyName: this.newOrder.companyName,
+            location: this.newOrder.location,
+            contactPerson: this.newOrder.contactPerson
+          };
+
+          ordersInOutbox.forEach(order => {
+            orders.push({
+              companyName: order.companyName,
+              location: order.location,
+              contactPerson: order.contactPerson
+            });
+          });
+          this.isAlreadyInOutbox = _.findIndex(orders, o => _.isMatch(o, newOrder)) > -1;
+          if (!this.isAlreadyInOutbox) {
+            this.indexDbService.addOrderToOutbox(this.newOrder);
+            this.isAlreadyInOutbox = true;
+          } else {
+            this.toastMessageRecordAlreadyExists();
+          }
+        } else {
+          this.indexDbService.addOrderToOutbox(this.newOrder);
+          this.toastMessageShowSuccess();
+        }
+        this.isAlreadyInOutbox = true;
       });
     }
   }
