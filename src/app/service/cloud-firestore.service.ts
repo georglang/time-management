@@ -10,6 +10,7 @@ import {
   AngularFirestore,
   AngularFirestoreCollection,
   AngularFirestoreDocument,
+  DocumentChangeAction,
   DocumentReference
 } from '@angular/fire/firestore';
 
@@ -21,33 +22,74 @@ import { map } from 'rxjs/operators';
 })
 export class CloudFirestoreService {
   private ordersDocument: AngularFirestoreDocument<IOrder>;
-  public order: Observable<IOrder>;
-  private ordersCollection: AngularFirestoreCollection<IOrder>;
+
+  public ordersCollection: AngularFirestoreCollection<IOrder>;
+  public order: Observable<IOrder[]>;
+
   private orders: Observable<IOrder[]>;
   private orderDoc: AngularFirestoreDocument<IOrder>;
+
+  private ordersInFirestore: any[] = [];
 
   private data: any;
   constructor(private afs: AngularFirestore) {
     this.ordersDocument = afs.doc<IOrder>('orders/1');
-    console.log('Orders Document', this.ordersDocument);
-
-    this.order = this.ordersDocument.valueChanges();
-
     this.ordersCollection = this.afs.collection<IOrder>('orders');
 
+    // this.ordersDocument = afs.doc<IOrder>('orders/1');
+    // console.log('Orders Document', this.ordersDocument);
+
+    // this.order = this.ordersDocument.valueChanges();
+
+    // this.orders = this.ordersCollection.snapshotChanges().pipe(
+    //   map(actions =>
+    //     actions.map(action => {
+    //       const data = action.payload.doc.data() as IOrder;
+    //       const id = action.payload.doc.id;
+    //       console.log(id, '=>', data);
+    //       this.data = data;
+    //       return { id, ...data };
+    //     })
+    //   )
+    // );
+
+    // this.orders.subscribe();
+  }
+
+  public hello() {
+    this.ordersCollection = this.afs.collection<IOrder>('orders');
     this.orders = this.ordersCollection.snapshotChanges().pipe(
-      map(actions =>
-        actions.map(action => {
-          const data = action.payload.doc.data() as IOrder;
-          const id = action.payload.doc.id;
-          console.log(id, '=>', data);
-          this.data = data;
+      map(actions => {
+        return actions.map(a => {
+          const data = a.payload.doc.data() as IOrder;
+          const id = a.payload.doc.id;
+          console.log('Orders', data);
+
           return { id, ...data };
-        })
-      )
+        });
+      })
     );
 
-    this.orders.subscribe();
+    return this.ordersCollection.snapshotChanges().pipe(
+      map((actions: DocumentChangeAction<IOrder>[]) => {
+        return actions.map((a: DocumentChangeAction<IOrder>) => {
+          const data: Object = a.payload.doc.data() as IOrder;
+          const id = a.payload.doc.id;
+          console.log('Data', data);
+
+          return { id, ...data };
+        });
+      })
+    );
+  }
+
+  public test() {
+    this.ordersCollection
+      .doc('orders')
+      .ref.get()
+      .then(documentSnapshot => {
+        console.log(documentSnapshot.exists);
+      });
   }
 
   update(item: IOrder) {
@@ -62,37 +104,28 @@ export class CloudFirestoreService {
     nestedCollection = this.orderDoc.collection<ITimeRecord>('records');
   }
 
-  public async getCompleteData() {
-    this.orders = this.ordersCollection
-      .snapshotChanges()
-      .pipe(map(actions => actions.map(this.documentToDomainObject)));
-    return this.orders;
+  public getDocumentsInOrdersCollection() {
+    return this.ordersCollection.ref.get().then(querySnapshot => {
+      querySnapshot.forEach(doc => {
+        console.log(doc.data());
+        this.ordersInFirestore.push(doc.data());
+        return doc.data();
+      });
+      return this.ordersInFirestore;
+    });
+  }
 
-    return this.afs
-      .collection('orders')
-      .snapshotChanges()
-      .pipe(
-        map(actions =>
-          actions.map(a => {
-            const data = a.payload.doc.data();
-            const id = a.payload.doc.id;
-            const pointRef: Observable<any> = this.afs.collection('records').valueChanges();
+  documentToDomainObject = _ => {
+    const object = _.payload.doc.data();
+    object.id = _.payload.doc.id;
 
-            const pointsObserver = pointRef.subscribe(records => {
-              console.log('pointsObserver', records);
-
-              return {};
-            });
-          })
-        )
-      );
+    return object;
   }
 
   public getOrders() {
-    this.orders = this.ordersCollection
+    return (this.orders = this.ordersCollection
       .snapshotChanges()
-      .pipe(map(actions => actions.map(this.documentToDomainObject)));
-    return this.orders;
+      .pipe(map(actions => actions.map(this.documentToDomainObject))));
   }
 
   public getRecords(orderId: string) {
@@ -103,28 +136,21 @@ export class CloudFirestoreService {
       .pipe(map(actions => actions.map(this.documentToDomainObject)));
   }
 
-  public getRecordById(orderId: string, recordId: string) {
-    return this.ordersCollection
-      .doc(orderId)
-      .collection('records')
-      .snapshotChanges()
-      .pipe(
-        map(actions => {
-          return actions.map(a => {
-            const object = a.payload.doc.data() as TimeRecord;
-            object.id = a.payload.doc.id;
-            return object;
-          });
-        })
-      );
-  }
-
-  documentToDomainObject = _ => {
-    const object = _.payload.doc.data();
-    object.id = _.payload.doc.id;
-    return object;
-  }
-
+  // public getRecordById(orderId: string, recordId: string) {
+  //   return this.ordersCollection
+  //     .doc(orderId)
+  //     .collection('records')
+  //     .snapshotChanges()
+  //     .pipe(
+  //       map(actions => {
+  //         return actions.map(a => {
+  //           const object = a.payload.doc.data() as TimeRecord;
+  //           object.id = a.payload.doc.id;
+  //           return object;
+  //         });
+  //       })
+  //     );
+  // }
 
   public deleteRecord(orderId: string, recordId) {
     this.ordersCollection
@@ -135,65 +161,33 @@ export class CloudFirestoreService {
   }
 
   public addOrder(order: IOrder) {
-    const id = this.afs.createId();
-    order.id = id;
-
-    console.log('New Order', order);
-
     const _order = JSON.parse(JSON.stringify(order));
-
     return this.ordersCollection
       .add(_order)
       .then(docReference => {
         return docReference.id;
       })
       .catch(error => {
-        console.error('Error adding document: ', error);
+        console.error('Error adding order: ', error);
       });
   }
 
-  public addTimeRecord(orderId: string, record: ITimeRecord) {
-    console.log('Record', record);
-
-    // const recordId = this.afs.createId();
-    // record.id = recordId;
-
-    console.log('Record with id', record);
-
-    // this.ordersCollection.doc(orderId).collection(record).stateChanges(record);
-    this.ordersCollection
+  public addTimeRecord(orderId: string, record: any) {
+    return this.ordersCollection
       .doc(orderId)
       .collection('records')
       .add(record)
-      .then(data => {
-        console.log('Added Record to Firestore', data.id);
-        record.id = data.id;
-        console.log('RRRRRECORD', record);
+      .then(docReference => {
+        return docReference.id;
+      })
+      .catch(error => {
+        console.error('Error adding record: ', error);
       });
-
-    // documentReference = this.ordersDocument.ref.collection('orders').where('id', '==', orderId);
-    // this.ordersCollection.add(record);
-
-    // return this.ordersCollection
-    //   .add(order)
-    //   .then(docReference => {
-    //     return docReference.id;
-    //   })
-    //   .catch(error => {
-    //     console.error('Error adding document: ', error);
-    //   });
   }
-
-  public recordById = _ => {
-    const object = _.payload.doc.data();
-  };
 
   public updateRecord(orderId: string, newRecords: any) {
     const records = newRecords.map(obj => {
       return Object.assign({}, obj);
     });
-
-    console.log('New Records', records);
-    console.log('OrderId', orderId);
   }
 }
