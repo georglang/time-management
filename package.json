@@ -12,7 +12,7 @@
   },
   "private": true,
   "dependencies": {
-    "@angular-devkit/build-angular": "^0.10.6",
+    "@angular-devkit/build-angular": "^0.13.0",
     "@angular/animations": "^7.0.1",
     "@angular/cdk": "^7.0.2",
     "@angular/common": "^7.0.1",
@@ -45,7 +45,7 @@
     "ng-connection-service": "^1.0.4",
     "ngx-toastr": "^9.1.0",
     "pdfjs": "^2.1.0",
-    "rxjs": "~6.3.3",
+    "rxjs": "^6.3.3",
     "zone.js": "~0.8.26"
   },
   "devDependencies": {
