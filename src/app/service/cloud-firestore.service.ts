@@ -118,9 +118,8 @@ export class CloudFirestoreService {
   documentToDomainObject = _ => {
     const object = _.payload.doc.data();
     object.id = _.payload.doc.id;
-
     return object;
-  }
+  };
 
   public getOrders() {
     return (this.orders = this.ordersCollection
@@ -136,28 +135,31 @@ export class CloudFirestoreService {
       .pipe(map(actions => actions.map(this.documentToDomainObject)));
   }
 
-  // public getRecordById(orderId: string, recordId: string) {
-  //   return this.ordersCollection
-  //     .doc(orderId)
-  //     .collection('records')
-  //     .snapshotChanges()
-  //     .pipe(
-  //       map(actions => {
-  //         return actions.map(a => {
-  //           const object = a.payload.doc.data() as TimeRecord;
-  //           object.id = a.payload.doc.id;
-  //           return object;
-  //         });
-  //       })
-  //     );
-  // }
+  public getOrderById(orderId: string) {
+    return this.ordersCollection
+      .doc(orderId)
+      .ref
+      .get()
+      .then(doc => {
+        if (doc.exists) {
+          const data: Order = Object.assign(doc.data());
+          return data;
+        }
+      })
+      .catch(function (error) {
+        console.log('getOrderById: no order found', error);
+    });
+  }
 
   public deleteRecord(orderId: string, recordId) {
-    this.ordersCollection
+    return this.ordersCollection
       .doc(orderId)
       .collection('records')
       .doc(recordId)
-      .delete();
+      .delete()
+      .then(data => {
+        return data;
+      });
   }
 
   public addOrder(order: IOrder) {
