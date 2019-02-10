@@ -48,6 +48,7 @@ export class OrderDetailComponent implements OnInit {
     this.dateAdapter.setLocale('de');
     this.columns = ['Date', 'Description', 'Time', 'Delete'];
     this.sumOfWorkingHours = 0;
+    this.dataSource = new MatTableDataSource<ITimeRecord>();
 
     if (window.indexedDB) {
       console.log('IndexedDB is supported');
@@ -133,18 +134,12 @@ export class OrderDetailComponent implements OnInit {
             record.date = moment.unix(record.date.seconds).format('MM.DD.YYYY');
             records.push(record);
           });
-          if (records.length !== 0) {
-            console.log('Records from firebase', records);
-            this.records = records;
-            this.dataSource = new MatTableDataSource<ITimeRecord>(this.records);
-            console.log('Data Source', this.dataSource);
-            this.getSumOfWorkingHours();
-          }
         }
       });
+      this.dataSource.data = records;
+      this.getSumOfWorkingHours();
     } else {
       console.log('Get Data from Indexed DB');
-      //
     }
   }
 
@@ -155,7 +150,7 @@ export class OrderDetailComponent implements OnInit {
       // });
 
       console.log('Records from Outbox', records);
-      this.dataSource = new MatTableDataSource<ITimeRecord>(records);
+      // this.dataSource = new MatTableDataSource<ITimeRecord>(records);
     });
   }
 
@@ -219,7 +214,10 @@ export class OrderDetailComponent implements OnInit {
 
         console.log('DIALOG', this.paramId);
 
-        this.cloudFirestoreService.deleteRecord(this.paramId, recordId);
+        this.cloudFirestoreService.deleteRecord(this.paramId, recordId).then(data => {
+          console.log('Record deleted', data);
+          this.getRecords(this.paramId);
+        });
       }
     });
   }
