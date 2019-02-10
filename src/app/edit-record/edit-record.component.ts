@@ -19,6 +19,7 @@ export class EditRecordComponent implements OnInit {
   private recordId: string;
   private orderId: string;
   public formatedDate: string;
+  public record: TimeRecord;
 
   constructor(
     private formBuilder: FormBuilder,
@@ -40,71 +41,36 @@ export class EditRecordComponent implements OnInit {
       workingHours: [0, Validators.required]
     });
 
-    this.route.params.subscribe(params => {
-      this.recordId = params['id'];
-      console.log('Record Id', this.recordId);
-    });
-
     this.route.parent.url.subscribe(urlPath => {
-      console.log('URL PATH: ', urlPath);
       this.orderId = urlPath[1].path;
     });
 
-    this.getOrderById(this.orderId, this.recordId);
-
-    console.log('Record: ');
-    this.getRecordById(this.orderId, this.recordId);
+    this.route.params.subscribe(params => {
+      this.recordId = params['id'];
+      this.getRecordById(this.orderId, this.recordId);
+    });
   }
 
   public isConnected() {
     return navigator.onLine;
   }
 
+  public getRecordById(orderId: string, recordId: string): void {
+    this.cloudFirestoreService.getRecordById(orderId, recordId).then(record => {
+      this.record = record;
+      if (this.record !== undefined) {
+        this.setControl(this.record);
+      }
+    });
+  }
   public navigateToOrderList() {
     this.router.navigate(['/order-details', this.orderId]);
   }
 
-  public getRecordById(orderId: string, recordId: string) {
-    if (this.isConnected) {
-      return this.cloudFirestoreService.getRecordById(orderId, recordId).subscribe(records => {
-        records.forEach(element => {
-          if (element.id === recordId) {
-            this.setControl(element);
-            return element;
-          }
-        });
-      });
-    } else {
-      console.warn('No internet connection: Get Data from IndexedDB');
-      this.indexedDB.getRecordById(orderId, recordId).then(record => {});
-    }
-  }
-
-  public getOrderById(orderId: string, recordId: string) {
-    this.indexedDB.getOrderById(orderId).then(order => {
-      if (order.length !== 0) {
-        if (order[0].hasOwnProperty('records')) {
-          const _order = order[0];
-          if (order !== undefined) {
-            const records = order[0].records;
-            if (records.length !== 0) {
-              records.forEach(element => {
-                if (element.id === recordId) {
-                  this.setControl(element);
-                  return element;
-                }
-              });
-            }
-          }
-        }
-      }
-    });
-  }
-
-  public setControl(record: TimeRecord) {
+  public setControl(record: TimeRecord): void {
     const date: any = record.date;
     this.editRecordForm.setValue({
-      id: record.id,
+      id: this.recordId,
       date: new Date(moment.unix(date.seconds).format('MM.DD.YYYY')),
       description: record.description,
       workingHours: record.workingHours
@@ -128,9 +94,9 @@ export class EditRecordComponent implements OnInit {
       this.editRecordForm.controls.id.value
     );
 
-    this.indexedDB.updateRecord(newRecord, this.orderId).then(data => {
-      this.showSuccessMessage();
-      this.navigateToOrderList();
-    });
+    // this.indexedDB.updateRecord(newRecord, this.orderId).then(data => {
+    //   this.showSuccessMessage();
+    //   this.navigateToOrderList();
+    // });
   }
 }
