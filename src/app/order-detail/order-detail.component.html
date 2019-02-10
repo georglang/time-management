@@ -26,7 +26,7 @@
     </div>
 
     <div class="order-detail-table-wrapper">
-      <mat-table #table [dataSource]="dataSource" matSort *ngIf="dataSource.data.length > 0">
+      <mat-table #table [dataSource]="dataSource" matSort *ngIf="dataSource?.data.length > 0">
         <ng-container matColumnDef="id">
           <mat-header-cell *matHeaderCellDef> Id</mat-header-cell>
           <mat-cell *matCellDef="let element">
@@ -43,7 +43,7 @@
               <input
                 matInput
                 placeholder="Datum"
-                value="{{ element.date.seconds | date: 'dd.MM.yyyy' }}"
+                value="{{ element.date | date: 'dd.MM.yyyy' }}"
                 readonly
               />
             </mat-form-field>
@@ -104,6 +104,11 @@
   </div>
 </div>
 <div id="bottom-nav">
+  <button>
+    <i class="material-icons">
+      delete
+    </i>
+  </button>
   <button id="create-record-btn" type="button" mat-fab (click)="createNewRecord()">
     <i class="material-icons">add</i>
   </button>
