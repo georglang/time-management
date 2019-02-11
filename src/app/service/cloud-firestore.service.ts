@@ -151,6 +151,26 @@ export class CloudFirestoreService {
     });
   }
 
+  public getRecordById(orderId: string, recordId: string) {
+    return this.ordersCollection
+      .doc(orderId)
+      .collection('records')
+      .doc(recordId)
+      .ref
+      .get()
+      .then(doc => {
+        if (doc.exists) {
+          const data: TimeRecord = Object.assign(doc.data());
+          console.log('data', data);
+
+          return data;
+        }
+      })
+      .catch(function (error) {
+        console.log('getOrderById: no order found', error);
+    });
+  }
+
   public deleteRecord(orderId: string, recordId) {
     return this.ordersCollection
       .doc(orderId)
