@@ -19,7 +19,7 @@ export class EditRecordComponent implements OnInit {
   private recordId: string;
   private orderId: string;
   public formatedDate: string;
-  public record: TimeRecord;
+  public record: any;
 
   constructor(
     private formBuilder: FormBuilder,
@@ -49,6 +49,11 @@ export class EditRecordComponent implements OnInit {
       this.recordId = params['id'];
       this.getRecordById(this.orderId, this.recordId);
     });
+
+    // ToDo implement change detection notification
+    this.editRecordForm.valueChanges.subscribe(changes => {
+      console.log('Changes', changes);
+    });
   }
 
   public isConnected() {
@@ -77,7 +82,7 @@ export class EditRecordComponent implements OnInit {
     });
   }
 
-  public showSuccessMessage() {
+  public showMessageUpdatedSuccessful() {
     const successConfig = {
       positionClass: 'toast-bottom-center',
       timeout: 500
@@ -94,9 +99,18 @@ export class EditRecordComponent implements OnInit {
       this.editRecordForm.controls.id.value
     );
 
-    // this.indexedDB.updateRecord(newRecord, this.orderId).then(data => {
-    //   this.showSuccessMessage();
-    //   this.navigateToOrderList();
-    // });
+    this.cloudFirestoreService.ordersCollection
+      .doc(this.orderId)
+      .collection('records')
+      .doc(this.recordId)
+      .update({
+        date: this.editRecordForm.controls.date.value,
+        description: this.editRecordForm.controls.description.value,
+        workingHours: this.editRecordForm.controls.workingHours.value,
+        createdAt: new Date()
+      })
+      .then(() => {
+        this.showMessageUpdatedSuccessful();
+      });
   }
 }
