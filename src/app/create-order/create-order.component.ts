@@ -24,6 +24,7 @@ export class CreateOrderComponent implements OnInit {
   private orderIds: number[] = [];
   public isOnline: boolean;
   public orders: any[]; // IOrder coudn´t be used because of firebase auto generated id,
+  // private ordersToPushToFirebase: IOrder[] = [];
 
   constructor(
     private formBuilder: FormBuilder,
@@ -43,6 +44,7 @@ export class CreateOrderComponent implements OnInit {
   }
 
   ngOnInit() {
+    const ordersToPushToFirebase: string[] = [];
     // detects transition from offline to online and from online to offline
     // this.connectionService.monitor().subscribe(isConnected => {
     //   this.isOnline = isConnected;
@@ -60,31 +62,44 @@ export class CreateOrderComponent implements OnInit {
 
     this.indexDbService.getOrdersFromOutbox().then(ordersInOutbox => {
       if (ordersInOutbox.length !== 0) {
-        ordersInOutbox.forEach(orderInOutbox => {
-          this.getOrdersOnline().then((ordersOnline) => {
-            if (!this.checkIfOrderIsAlreadyOnline(orderInOutbox, ordersOnline)) {
-
+        ordersInOutbox.forEach(_orderInOutbox => {
+          this.getOrdersOnline().then(ordersOnline => {
+            if (ordersOnline.length !== 0) {
+              if (!this.checkIfOrderIsAlreadyOnline(_orderInOutbox, ordersOnline)) {
+                ordersToPushToFirebase.push(_orderInOutbox);
+              } else {
+                ordersToPushToFirebase.push(_orderInOutbox);
+              }
             }
-
           });
-
-
         });
-      }
-
-    });
-
-    this.getOrdersOnline().then(ordersOnline => {
-      if (ordersOnline.length !== 0) {
-        this.ordersOnline = ordersOnline;
-        this.sychronizeOutboxWithDatabase();
+        debugger;
+        this.sychronizeOutboxWithDatabase(ordersToPushToFirebase);
       } else {
-        // push orders from ordersOutbox to firestore
+        // if no orders are in ordersOubox, synchronization is not necessary
+        return;
       }
     });
+  }
 
-    // if connection changes from offline to online
-    this.sychronizeOutboxWithDatabase();
+  public checkIfOrderIsAlreadyOnline(orderInOutbox, ordersOnline) {
+    let isOrderAlreadyOnline = false;
+    ordersOnline.forEach(orderOnline => {
+      if (_.isEqual(orderOnline, orderInOutbox)) {
+        return (isOrderAlreadyOnline = true);
+      }
+    });
+    return isOrderAlreadyOnline;
+  }
+
+  public isAlreadyInIndexedDBOrders(orderToPush, orders) {
+    let isAlreadyInIndexedDB = false;
+    orders.forEach(order => {
+      if (_.isEqual(orderToPush, orders)) {
+        return (isAlreadyInIndexedDB = true);
+      }
+    });
+    return isAlreadyInIndexedDB;
   }
 
   // get orders from firestore database
@@ -94,45 +109,56 @@ export class CreateOrderComponent implements OnInit {
     });
   }
 
-  public checkIfOrderIsAlreadyOnline(orderInOutbox: IOrder, ordersOnline: []): boolean {
-    let isOrderOnline = true;
-    ordersOnline.forEach(orderOnline => {
-      if (_.isEqual(orderOnline, orderInOutbox)) {
-        return true;
-      }
-    });
-  }
-
-  // check if orders are in indexedDB ordersOutbox
-  // if orders in ordersOutbox synchronize with firestore database
-  public sychronizeOutboxWithDatabase() {
-    let ordersOnline: IOrder[] = [];
-    let ordersInOutbox: IOrder[] = [];
-
-    this.getOrdersOnline().then(_ordersOnline => {
-      ordersOnline = _ordersOnline;
-    });
-
-    ordersInOutbox.forEach(order => {
-      const id = order.id;
-      delete order.id;
-
+  // push orders from ordersOutbox to Firestore
+  // if orders are in Firestore push to indexedDB Orders
+  public sychronizeOutboxWithDatabase(ordersToPushToFirebase) {
+    ordersToPushToFirebase.forEach(order => {
       this.cloudFirestoreService.addOrder(order).then(() => {
-        this.indexDbService.ordersInOrdersTable().then(ordersInIndexedDB => {
-          ordersInIndexedDB.forEach(cachedOrder => {
-            this.orderIds.push(cachedOrder.id);
+        debugger;
+        if (!this.isAlreadyInIndexedDBOrders(order, ordersToPushToFirebase)) {
+          this.indexDbService.addToOrdersTable(order).then(() => {
+            this.deleteOrderInIndexedDbOrdersOutbox(order);
           });
-          this.orders.forEach(_order => {
-            if (!this.orderIds.includes(_order.id)) {
-              this.indexDbService.addToOrdersTable(order).then(() => {
-                this.indexDbService.deleteOrderFromOutbox(id);
-              });
-            }
-          });
-        });
+        }
       });
     });
   }
+
+  // delete order in indexedDbOrdersOutbox
+  // check if orders are in firebase delete from ordersOutbox
+  public deleteOrderInIndexedDbOrdersOutbox(order) {
+    this.indexDbService.deleteOrderFromOutbox(order)
+      .then(() => {
+
+      });
+  }
+
+
+
+
+//         this.indexDbService.ordersInOrdersTable().then(ordersInIndexedDB => {
+//           ordersInIndexedDB.forEach(cachedOrder => {
+//             this.orderIds.push(cachedOrder.id);
+//           });
+//           this.orders.forEach(_order => {
+//             if (!this.orderIds.includes(_order.id)) {
+//               this.indexDbService.addToOrdersTable(order).then(() => {
+//                 //this.indexDbService.deleteOrderFromOutbox(id);
+//               });
+//             }
+//           });
+//         });
+//       });
+//     });
+
+//     ordersInOutbox.forEach(order => {
+//       debugger;
+//       // const id = _order.id;
+//       // delete _order.id;
+//     });
+// }
+
+
 
   // ToDo
   // Wenn Offline order erstellt wird und man auf detail seite weiter geleitet wird
@@ -170,11 +196,14 @@ export class CreateOrderComponent implements OnInit {
     );
     this.newOrder.records = [];
 
-    if (this.isConnected()) {
-      this.createOrderIfOnline();
-    } else {
-      this.createOrderIfOffline();
-    }
+
+    this.createOrderIfOffline();
+
+    // if (this.isConnected()) {
+    //   this.createOrderIfOnline();
+    // } else {
+    //   this.createOrderIfOffline();
+    // }
   }
 
   public createOrderIfOnline(): void {
