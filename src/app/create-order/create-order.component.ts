@@ -73,10 +73,10 @@ export class CreateOrderComponent implements OnInit {
             }
           });
         });
-        debugger;
         this.sychronizeOutboxWithDatabase(ordersToPushToFirebase);
       } else {
         // if no orders are in ordersOubox, synchronization is not necessary
+        this.sychronizeOutboxWithDatabase(ordersInOutbox);
         return;
       }
     });
@@ -117,7 +117,7 @@ export class CreateOrderComponent implements OnInit {
         debugger;
         if (!this.isAlreadyInIndexedDBOrders(order, ordersToPushToFirebase)) {
           this.indexDbService.addToOrdersTable(order).then(() => {
-            this.deleteOrderInIndexedDbOrdersOutbox(order);
+            this.deleteOrderInIndexedDbOrdersOutbox(order.id);
           });
         }
       });
@@ -126,39 +126,31 @@ export class CreateOrderComponent implements OnInit {
 
   // delete order in indexedDbOrdersOutbox
   // check if orders are in firebase delete from ordersOutbox
-  public deleteOrderInIndexedDbOrdersOutbox(order) {
-    this.indexDbService.deleteOrderFromOutbox(order)
-      .then(() => {
-
-      });
+  public deleteOrderInIndexedDbOrdersOutbox(orderId) {
+    this.indexDbService.deleteOrderFromOutbox(orderId).then(() => {});
   }
 
+  //         this.indexDbService.ordersInOrdersTable().then(ordersInIndexedDB => {
+  //           ordersInIndexedDB.forEach(cachedOrder => {
+  //             this.orderIds.push(cachedOrder.id);
+  //           });
+  //           this.orders.forEach(_order => {
+  //             if (!this.orderIds.includes(_order.id)) {
+  //               this.indexDbService.addToOrdersTable(order).then(() => {
+  //                 //this.indexDbService.deleteOrderFromOutbox(id);
+  //               });
+  //             }
+  //           });
+  //         });
+  //       });
+  //     });
 
-
-
-//         this.indexDbService.ordersInOrdersTable().then(ordersInIndexedDB => {
-//           ordersInIndexedDB.forEach(cachedOrder => {
-//             this.orderIds.push(cachedOrder.id);
-//           });
-//           this.orders.forEach(_order => {
-//             if (!this.orderIds.includes(_order.id)) {
-//               this.indexDbService.addToOrdersTable(order).then(() => {
-//                 //this.indexDbService.deleteOrderFromOutbox(id);
-//               });
-//             }
-//           });
-//         });
-//       });
-//     });
-
-//     ordersInOutbox.forEach(order => {
-//       debugger;
-//       // const id = _order.id;
-//       // delete _order.id;
-//     });
-// }
-
-
+  //     ordersInOutbox.forEach(order => {
+  //       debugger;
+  //       // const id = _order.id;
+  //       // delete _order.id;
+  //     });
+  // }
 
   // ToDo
   // Wenn Offline order erstellt wird und man auf detail seite weiter geleitet wird
@@ -195,7 +187,6 @@ export class CreateOrderComponent implements OnInit {
       formInput.contactPerson
     );
     this.newOrder.records = [];
-
 
     this.createOrderIfOffline();
 
@@ -273,34 +264,36 @@ export class CreateOrderComponent implements OnInit {
     // if not, add to outbox otherwise ignore
     // wenn mit server synchronisiert wird, muss indexedDB id durch firebase id ersetzt werden
     this.indexDbService.getOrdersFromOutbox().then(ordersInOutbox => {
-      if (ordersInOutbox.length !== 0) {
-        const orders = [];
-        const newOrder = {
-          companyName: this.newOrder.companyName,
-          location: this.newOrder.location,
-          contactPerson: this.newOrder.contactPerson
-        };
+      if (ordersInOutbox !== undefined) {
+        if (ordersInOutbox.length !== 0) {
+          const orders = [];
+          const newOrder = {
+            companyName: this.newOrder.companyName,
+            location: this.newOrder.location,
+            contactPerson: this.newOrder.contactPerson
+          };
 
-        ordersInOutbox.forEach(order => {
-          orders.push({
-            companyName: order.companyName,
-            location: order.location,
-            contactPerson: order.contactPerson
+          ordersInOutbox.forEach(order => {
+            orders.push({
+              companyName: order.companyName,
+              location: order.location,
+              contactPerson: order.contactPerson
+            });
           });
-        });
-        this.isAlreadyInOutbox = _.findIndex(orders, o => _.isMatch(o, newOrder)) > -1;
-        if (!this.isAlreadyInOutbox) {
-          this.indexDbService.addOrderToOutbox(this.newOrder);
-          this.isAlreadyInOutbox = true;
+          this.isAlreadyInOutbox = _.findIndex(orders, o => _.isMatch(o, newOrder)) > -1;
+          if (!this.isAlreadyInOutbox) {
+            this.indexDbService.addOrderToOutbox(this.newOrder);
+            this.isAlreadyInOutbox = true;
+          } else {
+            this.toastMessageRecordAlreadyExists();
+          }
         } else {
-          this.toastMessageRecordAlreadyExists();
+          this.indexDbService.addOrderToOutbox(this.newOrder).then(() => {
+            this.toastMessageShowSuccess();
+          });
         }
-      } else {
-        this.indexDbService.addOrderToOutbox(this.newOrder).then(() => {
-          this.toastMessageShowSuccess();
-        });
+        this.isAlreadyInOutbox = true;
       }
-      this.isAlreadyInOutbox = true;
     });
   }
 
