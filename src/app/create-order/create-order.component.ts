@@ -62,21 +62,20 @@ export class CreateOrderComponent implements OnInit {
 
     this.indexDbService.getOrdersFromOutbox().then(ordersInOutbox => {
       if (ordersInOutbox.length !== 0) {
-        ordersInOutbox.forEach(_orderInOutbox => {
-          this.getOrdersOnline().then(ordersOnline => {
+        this.getOrdersOnline().then(ordersOnline => {
+          ordersInOutbox.forEach(orderInOutbox => {
             if (ordersOnline.length !== 0) {
-              if (!this.checkIfOrderIsAlreadyOnline(_orderInOutbox, ordersOnline)) {
-                ordersToPushToFirebase.push(_orderInOutbox);
-              } else {
-                ordersToPushToFirebase.push(_orderInOutbox);
+              if (!this.checkIfOrderIsAlreadyOnline(orderInOutbox, ordersOnline)) {
+                ordersToPushToFirebase.push(orderInOutbox);
               }
+            } else {
+              ordersToPushToFirebase.push(orderInOutbox);
             }
           });
+          this.sychronizeOutboxWithDatabase(ordersToPushToFirebase);
         });
-        this.sychronizeOutboxWithDatabase(ordersToPushToFirebase);
       } else {
         // if no orders are in ordersOubox, synchronization is not necessary
-        this.sychronizeOutboxWithDatabase(ordersInOutbox);
         return;
       }
     });
