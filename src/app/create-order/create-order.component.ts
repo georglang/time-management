@@ -82,9 +82,14 @@ export class CreateOrderComponent implements OnInit {
   }
 
   public checkIfOrderIsAlreadyOnline(orderInOutbox, ordersOnline) {
+    const orderInOutboxCpy = orderInOutbox;
+    delete orderInOutboxCpy.createdAt;
+    delete orderInOutboxCpy.id;
     let isOrderAlreadyOnline = false;
     ordersOnline.forEach(orderOnline => {
-      if (_.isEqual(orderOnline, orderInOutbox)) {
+      delete orderOnline.createdAt;
+      delete orderOnline.id;
+      if (_.isEqual(orderOnline, orderInOutboxCpy)) {
         return (isOrderAlreadyOnline = true);
       }
     });
