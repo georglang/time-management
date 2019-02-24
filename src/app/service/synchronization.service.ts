@@ -18,8 +18,10 @@ export class SynchronizationService {
       if (ordersInOutbox.length > 0) {
         this.cloudFirestoreService.getDocumentsInOrdersCollection().then(ordersOnline => {
           ordersInOutbox.forEach(orderInOutbox => {
+            const orderToCompare = {};
+            Object.assign(orderToCompare, orderInOutbox);
             if (ordersOnline.length > 0) {
-              if (!this.compareIfOrderIsOnline(orderInOutbox, ordersOnline)) {
+              if (!this.compareIfOrderIsOnline(orderToCompare, ordersOnline)) {
                 ordersToPushToFirebase.push(orderInOutbox);
               }
             } else {
@@ -40,6 +42,7 @@ export class SynchronizationService {
   // delete order form indexedDB ordersOutbox
   public sychronizeOrdersOutbox(ordersToPushToFirebase) {
     ordersToPushToFirebase.forEach(order => {
+      debugger;
       this.cloudFirestoreService.addOrder(order).then(id => {
         if (!this.isAlreadyInIndexedDBOrders(order, ordersToPushToFirebase)) {
           const localId = order.id;
@@ -53,14 +56,13 @@ export class SynchronizationService {
   }
 
   private compareIfOrderIsOnline(orderInOutbox, ordersOnline): boolean {
-    const orderInOutboxCpy = orderInOutbox;
-    delete orderInOutboxCpy.createdAt;
-    delete orderInOutboxCpy.id;
+    delete orderInOutbox.createdAt;
+    delete orderInOutbox.id;
     let isOrderAlreadyOnline = false;
     ordersOnline.forEach(orderOnline => {
       delete orderOnline.createdAt;
       delete orderOnline.id;
-      if (_.isEqual(orderOnline, orderInOutboxCpy)) {
+      if (_.isEqual(orderOnline, orderInOutbox)) {
         return (isOrderAlreadyOnline = true);
       }
     });
