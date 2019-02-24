@@ -158,6 +158,7 @@ export class CloudFirestoreService {
 
   public addOrder(order: IOrder) {
     const _order = JSON.parse(JSON.stringify(order));
+    delete _order.id;
     return this.ordersCollection
       .add(_order)
       .then(docReference => {
