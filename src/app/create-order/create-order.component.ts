@@ -155,7 +155,7 @@ export class CreateOrderComponent implements OnInit {
     );
     newOrder.records = [];
 
-    this.createOrderIfOffline(newOrder);
+    this.createOrderIfOnline(newOrder);
 
     // if (this.isConnected()) {
     //   this.createOrderIfOnline();
@@ -164,7 +164,29 @@ export class CreateOrderComponent implements OnInit {
     // }
   }
 
-  public createOrderIfOnline(): void {
+  // check if new order is already in indexedDB orders or ordersOutbox table
+  // if not, add to ordersOutbox otherwise send toast message
+  public createOrderIfOffline(newOrder) {
+    this.indexDbService.checkIfOrderIsIndexedDBOrdersTable(newOrder).then(isInOrdersTable => {
+      if (!isInOrdersTable) {
+        return this.indexDbService.checkIfOrderIsInIndexedDBOrdersOutboxTable(newOrder).then(isInOrdersOutbox => {
+          if (!isInOrdersOutbox) {
+            this.indexDbService.addOrderToOutbox(newOrder).then(data => {
+              console.log('Added order to outbox', newOrder);
+              this.toastMessageOrderSuccessfulCreated();
+              this.router.navigate(['/order-details/' + newOrder.id]);
+            });
+          } else {
+            this.toastMessageOrderAlreadyExists();
+          }
+        });
+      } else {
+        this.toastMessageOrderAlreadyExists();
+      }
+    });
+  }
+
+  public createOrderIfOnline(newOrder: IOrder): void {
     if (this.isConnected()) {
       // check if order is already in firestore
       this.cloudFirestoreService.getDocumentsInOrdersCollection().then(data => {
@@ -181,9 +203,9 @@ export class CreateOrderComponent implements OnInit {
           });
 
           const newOrderToCompare = {
-            companyName: this.newOrder.companyName,
-            location: this.newOrder.location,
-            contactPerson: this.newOrder.contactPerson
+            companyName: newOrder.companyName,
+            location: newOrder.location,
+            contactPerson: newOrder.contactPerson
           };
 
           this.tempOrders.forEach(order => {
@@ -192,10 +214,11 @@ export class CreateOrderComponent implements OnInit {
               return;
             }
           });
+
           // if order is not in firestore add it
           if (!this.isAlreadyInFirestore) {
             this.cloudFirestoreService
-              .addOrder(this.newOrder)
+              .addOrder(newOrder)
               .then(id => {
                 this.toastMessageOrderSuccessfulCreated();
                 this.isAlreadyInFirestore = true;
@@ -211,7 +234,7 @@ export class CreateOrderComponent implements OnInit {
           }
         } else {
           this.cloudFirestoreService
-            .addOrder(this.newOrder)
+            .addOrder(newOrder)
             .then(id => {
               this.toastMessageOrderSuccessfulCreated();
               this.isAlreadyInFirestore = true;
@@ -224,91 +247,6 @@ export class CreateOrderComponent implements OnInit {
         }
       });
     }
-  }
-
-  // check if order is in indexedDB ordersOutbox
-  public checkIfOrderIsInIndexedDBOrdersOutboxTable(order): Promise<boolean> {
-    let isAlreadyInOrdersOutboxTable = true;
-    return new Promise((resolve, reject) => {
-      this.indexDbService.getOrdersFromOutbox().then(ordersInOutbox => {
-        if (ordersInOutbox !== undefined) {
-          if (ordersInOutbox.length !== 0) {
-            const orders = [];
-            const newOrder = {
-              companyName: order.companyName,
-              location: order.location,
-              contactPerson: order.contactPerson
-            };
-
-            ordersInOutbox.forEach(orderInOutbox => {
-              orders.push({
-                companyName: orderInOutbox.companyName,
-                location: orderInOutbox.location,
-                contactPerson: orderInOutbox.contactPerson
-              });
-            });
-            isAlreadyInOrdersOutboxTable = _.findIndex(orders, o => _.isMatch(o, newOrder)) > -1;
-            resolve(isAlreadyInOrdersOutboxTable);
-          } else {
-            resolve(false);
-          }
-        }
-      });
-    });
-  }
-
-  // check if order is in indexedDB orders table
-  public checkIfOrderIsIndexedDBOrdersTable(order): Promise<boolean> {
-    let isAlreadyInOrdersTable = true;
-    return new Promise((resolve, reject) => {
-      this.indexDbService.getOrdersFromOrdersTable().then(_orders => {
-        if (_orders !== undefined) {
-          if (_orders.length !== 0) {
-            const orders = [];
-            const newOrder = {
-              companyName: order.companyName,
-              location: order.location,
-              contactPerson: order.contactPerson
-            };
-
-            _orders.forEach(orderInOutbox => {
-              orders.push({
-                companyName: orderInOutbox.companyName,
-                location: orderInOutbox.location,
-                contactPerson: orderInOutbox.contactPerson
-              });
-            });
-
-            isAlreadyInOrdersTable = _.findIndex(orders, o => _.isMatch(o, newOrder)) > -1;
-            resolve(isAlreadyInOrdersTable);
-          } else {
-            isAlreadyInOrdersTable = false;
-            resolve(isAlreadyInOrdersTable);
-          }
-        }
-      });
-    });
-  }
-
-  // check if new order is already in indexedDB orders or ordersOutbox table
-  // if not, add to ordersOutbox otherwise send toast message
-  public createOrderIfOffline(newOrder) {
-    this.checkIfOrderIsIndexedDBOrdersTable(newOrder).then(isInOrdersTable => {
-      if (!isInOrdersTable) {
-        return this.checkIfOrderIsInIndexedDBOrdersOutboxTable(newOrder).then(isInOrdersOutbox => {
-          if (!isInOrdersOutbox) {
-            this.indexDbService.addOrderToOutbox(newOrder).then(data => {
-              console.log('Added order to outbox', newOrder);
-              this.toastMessageOrderSuccessfulCreated();
-            });
-          } else {
-            this.toastMessageOrderAlreadyExists();
-          }
-        });
-      } else {
-        this.toastMessageOrderAlreadyExists();
-      }
-    });
   }
 
   public onSubmit() {
