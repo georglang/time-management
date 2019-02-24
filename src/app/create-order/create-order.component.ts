@@ -1,10 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
-import { IndexDBService } from '../service/index-db.service';
-import { Order, IOrder } from '../data-classes/order';
+import { IndexedDBService } from '../service/indexedDb.service';
+import { Order, IOrder } from '../data-classes/Order';
 import { ToastrService } from 'ngx-toastr';
-import { CloudFirestoreService } from './../service/cloud-firestore.service';
+import { CloudFirestoreService } from '../service/cloudFirestore.service';
 import { ConnectionService } from 'ng-connection-service';
 import _ from 'lodash';
 
@@ -25,7 +25,7 @@ export class CreateOrderComponent implements OnInit {
 
   constructor(
     private formBuilder: FormBuilder,
-    private indexDbService: IndexDBService,
+    private indexDbService: IndexedDBService,
     private router: Router,
     private toastr: ToastrService,
     private cloudFirestoreService: CloudFirestoreService,
@@ -50,10 +50,10 @@ export class CreateOrderComponent implements OnInit {
     //   }
     // });
     this.indexDbService.getOrdersFromOutbox().then(ordersInOutbox => {
-      if (ordersInOutbox.length !== 0) {
+      if (ordersInOutbox.length > 0) {
         this.getOrdersOnline().then(ordersOnline => {
           ordersInOutbox.forEach(orderInOutbox => {
-            if (ordersOnline.length !== 0) {
+            if (ordersOnline.length > 0) {
               if (!this.compareIfOrderIsOnline(orderInOutbox, ordersOnline)) {
                 ordersToPushToFirebase.push(orderInOutbox);
               }
@@ -102,14 +102,17 @@ export class CreateOrderComponent implements OnInit {
     });
   }
 
-  // push orders from ordersOutbox to Firestore
-  // if orders are in Firestore push to indexedDB Orders
+  // add order from indexedDB ordersOutbox table to firestore
+  // after receiving the firestore id, add order to indexedDB orders table
+  // delete order form indexedDB ordersOutbox
   public sychronizeOutboxWithDatabase(ordersToPushToFirebase) {
     ordersToPushToFirebase.forEach(order => {
-      this.cloudFirestoreService.addOrder(order).then(() => {
+      this.cloudFirestoreService.addOrder(order).then(id => {
         if (!this.isAlreadyInIndexedDBOrders(order, ordersToPushToFirebase)) {
+          const localId = order.id;
+          order.id = id;
           this.indexDbService.addToOrdersTable(order).then(() => {
-            this.deleteOrderInIndexedDbOrdersOutbox(order.id);
+            this.deleteOrderInIndexedDbOrdersOutbox(localId);
           });
         }
       });
@@ -155,7 +158,7 @@ export class CreateOrderComponent implements OnInit {
     );
     newOrder.records = [];
 
-    this.createOrderIfOnline(newOrder);
+    this.createOrderIfOffline(newOrder);
 
     // if (this.isConnected()) {
     //   this.createOrderIfOnline();
@@ -169,81 +172,43 @@ export class CreateOrderComponent implements OnInit {
   public createOrderIfOffline(newOrder) {
     this.indexDbService.checkIfOrderIsIndexedDBOrdersTable(newOrder).then(isInOrdersTable => {
       if (!isInOrdersTable) {
-        return this.indexDbService.checkIfOrderIsInIndexedDBOrdersOutboxTable(newOrder).then(isInOrdersOutbox => {
-          if (!isInOrdersOutbox) {
-            this.indexDbService.addOrderToOutbox(newOrder).then(data => {
-              console.log('Added order to outbox', newOrder);
-              this.toastMessageOrderSuccessfulCreated();
-              this.router.navigate(['/order-details/' + newOrder.id]);
-            });
-          } else {
-            this.toastMessageOrderAlreadyExists();
-          }
-        });
+        return this.indexDbService
+          .checkIfOrderIsInIndexedDBOrdersOutboxTable(newOrder)
+          .then(isInOrdersOutbox => {
+            if (!isInOrdersOutbox) {
+              this.indexDbService.addOrderToOutbox(newOrder).then(data => {
+                console.log('Added order to outbox', newOrder);
+                this.toastMessageOrderSuccessfulCreated();
+                this.router.navigate(['/order-details/' + newOrder.id]);
+              });
+            } else {
+              this.toastMessageOrderAlreadyExists();
+            }
+          });
       } else {
         this.toastMessageOrderAlreadyExists();
       }
     });
   }
 
-  public createOrderIfOnline(newOrder: IOrder): void {
+  public createOrderIfOnline(order: IOrder): void {
     if (this.isConnected()) {
       // check if order is already in firestore
-      this.cloudFirestoreService.getDocumentsInOrdersCollection().then(data => {
-        this.ordersOnline = data;
-
-        this.isAlreadyInFirestore = false;
-        if (this.ordersOnline.length > 0) {
-          this.ordersOnline.forEach(order => {
-            this.tempOrders.push({
-              companyName: order.companyName,
-              location: order.location,
-              contactPerson: order.contactPerson
-            });
-          });
-
-          const newOrderToCompare = {
-            companyName: newOrder.companyName,
-            location: newOrder.location,
-            contactPerson: newOrder.contactPerson
-          };
-
-          this.tempOrders.forEach(order => {
-            if (_.isEqual(order, newOrderToCompare)) {
-              this.isAlreadyInFirestore = true;
-              return;
-            }
-          });
-
-          // if order is not in firestore add it
-          if (!this.isAlreadyInFirestore) {
-            this.cloudFirestoreService
-              .addOrder(newOrder)
-              .then(id => {
-                this.toastMessageOrderSuccessfulCreated();
-                this.isAlreadyInFirestore = true;
-                this.router.navigate(['/order-details/' + id]);
-                return;
-              })
-              .catch(e => {
-                console.error('can´t create order to firebase', e);
-              });
-          } else {
-            this.toastMessageOrderAlreadyExists();
-            return;
-          }
-        } else {
+      this.cloudFirestoreService.checkIfOrderIsInFirestore(order).then(isAlreadyInFirestore => {
+        // if order is not in firestore add it
+        if (!isAlreadyInFirestore) {
           this.cloudFirestoreService
-            .addOrder(newOrder)
+            .addOrder(order)
             .then(id => {
               this.toastMessageOrderSuccessfulCreated();
-              this.isAlreadyInFirestore = true;
               this.router.navigate(['/order-details/' + id]);
-              return;
             })
             .catch(e => {
               console.error('can´t create order to firebase', e);
             });
+        } else {
+          this.toastMessageOrderAlreadyExists();
+          return;
         }
       });
     }
