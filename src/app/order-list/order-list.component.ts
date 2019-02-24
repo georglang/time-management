@@ -1,11 +1,13 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { MatSort, MatTableDataSource } from '@angular/material';
+import { Observable } from 'rxjs';
+
 import { IndexedDBService } from '../service/indexedDb.service';
-import { IOrder } from '../data-classes/Order';
 import { CloudFirestoreService } from '../service/cloudFirestore.service';
 import { ConnectionService } from 'ng-connection-service';
-import { Observable } from 'rxjs';
+import { SynchronizationService } from './../service/synchronization.service';
+import { IOrder } from '../data-classes/Order';
 
 @Component({
   selector: 'app-order-list',
@@ -28,45 +30,14 @@ export class OrderListComponent implements OnInit {
     private indexDbService: IndexedDBService,
     private router: Router,
     private cloudFirestoreService: CloudFirestoreService,
-    private connectionService: ConnectionService
+    private connectionService: ConnectionService,
+    private synchronizationService: SynchronizationService
   ) {}
 
   ngOnInit() {
     this.connectionService.monitor().subscribe(isConnected => {
-      this.isOnlineService = isConnected;
-      if (this.isOnlineService) {
-        this.indexDbService.getOrdersFromOutbox().then(orders => {
-          if (orders.length !== 0) {
-            orders.forEach(order => {
-              const id = order.id;
-              delete order.id;
-              this.cloudFirestoreService.addOrder(order).then(() => {
-                this.indexDbService.getOrdersFromOrdersTable().then(ordersInIndexedDB => {
-                  if (ordersInIndexedDB.length > 0) {
-                    ordersInIndexedDB.forEach(cachedOrder => {
-                      this.orderIds.push(cachedOrder.id);
-                    });
-                    orders.forEach(_order => {
-                      if (!this.orderIds.includes(_order.id)) {
-                        this.indexDbService.addToOrdersTable(order).then(() => {
-                          this.indexDbService.deleteOrderFromOutbox(id).then(() => {
-                            this.orderIds = [];
-                          });
-                        });
-                      }
-                    });
-                  } else {
-                    this.indexDbService.addToOrdersTable(order).then(() => {
-                      this.indexDbService.deleteOrderFromOutbox(id);
-                    });
-                  }
-                });
-              });
-            });
-          }
-        });
-      }
     });
+    this.synchronizationService.synchronizeIndexedDBWithFirebase();
 
     this.getOrdersIfOffline();
     // this.getOrdersFromIndexedDB();
