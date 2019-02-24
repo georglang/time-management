@@ -2,8 +2,8 @@ import { Injectable } from '@angular/core';
 import { Database } from '../database/Database';
 import { TimeRecord } from '../data-classes/time-record';
 import _ from 'lodash';
-import { IOrder } from '../data-classes/order';
-import { CloudFirestoreService } from './cloud-firestore.service';
+import { IOrder } from '../data-classes/Order';
+import { CloudFirestoreService } from './cloudFirestore.service';
 
 @Injectable()
 export class IndexedDBService {
@@ -16,11 +16,12 @@ export class IndexedDBService {
   // check if order is in indexedDB ordersOutbox
   public checkIfOrderIsInIndexedDBOrdersOutboxTable(order): Promise<boolean> {
     let isAlreadyInOrdersOutboxTable = true;
+    const orders = [];
+
     return new Promise((resolve, reject) => {
       this.getOrdersFromOutbox().then(ordersInOutbox => {
         if (ordersInOutbox !== undefined) {
           if (ordersInOutbox.length !== 0) {
-            const orders = [];
             const newOrder = {
               companyName: order.companyName,
               location: order.location,
@@ -79,10 +80,15 @@ export class IndexedDBService {
 
   // add order offline
   public addOrderToOutbox(order: IOrder) {
-    return this.timeRecordsDb.outboxForOrders.add(order).then(data => {
+    return this.timeRecordsDb.ordersOutbox.add(order).then(data => {
       console.log('Data', data);
       return data;
     });
+  }
+
+  // delete order in indexedDb ordersOutbox
+  public deleteOrderInOutbox(orderId) {
+    this.deleteOrderInOrdersOutbox(orderId).then(() => {});
   }
 
   // evtl. noch createdAt mit einbeziehen, damit keine doppelten eintraege vorhanden sind
@@ -107,14 +113,14 @@ export class IndexedDBService {
   }
 
   public addRecordToOrderOutbox(record, orderId) {
-    return this.timeRecordsDb.outboxForOrders
+    return this.timeRecordsDb.ordersOutbox
       .where('id')
       .equals(+orderId)
       .first()
       .then(data => {
         data.records.push(record);
         console.log('Data', data);
-        this.timeRecordsDb.outboxForOrders
+        this.timeRecordsDb.ordersOutbox
           .where('id')
           .equals(+orderId)
           .modify(data)
@@ -128,7 +134,7 @@ export class IndexedDBService {
   }
 
   public getOrderByIdFromOutbox(paramId: number) {
-    return this.timeRecordsDb.outboxForOrders
+    return this.timeRecordsDb.ordersOutbox
       .where('id')
       .equals(paramId)
       .toArray(order => {
@@ -155,7 +161,7 @@ export class IndexedDBService {
   }
 
   public getOrdersFromOutbox(): Promise<any> {
-    return this.timeRecordsDb.outboxForOrders
+    return this.timeRecordsDb.ordersOutbox
       .toArray()
       .then(orders => {
         return orders;
@@ -178,8 +184,8 @@ export class IndexedDBService {
       });
   }
 
-  public deleteOrderFromOutbox(orderId: string) {
-    return this.timeRecordsDb.outboxForOrders
+  public deleteOrderInOrdersOutbox(orderId: string) {
+    return this.timeRecordsDb.ordersOutbox
       .where('id')
       .equals(orderId)
       .delete()
