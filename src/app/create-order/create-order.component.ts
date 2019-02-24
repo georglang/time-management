@@ -49,22 +49,12 @@ export class CreateOrderComponent implements OnInit {
     //     this.checkIfOrdersAreInOrdersTable();
     //   }
     // });
-
-    // if no orders in firestore push it
-
-    // Wenn Orders in der Datenbank sind, überprüfen, ob orders aus outbox schon online vorhande
-    // Wenn keine Orders in Datenbank, kann Outbox direkt gepushed werden
-
-    // Wechsel von Offline nach Online, schauen ob orders in ordersOutbox
-
-    // wenn mit server synchronisiert wird, muss indexedDB id durch firebase id ersetzt werden
-
     this.indexDbService.getOrdersFromOutbox().then(ordersInOutbox => {
       if (ordersInOutbox.length !== 0) {
         this.getOrdersOnline().then(ordersOnline => {
           ordersInOutbox.forEach(orderInOutbox => {
             if (ordersOnline.length !== 0) {
-              if (!this.checkIfOrderIsAlreadyOnline(orderInOutbox, ordersOnline)) {
+              if (!this.compareIfOrderIsOnline(orderInOutbox, ordersOnline)) {
                 ordersToPushToFirebase.push(orderInOutbox);
               }
             } else {
@@ -74,13 +64,13 @@ export class CreateOrderComponent implements OnInit {
           this.sychronizeOutboxWithDatabase(ordersToPushToFirebase);
         });
       } else {
-        // if no orders are in ordersOubox, synchronization is not necessary
+        // if no orders are in ordersOutbox, synchronization is not necessary
         return;
       }
     });
   }
 
-  public checkIfOrderIsAlreadyOnline(orderInOutbox, ordersOnline) {
+  public compareIfOrderIsOnline(orderInOutbox, ordersOnline) {
     const orderInOutboxCpy = orderInOutbox;
     delete orderInOutboxCpy.createdAt;
     delete orderInOutboxCpy.id;
@@ -132,31 +122,6 @@ export class CreateOrderComponent implements OnInit {
     this.indexDbService.deleteOrderFromOutbox(orderId).then(() => {});
   }
 
-  //         this.indexDbService.ordersInOrdersTable().then(ordersInIndexedDB => {
-  //           ordersInIndexedDB.forEach(cachedOrder => {
-  //             this.orderIds.push(cachedOrder.id);
-  //           });
-  //           this.orders.forEach(_order => {
-  //             if (!this.orderIds.includes(_order.id)) {
-  //               this.indexDbService.addToOrdersTable(order).then(() => {
-  //                 //this.indexDbService.deleteOrderFromOutbox(id);
-  //               });
-  //             }
-  //           });
-  //         });
-  //       });
-  //     });
-
-  //     ordersInOutbox.forEach(order => {
-  //       debugger;
-  //       // const id = _order.id;
-  //       // delete _order.id;
-  //     });
-  // }
-
-  // ToDo
-  // Wenn Offline order erstellt wird und man auf detail seite weiter geleitet wird
-
   public isConnected() {
     return navigator.onLine;
   }
@@ -165,7 +130,7 @@ export class CreateOrderComponent implements OnInit {
     this.router.navigate(['/']);
   }
 
-  public toastMessageShowSuccess() {
+  public toastMessageOrderSuccessfulCreated() {
     const successConfig = {
       positionClass: 'toast-bottom-center',
       timeout: 2000
@@ -232,7 +197,7 @@ export class CreateOrderComponent implements OnInit {
             this.cloudFirestoreService
               .addOrder(this.newOrder)
               .then(id => {
-                this.toastMessageShowSuccess();
+                this.toastMessageOrderSuccessfulCreated();
                 this.isAlreadyInFirestore = true;
                 this.router.navigate(['/order-details/' + id]);
                 return;
@@ -248,7 +213,7 @@ export class CreateOrderComponent implements OnInit {
           this.cloudFirestoreService
             .addOrder(this.newOrder)
             .then(id => {
-              this.toastMessageShowSuccess();
+              this.toastMessageOrderSuccessfulCreated();
               this.isAlreadyInFirestore = true;
               this.router.navigate(['/order-details/' + id]);
               return;
@@ -334,13 +299,14 @@ export class CreateOrderComponent implements OnInit {
           if (!isInOrdersOutbox) {
             this.indexDbService.addOrderToOutbox(newOrder).then(data => {
               console.log('Added order to outbox', newOrder);
+              this.toastMessageOrderSuccessfulCreated();
             });
           } else {
             this.toastMessageOrderAlreadyExists();
           }
         });
       } else {
-        return;
+        this.toastMessageOrderAlreadyExists();
       }
     });
   }
