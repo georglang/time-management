@@ -38,15 +38,13 @@ import {
 // components
 import { OrderListComponent } from './order-list/order-list.component';
 import { HeaderComponent } from './header/header.component';
-import { IndexDBService } from './service/index-db.service';
+import { IndexedDBService } from './service/indexedDb.service';
 import { Database } from './database/Database';
 import { CreateOrderComponent } from './create-order/create-order.component';
 import { OrderDetailComponent } from './order-detail/order-detail.component';
 import { EditRecordComponent } from './edit-record/edit-record.component';
 import { CreateRecordComponent } from './create-record/create-record.component';
 import { ConfirmDeleteDialogComponent } from './confirm-delete-dialog/confirm-delete-dialog.component';
-
-const firebaseConfig = environment.firebase;
 
 @NgModule({
   declarations: [
@@ -84,7 +82,7 @@ const firebaseConfig = environment.firebase;
     AngularFireModule.initializeApp(environment.firebase),
     AngularFirestoreModule
   ],
-  providers: [IndexDBService, Database, SortFormArrayByDate],
+  providers: [IndexedDBService, Database, SortFormArrayByDate],
   entryComponents: [ConfirmDeleteDialogComponent],
   bootstrap: [AppComponent]
 })

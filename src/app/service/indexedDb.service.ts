@@ -1,25 +1,88 @@
 import { Injectable } from '@angular/core';
-import { Database } from './../database/Database';
+import { Database } from '../database/Database';
 import { TimeRecord } from '../data-classes/time-record';
 import _ from 'lodash';
 import { IOrder } from '../data-classes/order';
 import { CloudFirestoreService } from './cloud-firestore.service';
 
 @Injectable()
-export class IndexDBService {
+export class IndexedDBService {
   public isAlreadyInDB: boolean;
 
   constructor(private timeRecordsDb: Database, private cloudFirestore: CloudFirestoreService) {
     this.isAlreadyInDB = false;
   }
 
-  private isConnected() {
-    return navigator.onLine;
+  // check if order is in indexedDB ordersOutbox
+  public checkIfOrderIsInIndexedDBOrdersOutboxTable(order): Promise<boolean> {
+    let isAlreadyInOrdersOutboxTable = true;
+    return new Promise((resolve, reject) => {
+      this.getOrdersFromOutbox().then(ordersInOutbox => {
+        if (ordersInOutbox !== undefined) {
+          if (ordersInOutbox.length !== 0) {
+            const orders = [];
+            const newOrder = {
+              companyName: order.companyName,
+              location: order.location,
+              contactPerson: order.contactPerson
+            };
+
+            ordersInOutbox.forEach(orderInOutbox => {
+              orders.push({
+                companyName: orderInOutbox.companyName,
+                location: orderInOutbox.location,
+                contactPerson: orderInOutbox.contactPerson
+              });
+            });
+            isAlreadyInOrdersOutboxTable = _.findIndex(orders, o => _.isMatch(o, newOrder)) > -1;
+            resolve(isAlreadyInOrdersOutboxTable);
+          } else {
+            resolve(false);
+          }
+        }
+      });
+    });
+  }
+
+  // check if order is in indexedDB orders table
+  public checkIfOrderIsIndexedDBOrdersTable(order): Promise<boolean> {
+    let isAlreadyInOrdersTable = true;
+    return new Promise((resolve, reject) => {
+      this.getOrdersFromOrdersTable().then(_orders => {
+        if (_orders !== undefined) {
+          if (_orders.length !== 0) {
+            const orders = [];
+            const newOrder = {
+              companyName: order.companyName,
+              location: order.location,
+              contactPerson: order.contactPerson
+            };
+
+            _orders.forEach(orderInOutbox => {
+              orders.push({
+                companyName: orderInOutbox.companyName,
+                location: orderInOutbox.location,
+                contactPerson: orderInOutbox.contactPerson
+              });
+            });
+
+            isAlreadyInOrdersTable = _.findIndex(orders, o => _.isMatch(o, newOrder)) > -1;
+            resolve(isAlreadyInOrdersTable);
+          } else {
+            isAlreadyInOrdersTable = false;
+            resolve(isAlreadyInOrdersTable);
+          }
+        }
+      });
+    });
   }
 
   // add order offline
   public addOrderToOutbox(order: IOrder) {
-    this.timeRecordsDb.outboxForOrders.add(order);
+    return this.timeRecordsDb.outboxForOrders.add(order).then(data => {
+      console.log('Data', data);
+      return data;
+    });
   }
 
   // evtl. noch createdAt mit einbeziehen, damit keine doppelten eintraege vorhanden sind
@@ -74,13 +137,13 @@ export class IndexDBService {
   }
 
   // add record to table orders
-  public addOrder(order) {
+  public addToOrdersTable(order) {
     return this.timeRecordsDb.orders.add(order).then(data => {
       return data;
     });
   }
 
-  public getAllOrders(): Promise<any> {
+  public getOrdersFromOrdersTable(): Promise<any> {
     return this.timeRecordsDb.orders
       .toArray()
       .then(result => {
