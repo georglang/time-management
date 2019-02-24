@@ -35,10 +35,13 @@ import {
   MatDialogModule
 } from '@angular/material';
 
+// services
+import { IndexedDBService } from './service/indexedDb.service';
+import { SynchronizationService } from './service/synchronization.service';
+
 // components
 import { OrderListComponent } from './order-list/order-list.component';
 import { HeaderComponent } from './header/header.component';
-import { IndexedDBService } from './service/indexedDb.service';
 import { Database } from './database/Database';
 import { CreateOrderComponent } from './create-order/create-order.component';
 import { OrderDetailComponent } from './order-detail/order-detail.component';
@@ -82,7 +85,7 @@ import { ConfirmDeleteDialogComponent } from './confirm-delete-dialog/confirm-de
     AngularFireModule.initializeApp(environment.firebase),
     AngularFirestoreModule
   ],
-  providers: [IndexedDBService, Database, SortFormArrayByDate],
+  providers: [IndexedDBService, SynchronizationService, Database, SortFormArrayByDate],
   entryComponents: [ConfirmDeleteDialogComponent],
   bootstrap: [AppComponent]
 })
