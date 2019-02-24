@@ -1,9 +1,9 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { MatSort, MatTableDataSource } from '@angular/material';
-import { IndexDBService } from '../service/index-db.service';
-import { IOrder } from './../data-classes/order';
-import { CloudFirestoreService } from '../service/cloud-firestore.service';
+import { IndexedDBService } from '../service/indexedDb.service';
+import { IOrder } from '../data-classes/Order';
+import { CloudFirestoreService } from '../service/cloudFirestore.service';
 import { ConnectionService } from 'ng-connection-service';
 import { Observable } from 'rxjs';
 
@@ -25,24 +25,13 @@ export class OrderListComponent implements OnInit {
   sort: MatSort;
 
   constructor(
-    private indexDbService: IndexDBService,
+    private indexDbService: IndexedDBService,
     private router: Router,
     private cloudFirestoreService: CloudFirestoreService,
     private connectionService: ConnectionService
   ) {}
 
   ngOnInit() {
-    // --> als naechstes machen
-
-    // ToDo
-    // Testen
-    // Online -> speichern in firebase
-    // Offline -> speichern in outbox
-    // Offline - Online -> von outbox nach firebase und indexedDB orders speichern schauen ob bereits in indexedDB orders und firbase
-
-    // if state changes from offline to online synchronize ordersOutbox with server
-    // and delete orders in outbox
-
     this.connectionService.monitor().subscribe(isConnected => {
       this.isOnlineService = isConnected;
       if (this.isOnlineService) {
@@ -52,7 +41,7 @@ export class OrderListComponent implements OnInit {
               const id = order.id;
               delete order.id;
               this.cloudFirestoreService.addOrder(order).then(() => {
-                this.indexDbService.ordersInOrdersTable().then(ordersInIndexedDB => {
+                this.indexDbService.getOrdersFromOrdersTable().then(ordersInIndexedDB => {
                   if (ordersInIndexedDB.length > 0) {
                     ordersInIndexedDB.forEach(cachedOrder => {
                       this.orderIds.push(cachedOrder.id);
@@ -60,10 +49,9 @@ export class OrderListComponent implements OnInit {
                     orders.forEach(_order => {
                       if (!this.orderIds.includes(_order.id)) {
                         this.indexDbService.addToOrdersTable(order).then(() => {
-                          this.indexDbService.deleteOrderFromOutbox(id)
-                            .then(() => {
-                              this.orderIds = [];
-                            });
+                          this.indexDbService.deleteOrderFromOutbox(id).then(() => {
+                            this.orderIds = [];
+                          });
                         });
                       }
                     });
@@ -80,7 +68,8 @@ export class OrderListComponent implements OnInit {
       }
     });
 
-    this.getOrdersFromIndexedDB();
+    this.getOrdersIfOffline();
+    // this.getOrdersFromIndexedDB();
 
     // if (this.isOnline()) {
     //   this.getOrdersOnline();
@@ -103,7 +92,7 @@ export class OrderListComponent implements OnInit {
         this.orders = orders;
         if (this.orders.length !== 0) {
           this.orders.forEach(order => {
-            this.indexDbService.ordersInOrdersTable().then(ordersInIndexedDB => {
+            this.indexDbService.getOrdersFromOrdersTable().then(ordersInIndexedDB => {
               ordersInIndexedDB.forEach(cachedOrder => {
                 this.orderIds.push(cachedOrder.id);
               });
@@ -120,25 +109,24 @@ export class OrderListComponent implements OnInit {
     }
   }
 
-  // if no internet connection persists, data from indexedDB orders and outboxForOrders tables will be fetched
-  public getOrdersFromIndexedDB() {
-    // if (!this.isOnline()) {
-    this.indexDbService
-      .ordersInOrdersTable()
-      .then(ordersTable => {
-        ordersTable.forEach(order => {
-          this.ordersFromIndexedDB.push(order);
-        });
-      })
-      .then(() => {
-        this.indexDbService.getOrdersFromOutbox().then(ordersOutboxTable => {
-          ordersOutboxTable.forEach(order => {
+  // if no internet connection persists
+  // orders from indexedDB orders and ordersOutbox tables will be fetched
+  public getOrdersIfOffline() {
+    if (!this.isOnline()) {
+      this.indexDbService.getOrdersFromOrdersTable().then(ordersInOrdersTabel => {
+        if (ordersInOrdersTabel.length > 0) {
+          ordersInOrdersTabel.forEach(order => {
+            this.ordersFromIndexedDB.push(order);
+          });
+        }
+        this.indexDbService.getOrdersFromOutbox().then(ordersInOutboxTable => {
+          ordersInOutboxTable.forEach(order => {
             this.ordersFromIndexedDB.push(order);
           });
           this.dataSource = new MatTableDataSource(this.ordersFromIndexedDB);
         });
       });
-    // }
+    }
   }
 
   public applyFilter(filterValue: string) {
