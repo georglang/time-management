@@ -1,8 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
+
 import { IndexedDBService } from '../service/indexedDb.service';
+import { SynchronizationService } from './../service/synchronization.service';
 import { Order, IOrder } from '../data-classes/Order';
+
 import { ToastrService } from 'ngx-toastr';
 import { CloudFirestoreService } from '../service/cloudFirestore.service';
 import { ConnectionService } from 'ng-connection-service';
@@ -17,7 +20,6 @@ export class CreateOrderComponent implements OnInit {
   public createOrderForm: FormGroup;
   public columns: string[];
   private newOrder: IOrder;
-  private isAlreadyInFirestore = false;
   private ordersOnline: IOrder[] = [];
   private tempOrders: any[] = [];
   public isOnline: boolean;
@@ -29,6 +31,7 @@ export class CreateOrderComponent implements OnInit {
     private router: Router,
     private toastr: ToastrService,
     private cloudFirestoreService: CloudFirestoreService,
+    private synchronizationService: SynchronizationService,
     private connectionService: ConnectionService
   ) {
     this.columns = ['Firma', 'Ansprechpartner', 'Ort'];
@@ -41,7 +44,6 @@ export class CreateOrderComponent implements OnInit {
   }
 
   ngOnInit() {
-    const ordersToPushToFirebase: string[] = [];
     // detects transition from offline to online and from online to offline
     // this.connectionService.monitor().subscribe(isConnected => {
     //   this.isOnline = isConnected;
@@ -49,80 +51,7 @@ export class CreateOrderComponent implements OnInit {
     //     this.checkIfOrdersAreInOrdersTable();
     //   }
     // });
-    this.indexDbService.getOrdersFromOutbox().then(ordersInOutbox => {
-      if (ordersInOutbox.length > 0) {
-        this.getOrdersOnline().then(ordersOnline => {
-          ordersInOutbox.forEach(orderInOutbox => {
-            if (ordersOnline.length > 0) {
-              if (!this.compareIfOrderIsOnline(orderInOutbox, ordersOnline)) {
-                ordersToPushToFirebase.push(orderInOutbox);
-              }
-            } else {
-              ordersToPushToFirebase.push(orderInOutbox);
-            }
-          });
-          this.sychronizeOutboxWithDatabase(ordersToPushToFirebase);
-        });
-      } else {
-        // if no orders are in ordersOutbox, synchronization is not necessary
-        return;
-      }
-    });
-  }
-
-  public compareIfOrderIsOnline(orderInOutbox, ordersOnline) {
-    const orderInOutboxCpy = orderInOutbox;
-    delete orderInOutboxCpy.createdAt;
-    delete orderInOutboxCpy.id;
-    let isOrderAlreadyOnline = false;
-    ordersOnline.forEach(orderOnline => {
-      delete orderOnline.createdAt;
-      delete orderOnline.id;
-      if (_.isEqual(orderOnline, orderInOutboxCpy)) {
-        return (isOrderAlreadyOnline = true);
-      }
-    });
-    return isOrderAlreadyOnline;
-  }
-
-  public isAlreadyInIndexedDBOrders(orderToPush, orders) {
-    let isAlreadyInIndexedDB = false;
-    orders.forEach(order => {
-      if (_.isEqual(orderToPush, orders)) {
-        return (isAlreadyInIndexedDB = true);
-      }
-    });
-    return isAlreadyInIndexedDB;
-  }
-
-  // get orders from firestore database
-  public getOrdersOnline() {
-    return this.cloudFirestoreService.getDocumentsInOrdersCollection().then(ordersInFirestore => {
-      return ordersInFirestore;
-    });
-  }
-
-  // add order from indexedDB ordersOutbox table to firestore
-  // after receiving the firestore id, add order to indexedDB orders table
-  // delete order form indexedDB ordersOutbox
-  public sychronizeOutboxWithDatabase(ordersToPushToFirebase) {
-    ordersToPushToFirebase.forEach(order => {
-      this.cloudFirestoreService.addOrder(order).then(id => {
-        if (!this.isAlreadyInIndexedDBOrders(order, ordersToPushToFirebase)) {
-          const localId = order.id;
-          order.id = id;
-          this.indexDbService.addToOrdersTable(order).then(() => {
-            this.deleteOrderInIndexedDbOrdersOutbox(localId);
-          });
-        }
-      });
-    });
-  }
-
-  // delete order in indexedDbOrdersOutbox
-  // check if orders are in firebase delete from ordersOutbox
-  public deleteOrderInIndexedDbOrdersOutbox(orderId) {
-    this.indexDbService.deleteOrderFromOutbox(orderId).then(() => {});
+    // this.synchronizationService.synchronizeIndexedDBWithFirebase();
   }
 
   public isConnected() {
