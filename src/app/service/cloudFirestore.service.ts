@@ -3,8 +3,7 @@ import { Injectable, OnInit } from '@angular/core';
 // import 'firebase/firestore';
 // import 'firebase/database';
 
-import { IOrder, Order } from './../data-classes/order';
-import { config } from './../firebase-credentials/FirebaseCredentials.js';
+import { IOrder, Order, IFlattenOrder } from '../data-classes/Order';
 import { TimeRecord, ITimeRecord } from '../data-classes/time-record';
 import {
   AngularFirestore,
@@ -16,6 +15,7 @@ import {
 
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
+import _ from 'lodash';
 
 @Injectable({
   providedIn: 'root'
@@ -35,61 +35,37 @@ export class CloudFirestoreService {
   constructor(private afs: AngularFirestore) {
     this.ordersDocument = afs.doc<IOrder>('orders/1');
     this.ordersCollection = this.afs.collection<IOrder>('orders');
-
-    // this.ordersDocument = afs.doc<IOrder>('orders/1');
-    // console.log('Orders Document', this.ordersDocument);
-
-    // this.order = this.ordersDocument.valueChanges();
-
-    // this.orders = this.ordersCollection.snapshotChanges().pipe(
-    //   map(actions =>
-    //     actions.map(action => {
-    //       const data = action.payload.doc.data() as IOrder;
-    //       const id = action.payload.doc.id;
-    //       console.log(id, '=>', data);
-    //       this.data = data;
-    //       return { id, ...data };
-    //     })
-    //   )
-    // );
-
-    // this.orders.subscribe();
   }
 
-  public hello() {
-    this.ordersCollection = this.afs.collection<IOrder>('orders');
-    this.orders = this.ordersCollection.snapshotChanges().pipe(
-      map(actions => {
-        return actions.map(a => {
-          const data = a.payload.doc.data() as IOrder;
-          const id = a.payload.doc.id;
-          console.log('Orders', data);
+  public checkIfOrderIsInFirestore(order: IOrder): Promise<boolean> {
+    let isAlreadyInFirestore = true;
+    const orders: IFlattenOrder[] = []; // without id and createdAt properties
 
-          return { id, ...data };
-        });
-      })
-    );
+    return new Promise((resolve, reject) => {
+      this.getDocumentsInOrdersCollection().then(ordersInFirestore => {
+        if (ordersInFirestore !== undefined) {
+          if (ordersInFirestore.length > 0) {
+            const newOrder = {
+              companyName: order.companyName,
+              location: order.location,
+              contactPerson: order.contactPerson
+            };
 
-    return this.ordersCollection.snapshotChanges().pipe(
-      map((actions: DocumentChangeAction<IOrder>[]) => {
-        return actions.map((a: DocumentChangeAction<IOrder>) => {
-          const data: Object = a.payload.doc.data() as IOrder;
-          const id = a.payload.doc.id;
-          console.log('Data', data);
-
-          return { id, ...data };
-        });
-      })
-    );
-  }
-
-  public test() {
-    this.ordersCollection
-      .doc('orders')
-      .ref.get()
-      .then(documentSnapshot => {
-        console.log(documentSnapshot.exists);
+            ordersInFirestore.forEach(orderInFirestore => {
+              orders.push({
+                companyName: orderInFirestore.companyName,
+                location: orderInFirestore.location,
+                contactPerson: orderInFirestore.contactPerson
+              });
+            });
+            isAlreadyInFirestore = _.findIndex(orders, o => _.isMatch(o, newOrder)) > -1;
+            resolve(isAlreadyInFirestore);
+          } else {
+            resolve(false);
+          }
+        }
       });
+    });
   }
 
   update(item: IOrder) {
@@ -115,11 +91,11 @@ export class CloudFirestoreService {
     });
   }
 
-  documentToDomainObject = _ => {
-    const object = _.payload.doc.data();
-    object.id = _.payload.doc.id;
+  documentToDomainObject = dToDO => {
+    const object = dToDO.payload.doc.data();
+    object.id = dToDO.payload.doc.id;
     return object;
-  };
+  }
 
   public getOrders() {
     return (this.orders = this.ordersCollection
@@ -138,17 +114,16 @@ export class CloudFirestoreService {
   public getOrderById(orderId: string) {
     return this.ordersCollection
       .doc(orderId)
-      .ref
-      .get()
+      .ref.get()
       .then(doc => {
         if (doc.exists) {
           const data: Order = Object.assign(doc.data());
           return data;
         }
       })
-      .catch(function (error) {
+      .catch(function(error) {
         console.log('getOrderById: no order found', error);
-    });
+      });
   }
 
   public getRecordById(orderId: string, recordId: string) {
@@ -156,8 +131,7 @@ export class CloudFirestoreService {
       .doc(orderId)
       .collection('records')
       .doc(recordId)
-      .ref
-      .get()
+      .ref.get()
       .then(doc => {
         if (doc.exists) {
           const data: TimeRecord = Object.assign(doc.data());
@@ -166,9 +140,9 @@ export class CloudFirestoreService {
           return data;
         }
       })
-      .catch(function (error) {
+      .catch(function(error) {
         console.log('getOrderById: no order found', error);
-    });
+      });
   }
 
   public deleteRecord(orderId: string, recordId) {
