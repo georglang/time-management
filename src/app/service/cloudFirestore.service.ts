@@ -1,4 +1,6 @@
 import { Injectable, OnInit } from '@angular/core';
+import { Timestamp } from '@firebase/firestore-types';
+
 // import * as firebase from 'firebase';
 // import 'firebase/firestore';
 // import 'firebase/database';
@@ -68,6 +70,51 @@ export class CloudFirestoreService {
     });
   }
 
+  // check if record is in firebase
+  public checkIfRecordExistsInOrderInFirestore(
+    orderId: string,
+    newRecord: ITimeRecord
+  ): Promise<boolean> {
+    let doesRecordExist = true;
+
+    console.log('OrderId', orderId);
+
+    return new Promise((resolve, reject) => {
+      this.getRecords(orderId).subscribe((records: any) => {
+
+        if (records.length > 0) {
+          if (this.compareIfRecordIsOnline(newRecord, records)) {
+            doesRecordExist = true;
+          } else {
+            doesRecordExist = false;
+          }
+        } else {
+          doesRecordExist = false;
+        }
+        resolve(doesRecordExist);
+      });
+    });
+  }
+
+  private compareIfRecordIsOnline(newRecord: ITimeRecord, records): boolean {
+    let isRecordAlreadyOnline = false;
+    const recordToCompare: ITimeRecord = Object();
+    Object.assign(recordToCompare, newRecord);
+    delete recordToCompare.createdAt;
+    delete recordToCompare.id;
+    records.forEach(recordOnline => {
+      delete recordOnline.createdAt;
+      delete recordOnline.id;
+      recordOnline.date = (recordOnline['date'] as Timestamp).toDate();
+
+      if (_.isEqual(recordOnline, recordToCompare)) {
+        isRecordAlreadyOnline = true;
+        return;
+      }
+    });
+    return isRecordAlreadyOnline;
+  }
+
   update(item: IOrder) {
     let test: any;
     let nestedCollection: AngularFirestoreCollection;
@@ -85,6 +132,7 @@ export class CloudFirestoreService {
       querySnapshot.forEach(doc => {
         console.log(doc.data());
         this.ordersInFirestore.push(doc.data());
+        debugger;
         return doc.data();
       });
       return this.ordersInFirestore;
@@ -95,7 +143,7 @@ export class CloudFirestoreService {
     const object = dToDO.payload.doc.data();
     object.id = dToDO.payload.doc.id;
     return object;
-  }
+  };
 
   public getOrders() {
     return (this.orders = this.ordersCollection
