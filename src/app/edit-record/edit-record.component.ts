@@ -1,11 +1,10 @@
 import { Component, OnInit, Inject } from '@angular/core';
 import { FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
-import { IndexDBService } from './../service/index-db.service';
-import { TimeRecord, ITimeRecord } from './../data-classes/time-record';
+import { TimeRecord } from './../data-classes/time-record';
 import { DateAdapter } from '@angular/material';
 import { ToastrService } from 'ngx-toastr';
-import { CloudFirestoreService } from './../service/cloud-firestore.service';
+import { CloudFirestoreService } from '../service/cloudFirestore.service';
 
 import * as moment from 'moment';
 
@@ -25,7 +24,6 @@ export class EditRecordComponent implements OnInit {
     private formBuilder: FormBuilder,
     private router: Router,
     private route: ActivatedRoute,
-    private indexedDB: IndexDBService,
     private dateAdapter: DateAdapter<Date>,
     private toastrService: ToastrService,
     private cloudFirestoreService: CloudFirestoreService
@@ -99,6 +97,18 @@ export class EditRecordComponent implements OnInit {
       this.editRecordForm.controls.id.value
     );
 
+    this.cloudFirestoreService
+      .checkIfRecordExistsInOrderInFirestore(this.orderId, newRecord)
+      .then(doesRecordExist => {
+        if (!doesRecordExist) {
+          this.update();
+        } else {
+          this.toastMessageRecordAlreadyExists();
+        }
+      });
+  }
+
+  private update() {
     this.cloudFirestoreService.ordersCollection
       .doc(this.orderId)
       .collection('records')
@@ -112,5 +122,13 @@ export class EditRecordComponent implements OnInit {
       .then(() => {
         this.showMessageUpdatedSuccessful();
       });
+  }
+
+  public toastMessageRecordAlreadyExists() {
+    const errorConfig = {
+      positionClass: 'toast-bottom-center',
+      timeout: 2000
+    };
+    this.toastrService.error('Existiert bereits', 'Eintrag', errorConfig);
   }
 }
