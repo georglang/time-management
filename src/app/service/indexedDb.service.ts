@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Database } from '../database/Database';
-import { TimeRecord } from '../data-classes/time-record';
+import { TimeRecord, ITimeRecord } from '../data-classes/time-record';
 import _ from 'lodash';
 import { IOrder } from '../data-classes/Order';
 import { CloudFirestoreService } from './cloudFirestore.service';
@@ -12,6 +12,8 @@ export class IndexedDBService {
   constructor(private timeRecordsDb: Database, private cloudFirestore: CloudFirestoreService) {
     this.isAlreadyInDB = false;
   }
+
+  // ToDo: schauen, ob check methoden vereinfacht werden koennen, ohne extra array
 
   // check if order is in indexedDB ordersOutbox
   public checkIfOrderIsInIndexedDBOrdersOutboxTable(order): Promise<boolean> {
@@ -72,6 +74,39 @@ export class IndexedDBService {
           } else {
             isAlreadyInOrdersTable = false;
             resolve(isAlreadyInOrdersTable);
+          }
+        }
+      });
+    });
+  }
+
+  // check if record is in indexedDB orders table
+  public checkIfRecordIsInOrdersTable(record: ITimeRecord, orderId: string) {
+    let isAlreadyInRecordsTable = true;
+    return new Promise((resolve, reject) => {
+      this.getAllRecords(orderId).then(recordsInIdxDB => {
+        if (recordsInIdxDB !== undefined) {
+          if (recordsInIdxDB.length !== 0) {
+            const _records = [];
+            const newRecord = {
+              date: record.date,
+              description: record.description,
+              workingHours: record.workingHours
+            };
+
+            recordsInIdxDB.forEach(recordIdxDB => {
+              _records.push({
+                date: recordIdxDB.date,
+                description: recordIdxDB.description,
+                workingHours: recordIdxDB.workingHours
+              });
+            });
+
+            isAlreadyInRecordsTable = _.findIndex(_records, o => _.isMatch(o, newRecord)) > -1;
+            resolve(isAlreadyInRecordsTable);
+          } else {
+            isAlreadyInRecordsTable = false;
+            resolve(isAlreadyInRecordsTable);
           }
         }
       });
@@ -243,7 +278,7 @@ export class IndexedDBService {
   //     });
   // }
 
-  public getAllRecords(orderId) {
+  public getAllRecords(orderId): Promise<ITimeRecord[]> {
     return this.timeRecordsDb.orders
       .where('id')
       .equals(orderId)
