@@ -1,4 +1,4 @@
-import { TimeRecord } from './time-record';
+import { TimeRecord } from './ITimeRecords';
 
 export interface IOrder {
   companyName: string;

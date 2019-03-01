@@ -6,7 +6,7 @@ import { Timestamp } from '@firebase/firestore-types';
 // import 'firebase/database';
 
 import { IOrder, Order, IFlattenOrder } from '../data-classes/Order';
-import { TimeRecord, ITimeRecord } from '../data-classes/time-record';
+import { TimeRecord, ITimeRecord } from '../data-classes/ITimeRecords';
 import {
   AngularFirestore,
   AngularFirestoreCollection,
@@ -76,12 +76,8 @@ export class CloudFirestoreService {
     newRecord: ITimeRecord
   ): Promise<boolean> {
     let doesRecordExist = true;
-
-    console.log('OrderId', orderId);
-
     return new Promise((resolve, reject) => {
       this.getRecords(orderId).subscribe((records: any) => {
-
         if (records.length > 0) {
           if (this.compareIfRecordIsOnline(newRecord, records)) {
             doesRecordExist = true;
@@ -100,31 +96,18 @@ export class CloudFirestoreService {
     let isRecordAlreadyOnline = false;
     const recordToCompare: ITimeRecord = Object();
     Object.assign(recordToCompare, newRecord);
-    delete recordToCompare.createdAt;
     delete recordToCompare.id;
     records.forEach(recordOnline => {
       delete recordOnline.createdAt;
       delete recordOnline.id;
+      // convert firebase timestamp to js date
       recordOnline.date = (recordOnline['date'] as Timestamp).toDate();
-
       if (_.isEqual(recordOnline, recordToCompare)) {
         isRecordAlreadyOnline = true;
         return;
       }
     });
     return isRecordAlreadyOnline;
-  }
-
-  update(item: IOrder) {
-    let test: any;
-    let nestedCollection: AngularFirestoreCollection;
-
-    this.orderDoc = this.afs.doc<IOrder>('order/');
-    console.log('Order Doc', this.orderDoc);
-
-    // access nested collection
-    test = this.orderDoc.collection<ITimeRecord>('records').valueChanges();
-    nestedCollection = this.orderDoc.collection<ITimeRecord>('records');
   }
 
   public getDocumentsInOrdersCollection() {

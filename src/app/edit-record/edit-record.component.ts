@@ -1,10 +1,11 @@
 import { Component, OnInit, Inject } from '@angular/core';
 import { FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
-import { TimeRecord } from './../data-classes/time-record';
+import { TimeRecord } from '../data-classes/ITimeRecords';
 import { DateAdapter } from '@angular/material';
 import { ToastrService } from 'ngx-toastr';
 import { CloudFirestoreService } from '../service/cloudFirestore.service';
+import { MessageService } from './../service/message.service';
 
 import * as moment from 'moment';
 
@@ -26,7 +27,8 @@ export class EditRecordComponent implements OnInit {
     private route: ActivatedRoute,
     private dateAdapter: DateAdapter<Date>,
     private toastrService: ToastrService,
-    private cloudFirestoreService: CloudFirestoreService
+    private cloudFirestoreService: CloudFirestoreService,
+    private messageService: MessageService
   ) {
     this.dateAdapter.setLocale('de');
   }
@@ -93,8 +95,8 @@ export class EditRecordComponent implements OnInit {
       this.editRecordForm.controls.date.value,
       this.editRecordForm.controls.description.value,
       this.editRecordForm.controls.workingHours.value,
-      new Date(),
-      this.editRecordForm.controls.id.value
+      this.editRecordForm.controls.id.value,
+      ''
     );
 
     this.cloudFirestoreService
@@ -103,7 +105,7 @@ export class EditRecordComponent implements OnInit {
         if (!doesRecordExist) {
           this.update();
         } else {
-          this.toastMessageRecordAlreadyExists();
+          this.messageService.recordAlreadyExists();
         }
       });
   }
@@ -122,13 +124,5 @@ export class EditRecordComponent implements OnInit {
       .then(() => {
         this.showMessageUpdatedSuccessful();
       });
-  }
-
-  public toastMessageRecordAlreadyExists() {
-    const errorConfig = {
-      positionClass: 'toast-bottom-center',
-      timeout: 2000
-    };
-    this.toastrService.error('Existiert bereits', 'Eintrag', errorConfig);
   }
 }

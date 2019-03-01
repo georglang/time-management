@@ -58,7 +58,6 @@ export class CreateRecordComponent implements OnInit {
   }
 
   public createRecordIfOnline(newRecord: ITimeRecord, orderId: string) {
-    newRecord.createdAt = new Date();
     this.cloudFirestoreService
       .checkIfRecordExistsInOrderInFirestore(orderId, newRecord)
       .then(doesRecordExist => {
