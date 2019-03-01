@@ -1,6 +1,6 @@
 import Dexie from 'dexie';
 import relationships from 'dexie-relationships';
-import { ITimeRecord } from '../data-classes/time-record';
+import { ITimeRecord } from '../data-classes/ITimeRecords';
 import { IOrder } from '../data-classes/Order';
 
 export class Database extends Dexie {
