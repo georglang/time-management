@@ -9,6 +9,7 @@ import { Order, IOrder } from '../data-classes/Order';
 import { ToastrService } from 'ngx-toastr';
 import { CloudFirestoreService } from '../service/cloudFirestore.service';
 import { ConnectionService } from 'ng-connection-service';
+import { MessageService } from './../service/message.service';
 import _ from 'lodash';
 
 @Component({
@@ -32,7 +33,8 @@ export class CreateOrderComponent implements OnInit {
     private toastr: ToastrService,
     private cloudFirestoreService: CloudFirestoreService,
     private synchronizationService: SynchronizationService,
-    private connectionService: ConnectionService
+    private connectionService: ConnectionService,
+    private messageService: MessageService
   ) {
     this.columns = ['Firma', 'Ansprechpartner', 'Ort'];
 
@@ -51,7 +53,7 @@ export class CreateOrderComponent implements OnInit {
     //     this.checkIfOrdersAreInOrdersTable();
     //   }
     // });
-    // this.synchronizationService.synchronizeIndexedDBWithFirebase();
+    this.synchronizationService.synchronizeIndexedDBWithFirebase();
   }
 
   public isConnected() {
@@ -62,21 +64,7 @@ export class CreateOrderComponent implements OnInit {
     this.router.navigate(['/']);
   }
 
-  public toastMessageOrderSuccessfulCreated() {
-    const successConfig = {
-      positionClass: 'toast-bottom-center',
-      timeout: 2000
-    };
-    this.toastr.success('Erfolgreich erstellt', 'Auftrag', successConfig);
-  }
 
-  public toastMessageOrderAlreadyExists() {
-    const successConfig = {
-      positionClass: 'toast-bottom-center',
-      timeout: 2000
-    };
-    this.toastr.error('Existiert bereits', 'Auftrag', successConfig);
-  }
 
   public createOrder(formInput: any) {
     const newOrder = new Order(
@@ -85,9 +73,8 @@ export class CreateOrderComponent implements OnInit {
       new Date(),
       formInput.contactPerson
     );
-    newOrder.records = [];
 
-    this.createOrderIfOffline(newOrder);
+    this.createOrderIfOnline(newOrder);
 
     // if (this.isConnected()) {
     //   this.createOrderIfOnline();
@@ -107,15 +94,15 @@ export class CreateOrderComponent implements OnInit {
             if (!isInOrdersOutbox) {
               this.indexDbService.addOrderToOutbox(newOrder).then(data => {
                 console.log('Added order to outbox', newOrder);
-                this.toastMessageOrderSuccessfulCreated();
+                this.messageService.orderSuccessfulCreated();
                 this.router.navigate(['/order-details/' + newOrder.id]);
               });
             } else {
-              this.toastMessageOrderAlreadyExists();
+              this.messageService.orderAlreadyExists();
             }
           });
       } else {
-        this.toastMessageOrderAlreadyExists();
+        this.messageService.orderAlreadyExists();
       }
     });
   }
@@ -129,14 +116,14 @@ export class CreateOrderComponent implements OnInit {
           this.cloudFirestoreService
             .addOrder(order)
             .then(id => {
-              this.toastMessageOrderSuccessfulCreated();
+              this.messageService.orderSuccessfulCreated();
               this.router.navigate(['/order-details/' + id]);
             })
             .catch(e => {
               console.error('can´t create order to firebase', e);
             });
         } else {
-          this.toastMessageOrderAlreadyExists();
+          this.messageService.orderAlreadyExists();
           return;
         }
       });
