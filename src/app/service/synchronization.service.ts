@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { IndexedDBService } from './indexedDb.service';
 import { CloudFirestoreService } from './cloudFirestore.service';
+import { MessageService } from './../service/message.service';
 import _ from 'lodash';
 
 @Injectable({
@@ -9,7 +10,8 @@ import _ from 'lodash';
 export class SynchronizationService {
   constructor(
     private indexedDBService: IndexedDBService,
-    private cloudFirestoreService: CloudFirestoreService
+    private cloudFirestoreService: CloudFirestoreService,
+    private messageService: MessageService
   ) {}
 
   // read orders from indexedDB ordersOutbox table
@@ -47,13 +49,18 @@ export class SynchronizationService {
       if (records !== undefined) {
         if (records.length > 0) {
           records.forEach(record => {
-            this.cloudFirestoreService
+            return this.cloudFirestoreService
               .checkIfRecordExistsInOrderInFirestore(record.orderId, record)
-              .then(doesRecordExists => {
-                if (!doesRecordExists) {
+              .then(doesRecordExist => {
+                if (!doesRecordExist) {
+                  const localId = record.id;
+                  delete record.id;
                   this.cloudFirestoreService.addTimeRecord(record.orderId, record).then(data => {
-                    this.indexedDBService.deleteRecordInOutbox(record.id);
+                    this.indexedDBService.deleteRecordInOutbox(localId);
+                    this.messageService.recordSuccessfulCreated();
                   });
+                } else {
+                  this.messageService.recordAlreadyExists();
                 }
               });
           });
