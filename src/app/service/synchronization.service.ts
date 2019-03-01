@@ -15,12 +15,12 @@ export class SynchronizationService {
   ) {}
 
   // read orders from indexedDB ordersOutbox table
-  public synchronizeIndexedDBWithFirebase() {
+  public synchronizeIndexedDbOrdersTableWithFirebase() {
     const ordersToPushToFirebase: string[] = [];
     this.indexedDBService.getOrdersFromOrdersOutbox().then(ordersInOutbox => {
       if (ordersInOutbox !== undefined) {
         if (ordersInOutbox.length > 0) {
-          this.cloudFirestoreService.getDocumentsInOrdersCollection().then(ordersOnline => {
+          this.cloudFirestoreService.getOrdersFromOrdersCollection().then(ordersOnline => {
             ordersInOutbox.forEach(orderInOutbox => {
               const orderToCompare = {};
               Object.assign(orderToCompare, orderInOutbox);
@@ -32,7 +32,7 @@ export class SynchronizationService {
                 ordersToPushToFirebase.push(orderInOutbox);
               }
             });
-            this.sychronizeOrdersOutbox(ordersToPushToFirebase);
+            this.sychronizeOrdersOutboxTableWithFirebase(ordersToPushToFirebase);
           });
         } else {
           // if no orders are in ordersOutbox, synchronization is not necessary
@@ -44,7 +44,7 @@ export class SynchronizationService {
 
   // records from indexedDB recordsOutbox table
   // update order with new records depending on orderId
-  public synchronizeIndexedDBRecordsTableWithFirebase() {
+  public synchronizeIndexedDbRecordsTableWithFirebase() {
     this.indexedDBService.getRecordsFromRecordsOutboxTable().then(records => {
       if (records !== undefined) {
         if (records.length > 0) {
@@ -56,11 +56,14 @@ export class SynchronizationService {
                   const localId = record.id;
                   delete record.id;
                   this.cloudFirestoreService.addTimeRecord(record.orderId, record).then(data => {
-                    this.indexedDBService.deleteRecordInOutbox(localId);
-                    this.messageService.recordSuccessfulCreated();
+                    this.indexedDBService
+                      .addRecordToOrdersTable(record, record.orderId)
+                      .then(() => {
+                        this.indexedDBService.deleteRecordInOutbox(localId);
+                      });
                   });
                 } else {
-                  this.messageService.recordAlreadyExists();
+                  this.indexedDBService.deleteRecordInOutbox(record.id);
                 }
               });
           });
@@ -69,14 +72,10 @@ export class SynchronizationService {
     });
   }
 
-  // ToDo: Refactoring: Gleiche Methode wie in edit-record.component update()
-  // sollte in service ausgelagert werden
-  public updateRecordByOrderId() {}
-
   // add order from indexedDB ordersOutbox table to firestore
   // after receiving the firestore id, add order to indexedDB orders table
-  // delete order form indexedDB ordersOutbox
-  public sychronizeOrdersOutbox(ordersToPushToFirebase) {
+  // delete order from indexedDB ordersOutbox
+  public sychronizeOrdersOutboxTableWithFirebase(ordersToPushToFirebase) {
     ordersToPushToFirebase.forEach(order => {
       this.cloudFirestoreService.addOrder(order).then(id => {
         if (!this.isAlreadyInIndexedDBOrders(order, ordersToPushToFirebase)) {
