@@ -38,4 +38,12 @@ export class MessageService {
     };
     this.toastr.success('Erfolgreich erstellt', 'Eintrag', successConfig);
   }
+
+  public recordDeletedSuccessful() {
+    const successConfig = {
+      positionClass: 'toast-bottom-center',
+      timeout: 500
+    };
+    this.toastr.success('Erfolgreich gelöscht', 'Eintrag', successConfig);
+  }
 }
