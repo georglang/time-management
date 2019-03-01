@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Database } from '../database/Database';
-import { TimeRecord, ITimeRecord } from '../data-classes/time-record';
+import { TimeRecord, ITimeRecord } from '../data-classes/ITimeRecords';
 import _ from 'lodash';
 import { IOrder } from '../data-classes/Order';
 import { CloudFirestoreService } from './cloudFirestore.service';
@@ -14,6 +14,31 @@ export class IndexedDBService {
   }
 
   // ToDo: schauen, ob check methoden vereinfacht werden koennen, ohne extra array
+  // ToDo: Wenn auch Order Offline erstellt wurde, befindet sie sich in ordersOutbox
+  // --> Hat dann noch keine firebase Id
+
+  // check by id, if order is in ordersOutbox
+  public checkByIdIfOrderIsInIndexedDBOrdersOutboxTable(orderId): Promise<boolean> {
+    const orderIds: number[] = [];
+    return new Promise((resolve, reject) => {
+      this.getOrdersFromOrdersOutbox().then(ordersInOutbox => {
+        if (ordersInOutbox !== undefined) {
+          if (ordersInOutbox.length !== 0) {
+            ordersInOutbox.forEach(orderInOubox => {
+              orderIds.push(orderInOubox.id);
+            });
+            if (orderIds.includes(orderId)) {
+              resolve(true);
+            } else {
+              resolve(false);
+            }
+          } else {
+            resolve(false);
+          }
+        }
+      });
+    });
+  }
 
   // check if order is in indexedDB ordersOutbox
   public checkIfOrderIsInIndexedDBOrdersOutboxTable(order): Promise<boolean> {
@@ -21,7 +46,7 @@ export class IndexedDBService {
     const orders = [];
 
     return new Promise((resolve, reject) => {
-      this.getOrdersFromOutbox().then(ordersInOutbox => {
+      this.getOrdersFromOrdersOutbox().then(ordersInOutbox => {
         if (ordersInOutbox !== undefined) {
           if (ordersInOutbox.length !== 0) {
             const newOrder = {
@@ -113,6 +138,38 @@ export class IndexedDBService {
     });
   }
 
+  // check if record is in recordsOutbox table
+  public checkIfRecordIsInRecordsOutboxTable(record: ITimeRecord, orderId: string) {
+    let isAlreadyInRecordsOutboxTable = true;
+    return new Promise((resolve, reject) => {
+      const records = [];
+
+      this.getRecordsFromRecordsOutboxTable().then(recordsInOutbox => {
+        if (recordsInOutbox !== undefined) {
+          if (recordsInOutbox.length !== 0) {
+            const newRecord = {
+              date: record.date,
+              description: record.description,
+              workingHours: record.workingHours
+            };
+
+            recordsInOutbox.forEach(recordInOutbox => {
+              records.push({
+                date: recordInOutbox.date,
+                description: recordInOutbox.description,
+                workingHours: recordInOutbox.workingHours
+              });
+            });
+            isAlreadyInRecordsOutboxTable = _.findIndex(records, o => _.isMatch(o, newRecord)) > -1;
+            resolve(isAlreadyInRecordsOutboxTable);
+          } else {
+            resolve(false);
+          }
+        }
+      });
+    });
+  }
+
   // add order offline
   public addOrderToOutbox(order: IOrder) {
     return this.timeRecordsDb.ordersOutbox.add(order).then(data => {
@@ -126,8 +183,21 @@ export class IndexedDBService {
     this.deleteOrderInOrdersOutbox(orderId).then(() => {});
   }
 
+  // delete record in indexedDb recordsOutbox
+  public deleteRecordInOutbox(recordId: string) {
+    return this.timeRecordsDb.recordsOutbox
+      .where('id')
+      .equals(recordId)
+      .delete()
+      .then(function(deleteCount) {
+        console.log('Deleted' + deleteCount + 'objects');
+      });
+  }
+
   // evtl. noch createdAt mit einbeziehen, damit keine doppelten eintraege vorhanden sind
-  public addRecordToOrder(record, orderId) {
+
+  // adds record to orders table
+  public addRecordToOrdersTable(record, orderId) {
     return this.timeRecordsDb.orders
       .where('id')
       .equals(orderId)
@@ -145,6 +215,34 @@ export class IndexedDBService {
             .modify(orders[0]);
         }
       });
+  }
+
+  // adds record to ordersOutbox table
+  public addRecordToOrdersOutboxTable(record, orderId) {
+    return this.timeRecordsDb.ordersOutbox
+      .where('id')
+      .equals(orderId)
+      .toArray(orders => {
+        if (orders !== undefined) {
+          const records = orders[0].records;
+          // if order has no record
+          if (records === undefined) {
+            orders[0].records = [];
+          }
+          orders[0].records.push(record);
+          this.timeRecordsDb.orders
+            .where('id')
+            .equals(orderId)
+            .modify(orders[0]);
+        }
+      });
+  }
+
+  public addRecordToRecordsOutboxTable(record) {
+    return this.timeRecordsDb.recordsOutbox.add(record).then(data => {
+      console.log('Data', data);
+      return data;
+    });
   }
 
   public addRecordToOrderOutbox(record, orderId) {
@@ -165,6 +263,17 @@ export class IndexedDBService {
           .catch(e => {
             console.warn('indexedDB: can´t add record to order in outbox');
           });
+      });
+  }
+
+  public getRecordsFromRecordsOutboxTable(): Promise<any> {
+    return this.timeRecordsDb.recordsOutbox
+      .toArray()
+      .then(result => {
+        return result;
+      })
+      .catch(e => {
+        console.error('IndexDB getRecordsFromRecordsOutboxTable: ', e);
       });
   }
 
@@ -195,7 +304,7 @@ export class IndexedDBService {
       });
   }
 
-  public getOrdersFromOutbox(): Promise<any> {
+  public getOrdersFromOrdersOutbox(): Promise<any> {
     return this.timeRecordsDb.ordersOutbox
       .toArray()
       .then(orders => {
