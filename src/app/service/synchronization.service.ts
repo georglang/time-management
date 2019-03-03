@@ -23,7 +23,6 @@ export class SynchronizationService {
       if (doesOrdersExist) {
         this.synchronizeIndexedDbOrdersOutboxTableWithFirebase().then(isSynchronized => {
           if (isSynchronized) {
-            debugger;
             this.indexedDBService.doesRecordsOutboxContainRecords().then(doesRecordsExist => {
               if (doesRecordsExist) {
                 this.synchronizeIndexedDbRecordsTableWithFirebase();
@@ -54,13 +53,32 @@ export class SynchronizationService {
                   if (!doesOrderExist) {
                     const localId = order.id;
                     delete order.id;
-                    this.cloudFirestoreService.addOrder(order).then(idFromFirebase => {
+                    this.cloudFirestoreService.addOrder(order).then((idFromFirebase: string) => {
                       order.id = idFromFirebase;
-                      this.indexedDBService.addToOrdersTable(order).then(() => {
-                        this.indexedDBService.deleteOrderInOutbox(localId);
-                        this.messageService.orderSuccessfulCreated();
-                        resolve(true);
-                      });
+                      // update depending records in recordsOutbox
+                      this.indexedDBService
+                        .doesRecordsOutboxContainRecords()
+                        .then(doesRecordsOutboxContainOrders => {
+                          if (doesRecordsOutboxContainOrders) {
+                            this.indexedDBService
+                              .updateLocalIdOfRecordsOutboxWithFirebaseId(localId, idFromFirebase)
+                              .then(hasBeenUpdated => {
+                                if (hasBeenUpdated) {
+                                  this.indexedDBService.addToOrdersTable(order).then(() => {
+                                    this.indexedDBService.deleteOrderInOutbox(localId);
+                                    this.messageService.orderSuccessfulCreated();
+                                    resolve(true);
+                                  });
+                                }
+                              });
+                          } else {
+                            this.indexedDBService.addToOrdersTable(order).then(() => {
+                              this.indexedDBService.deleteOrderInOutbox(localId);
+                              this.messageService.orderSuccessfulCreated();
+                              resolve(true);
+                            });
+                          }
+                        });
                     });
                   } else {
                     this.indexedDBService.deleteOrderInOutbox(order.id);
