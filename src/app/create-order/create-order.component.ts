@@ -53,7 +53,7 @@ export class CreateOrderComponent implements OnInit {
     //     this.checkIfOrdersAreInOrdersTable();
     //   }
     // });
-    this.synchronizationService.synchronizeIndexedDBWithFirebase();
+    this.synchronizationService.synchronizeIndexedDbOrdersOutboxTableWithFirebase();
   }
 
   public isConnected() {
@@ -74,7 +74,7 @@ export class CreateOrderComponent implements OnInit {
       formInput.contactPerson
     );
 
-    this.createOrderIfOnline(newOrder);
+    this.createOrderIfOffline(newOrder);
 
     // if (this.isConnected()) {
     //   this.createOrderIfOnline();
@@ -83,17 +83,19 @@ export class CreateOrderComponent implements OnInit {
     // }
   }
 
-  // check if new order is already in indexedDB orders or ordersOutbox table
-  // if not, add to ordersOutbox otherwise send toast message
+  // check if new order is already in indexedDB orders table (same orders than online)
+  // if already in orders table, send message "order already exists"
+  // if not in orders table, check if order is in indexedDB ordersOutbox
+  // if not in ordersOutbox add to ordersOutbox
+  // if in ordersOutbox, send message "order already exists"
   public createOrderIfOffline(newOrder) {
-    this.indexDbService.checkIfOrderIsIndexedDBOrdersTable(newOrder).then(isInOrdersTable => {
+    this.indexDbService.checkIfOrderIsInIndexedDBOrdersTable(newOrder).then(isInOrdersTable => {
       if (!isInOrdersTable) {
         return this.indexDbService
           .checkIfOrderIsInIndexedDBOrdersOutboxTable(newOrder)
           .then(isInOrdersOutbox => {
             if (!isInOrdersOutbox) {
               this.indexDbService.addOrderToOutbox(newOrder).then(data => {
-                console.log('Added order to outbox', newOrder);
                 this.messageService.orderSuccessfulCreated();
                 this.router.navigate(['/order-details/' + newOrder.id]);
               });
@@ -110,7 +112,7 @@ export class CreateOrderComponent implements OnInit {
   public createOrderIfOnline(order: IOrder): void {
     if (this.isConnected()) {
       // check if order is already in firestore
-      this.cloudFirestoreService.checkIfOrderIsInFirestore(order).then(isAlreadyInFirestore => {
+      this.cloudFirestoreService.checkIfOrderExistsInFirestore(order).then(isAlreadyInFirestore => {
         // if order is not in firestore add it
         if (!isAlreadyInFirestore) {
           this.cloudFirestoreService
