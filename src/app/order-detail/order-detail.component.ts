@@ -5,7 +5,6 @@ import { MatTableDataSource, MatDialog, MatDialogConfig } from '@angular/materia
 import { IndexedDBService } from '../service/indexedDb.service';
 import { DateAdapter } from '@angular/material';
 import { TimeRecord, ITimeRecord } from '../data-classes/ITimeRecords';
-import { Order } from '../data-classes/Order';
 import { ConfirmDeleteDialogComponent } from './../confirm-delete-dialog/confirm-delete-dialog.component';
 import { ToastrService } from 'ngx-toastr';
 import { CloudFirestoreService } from '../service/cloudFirestore.service';
@@ -29,7 +28,6 @@ export class OrderDetailComponent implements OnInit {
   public isOnline;
   public sumOfWorkingHours;
   public order: any;
-  private orderId;
   public columns: string[];
   public totalTime = 0.0;
   public records: TimeRecord[] = [];
@@ -64,7 +62,6 @@ export class OrderDetailComponent implements OnInit {
       this.paramId = params['id'];
       if (this.isConnected()) {
         this.getRecords(this.paramId);
-
       } else {
         console.log('Get records from indexedDB');
       }
@@ -98,7 +95,6 @@ export class OrderDetailComponent implements OnInit {
         });
       }
     });
-
   }
 
   public navigateToOrderList() {
@@ -117,35 +113,27 @@ export class OrderDetailComponent implements OnInit {
   public isConnected() {
     return navigator.onLine;
   }
-  // this.dataSource.sortingDataAccessor = (item, property) => {
-  //   switch (property) {
-  //     case 'date':
-  //       return new Date(item.date);
-  //     default:
-  //       return item[property];
-  //   }
 
   // records from firebase and indexedDB
   public getRecords(orderId: string) {
     const records: TimeRecord[] = [];
 
     if (this.isConnected()) {
-      this.cloudFirestoreService.getOrderById(orderId)
-        .then((order) => {
-          console.log('Order', order);
-
-        });
-
+      this.cloudFirestoreService.getOrderById(orderId).then(order => {
+        console.log('Order', order);
+      });
 
       this.cloudFirestoreService.getRecords(orderId).subscribe(recordsInFirebase => {
-        if (recordsInFirebase.length !== 0) {
-          recordsInFirebase.forEach(record => {
-            record.date = moment.unix(record.date.seconds).format('MM.DD.YYYY');
-            records.push(record);
-            this.getSumOfWorkingHours(records);
-          });
-        } else {
-          this.sumOfWorkingHours = 0;
+        if (recordsInFirebase !== undefined) {
+          if (recordsInFirebase.length > 0) {
+            recordsInFirebase.forEach(record => {
+              record.date = moment.unix(record.date.seconds).format('MM.DD.YYYY');
+              records.push(record);
+              this.getSumOfWorkingHours(records);
+            });
+          } else {
+            this.sumOfWorkingHours = 0;
+          }
         }
       });
       this.dataSource.data = records;
@@ -212,6 +200,7 @@ export class OrderDetailComponent implements OnInit {
   }
 
   public openDeleteRecordDialog(recordId) {
+    const _recordId = recordId;
     const dialogConfig = new MatDialogConfig();
     dialogConfig.disableClose = true;
     dialogConfig.autoFocus = true;
@@ -222,17 +211,14 @@ export class OrderDetailComponent implements OnInit {
     const dialogRef = this.dialog.open(ConfirmDeleteDialogComponent, dialogConfig);
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        // this.indexDbService.deleteRecord(this.paramId, recordId).then(data => {
-        //   this.getOrderById(this.paramId);
-        //   this.showDeleteMessage();
-        //   this.getSumOfWorkingHours();
-        // });
-
-        console.log('DIALOG', this.paramId);
-
-        this.cloudFirestoreService.deleteRecord(this.paramId, recordId).then(data => {
+        this.cloudFirestoreService.deleteRecord(this.paramId, _recordId).then(data => {
+          // load records after deletion
           this.getRecords(this.paramId);
-          this.messageService.recordDeletedSuccessful();
+          // delete record in indexedDB orders table
+          this.indexDbService.deleteRecordInOrdersTable(this.paramId, _recordId)
+            .then(() => {
+              this.messageService.recordDeletedSuccessful();
+            });
         });
       }
     });
@@ -283,6 +269,16 @@ export class OrderDetailComponent implements OnInit {
   }
 
   public synchronizeRecordsTable() {
-    this.synchronizationService.synchronizeIndexedDBRecordsTableWithFirebase();
+    this.synchronizationService.synchronizeIndexedDbRecordsTableWithFirebase();
+  }
+
+  public synchronizeWithOrdersTable() {
+    this.synchronizationService.synchronizeIndexedDbOrdersOutboxTableWithFirebase();
+  }
+
+  // Beim allgemeinen synchronisieren muss zuerst herausgefunden werden, was ueberhaut sychronisiert werden muss
+  // Erstellen Order und Record Offline: schauen in ordersOutbox
+  public synchronizeOrdersAndRecords() {
+    this.synchronizationService.synchronizeWithFirebase();
   }
 }
