@@ -18,7 +18,7 @@ export class IndexedDBService {
   // --> Hat dann noch keine firebase Id
 
   // check by id, if order is in ordersOutbox
-  public checkByIdIfOrderIsInIndexedDBOrdersOutboxTable(orderId): Promise<boolean> {
+  public checkByIdIfOrderIsInIndexedDBOrdersOutboxTable(orderId: number): Promise<boolean> {
     const orderIds: number[] = [];
     return new Promise((resolve, reject) => {
       this.getOrdersFromOrdersOutbox().then(ordersInOutbox => {
@@ -73,7 +73,7 @@ export class IndexedDBService {
   }
 
   // check if order is in indexedDB orders table
-  public checkIfOrderIsIndexedDBOrdersTable(order): Promise<boolean> {
+  public checkIfOrderIsInIndexedDBOrdersTable(order): Promise<boolean> {
     let isAlreadyInOrdersTable = true;
     return new Promise((resolve, reject) => {
       this.getOrdersFromOrdersTable().then(_orders => {
@@ -170,6 +170,65 @@ export class IndexedDBService {
     });
   }
 
+  // check if ordersOutbox contains orders
+  public doesOrdersOutboxContainOrders(): Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      this.getOrdersFromOrdersOutbox().then(ordersInOrdersOutbox => {
+        if (ordersInOrdersOutbox !== undefined) {
+          if (ordersInOrdersOutbox.length > 0) {
+            resolve(true);
+          } else {
+            resolve(false);
+          }
+        }
+      });
+    });
+  }
+
+  // check if recordsOutbox contains records
+  public doesRecordsOutboxContainRecords(): Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      this.getRecordsFromRecordsOutboxTable().then(recordssInRecordsOutbox => {
+        if (recordssInRecordsOutbox !== undefined) {
+          if (recordssInRecordsOutbox.length > 0) {
+            resolve(true);
+          } else {
+            resolve(false);
+          }
+        }
+      });
+    });
+  }
+
+  public updateLocalIdOfRecordsOutboxWithFirebaseId(
+    localOrderId: number,
+    fbId: string
+  ): Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      this.getRecordsFromRecordsOutboxTable().then(records => {
+        records.forEach(record => {
+          if (localOrderId === +record.orderId) {
+            this.timeRecordsDb.recordsOutbox
+              .where('orderId')
+              .equals(localOrderId.toString())
+              .modify({ orderId: fbId })
+              .then(updated => {
+                if (updated) {
+                  resolve(true);
+                } else {
+                  resolve(false);
+                }
+              })
+              .catch(e => {
+                console.warn('indexedDB: can´t update orderId of record');
+                resolve(false);
+              });
+          }
+        });
+      });
+    });
+  }
+
   // add order offline
   public addOrderToOutbox(order: IOrder) {
     return this.timeRecordsDb.ordersOutbox.add(order).then(data => {
@@ -221,7 +280,7 @@ export class IndexedDBService {
   public addRecordToOrdersOutboxTable(record, orderId) {
     return this.timeRecordsDb.ordersOutbox
       .where('id')
-      .equals(orderId)
+      .equals(+orderId)
       .toArray(orders => {
         if (orders !== undefined) {
           const records = orders[0].records;
@@ -365,27 +424,26 @@ export class IndexedDBService {
   //     });
   // }
 
-  // public deleteRecord(orderId, recordId) {
-  //   return this.timeRecordsDb.orders
-  //     .where('id')
-  //     .equals(orderId)
-  //     .toArray(order => {
-  //       const records: TimeRecord[] = order[0].records;
-  //       for (let index = 0; index < records.length; index++) {
-  //         const element = records[index];
-  //         if (element.id === recordId) {
-  //           records.splice(index, 1);
-  //           this.timeRecordsDb.orders
-  //             .where('id')
-  //             .equals(orderId)
-  //             .modify(_order => {
-  //               _order.records = records;
-  //               this.cloudFirestore.updateRecord(orderId, _order.records);
-  //             });
-  //         }
-  //       }
-  //     });
-  // }
+  public deleteRecordInOrdersTable(orderId, recordId) {
+    return this.timeRecordsDb.orders
+      .where('id')
+      .equals(orderId)
+      .toArray(order => {
+        const records: TimeRecord[] = order[0].records;
+        for (let index = 0; index < records.length; index++) {
+          const element = records[index];
+          if (element.id === recordId) {
+            records.splice(index, 1);
+            this.timeRecordsDb.orders
+              .where('id')
+              .equals(orderId)
+              .modify(_order => {
+                _order.records = records;
+              });
+          }
+        }
+      });
+  }
 
   public getAllRecords(orderId): Promise<ITimeRecord[]> {
     return this.timeRecordsDb.orders
