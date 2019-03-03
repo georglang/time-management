@@ -66,7 +66,6 @@ export class SynchronizationService {
                                 if (hasBeenUpdated) {
                                   this.indexedDBService.addToOrdersTable(order).then(() => {
                                     this.indexedDBService.deleteOrderInOutbox(localId);
-                                    this.messageService.orderSuccessfulCreated();
                                     resolve(true);
                                   });
                                 }
@@ -74,7 +73,6 @@ export class SynchronizationService {
                           } else {
                             this.indexedDBService.addToOrdersTable(order).then(() => {
                               this.indexedDBService.deleteOrderInOutbox(localId);
-                              this.messageService.orderSuccessfulCreated();
                               resolve(true);
                             });
                           }
@@ -82,7 +80,6 @@ export class SynchronizationService {
                     });
                   } else {
                     this.indexedDBService.deleteOrderInOutbox(order.id);
-                    this.messageService.orderAlreadyExists();
                     resolve(true);
                   }
                 });
@@ -107,18 +104,17 @@ export class SynchronizationService {
                   if (!doesRecordExist) {
                     const localId = record.id;
                     delete record.id;
-                    this.cloudFirestoreService.addTimeRecord(record.orderId, record).then(data => {
+                    this.cloudFirestoreService.addTimeRecord(record.orderId, record).then((idFromFirebase: string) => {
+                      record.id = idFromFirebase;
                       this.indexedDBService
                         .addRecordToOrdersTable(record, record.orderId)
                         .then(() => {
                           this.indexedDBService.deleteRecordInOutbox(localId);
-                          this.messageService.recordSuccessfulCreated();
                           resolve(true);
                         });
                     });
                   } else {
                     this.indexedDBService.deleteRecordInOutbox(record.id);
-                    this.messageService.recordAlreadyExists();
                     resolve(true);
                   }
                 });
@@ -128,51 +124,4 @@ export class SynchronizationService {
       });
     });
   }
-
-  // Weiter  machen
-
-  // add order from indexedDB ordersOutbox table to firestore
-  // after receiving the firestore id, add order to indexedDB orders table
-  // delete order from indexedDB ordersOutbox
-  // public sychronizeOrdersOutboxTableWithFirebase(ordersToPushToFirebase) {
-  //   ordersToPushToFirebase.forEach(order => {
-  //     this.cloudFirestoreService.addOrder(order).then(id => {
-  //       if (!this.isAlreadyInIndexedDBOrders(order, ordersToPushToFirebase)) {
-  //         const localId = order.id;
-  //         order.id = id;
-  //         this.indexedDBService.addToOrdersTable(order).then(() => {
-  //           debugger;
-  //           this.indexedDBService.deleteOrderInOutbox(localId);
-  //         });
-  //       } else {
-  //         debugger;
-  //         this.messageService.orderAlreadyExists();
-  //       }
-  //     });
-  //   });
-  // }
-
-  // private compareIfOrderIsOnline(orderInOutbox, ordersOnline): boolean {
-  //   delete orderInOutbox.createdAt;
-  //   delete orderInOutbox.id;
-  //   let isOrderAlreadyOnline = false;
-  //   ordersOnline.forEach(orderOnline => {
-  //     delete orderOnline.createdAt;
-  //     delete orderOnline.id;
-  //     if (_.isEqual(orderOnline, orderInOutbox)) {
-  //       return (isOrderAlreadyOnline = true);
-  //     }
-  //   });
-  //   return isOrderAlreadyOnline;
-  // }
-
-  // private isAlreadyInIndexedDBOrders(orderToPush, orders) {
-  //   let isAlreadyInIndexedDB = false;
-  //   orders.forEach(order => {
-  //     if (_.isEqual(orderToPush, orders)) {
-  //       return (isAlreadyInIndexedDB = true);
-  //     }
-  //   });
-  //   return isAlreadyInIndexedDB;
-  // }
 }
