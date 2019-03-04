@@ -1,11 +1,12 @@
 import { Component, OnInit, Inject } from '@angular/core';
 import { FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
-import { TimeRecord } from '../data-classes/ITimeRecords';
+import { TimeRecord, ITimeRecord } from '../data-classes/ITimeRecords';
 import { DateAdapter } from '@angular/material';
 import { ToastrService } from 'ngx-toastr';
 import { CloudFirestoreService } from '../service/cloudFirestore.service';
 import { MessageService } from './../service/message.service';
+import { IndexedDBService } from './../service/indexedDb.service';
 
 import * as moment from 'moment';
 
@@ -28,7 +29,8 @@ export class EditRecordComponent implements OnInit {
     private dateAdapter: DateAdapter<Date>,
     private toastrService: ToastrService,
     private cloudFirestoreService: CloudFirestoreService,
-    private messageService: MessageService
+    private messageService: MessageService,
+    private indexedDBService: IndexedDBService
   ) {
     this.dateAdapter.setLocale('de');
   }
@@ -91,13 +93,13 @@ export class EditRecordComponent implements OnInit {
   }
 
   public onSubmit() {
-    const newRecord = new TimeRecord(
-      this.editRecordForm.controls.date.value,
-      this.editRecordForm.controls.description.value,
-      this.editRecordForm.controls.workingHours.value,
-      this.editRecordForm.controls.id.value,
-      ''
-    );
+    const newRecord = {
+      date: this.editRecordForm.controls.date.value,
+      description: this.editRecordForm.controls.description.value,
+      workingHours: this.editRecordForm.controls.workingHours.value,
+      recordId: this.recordId,
+      orderId: this.orderId
+    };
 
     this.cloudFirestoreService
       .checkIfRecordExistsInOrderInFirestore(this.orderId, newRecord)
@@ -111,18 +113,23 @@ export class EditRecordComponent implements OnInit {
   }
 
   private update() {
+    const newRecord = {
+      date: this.editRecordForm.controls.date.value,
+      description: this.editRecordForm.controls.description.value,
+      workingHours: this.editRecordForm.controls.workingHours.value,
+      id: this.recordId,
+      orderId: this.orderId
+    };
+
     this.cloudFirestoreService.ordersCollection
       .doc(this.orderId)
       .collection('records')
       .doc(this.recordId)
-      .update({
-        date: this.editRecordForm.controls.date.value,
-        description: this.editRecordForm.controls.description.value,
-        workingHours: this.editRecordForm.controls.workingHours.value,
-        createdAt: new Date()
-      })
+      .update(newRecord)
       .then(() => {
-        this.showMessageUpdatedSuccessful();
+        this.indexedDBService.updateRecordInOrdersTable(newRecord, this.orderId).then(() => {
+          this.showMessageUpdatedSuccessful();
+        });
       });
   }
 }
