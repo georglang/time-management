@@ -8,6 +8,7 @@ import { CloudFirestoreService } from '../service/cloudFirestore.service';
 import { ConnectionService } from 'ng-connection-service';
 import { SynchronizationService } from './../service/synchronization.service';
 import { IOrder } from '../data-classes/Order';
+import { ITimeRecord } from '../data-classes/ITimeRecords';
 
 @Component({
   selector: 'app-order-list',
@@ -15,7 +16,7 @@ import { IOrder } from '../data-classes/Order';
   styleUrls: ['./order-list.component.sass']
 })
 export class OrderListComponent implements OnInit {
-  public orders: any[]; // IOrder coudn´t be used because of firebase auto generated id,
+  public orders: any[] = []; // IOrder coudn´t be used because of firebase auto generated id,
   public dataSource = new MatTableDataSource();
   public displayedColumns = ['customer', 'contactPerson', 'location', 'detail'];
   public isOnlineService: boolean;
@@ -35,13 +36,9 @@ export class OrderListComponent implements OnInit {
   ) {}
 
   ngOnInit() {
+    // this.getOrdersWithRecordsFromFirebase();
 
-    this.cloudFirestoreService.getOrdersFromOrdersCollection()
-      .then((orders) => {
-        console.log('Orders: ', orders);
-      });
-
-    this.connectionService.monitor().subscribe(isConnected => {});
+    // this.connectionService.monitor().subscribe(isConnected => {});
     // this.synchronizationService.synchronizeIndexedDbOrdersOutboxTableWithFirebase();
 
     this.getOrdersIfOnline();
@@ -55,6 +52,14 @@ export class OrderListComponent implements OnInit {
     // }
   }
 
+  private getOrdersWithRecordsFromFirebase() {
+    this.cloudFirestoreService.getOrdersWithRecords().then(orders => {
+      if (orders.length > 0) {
+        this.dataSource = new MatTableDataSource(orders);
+      }
+    });
+  }
+
   public isOnline() {
     return navigator.onLine;
   }
@@ -63,26 +68,11 @@ export class OrderListComponent implements OnInit {
   // the firebase unique id will be used as indexedDB key
   public getOrdersIfOnline() {
     if (this.isOnline) {
-      this.ordersObs = this.cloudFirestoreService.getOrders();
-      this.ordersObs.subscribe(orders => {
-        this.orders = orders;
-        if (this.orders.length !== 0) {
-          this.orders.forEach(order => {
-            this.indexDbService.getOrdersFromOrdersTable().then(ordersInIndexedDB => {
-              if (ordersInIndexedDB !== undefined) {
-                ordersInIndexedDB.forEach(cachedOrder => {
-                  this.orderIds.push(cachedOrder.id);
-                });
-                this.orders.forEach(_order => {
-                  if (!this.orderIds.includes(_order.id)) {
-                    this.indexDbService.addToOrdersTable(order);
-                  }
-                });
-              }
-            });
-            this.dataSource = new MatTableDataSource(this.orders);
-          });
-        }
+      this.cloudFirestoreService.getOrdersWithRecords()
+        .then(orders => {
+          this.orders = orders;
+          this.dataSource = new MatTableDataSource(this.orders);
+          this.indexDbService.addOrderToOrdersTable(orders);
       });
     }
   }
@@ -91,19 +81,19 @@ export class OrderListComponent implements OnInit {
   // orders from indexedDB orders and ordersOutbox tables will be fetched
   public getOrdersIfOffline() {
     // if (!this.isOnline()) {
-      this.indexDbService.getOrdersFromOrdersTable().then(ordersInOrdersTabel => {
-        if (ordersInOrdersTabel.length > 0) {
-          ordersInOrdersTabel.forEach(order => {
-            this.ordersFromIndexedDB.push(order);
-          });
-        }
-        this.indexDbService.getOrdersFromOrdersOutbox().then(ordersInOutboxTable => {
-          ordersInOutboxTable.forEach(order => {
-            this.ordersFromIndexedDB.push(order);
-          });
-          this.dataSource = new MatTableDataSource(this.ordersFromIndexedDB);
+    this.indexDbService.getOrdersFromOrdersTable().then(ordersInOrdersTabel => {
+      if (ordersInOrdersTabel.length > 0) {
+        ordersInOrdersTabel.forEach(order => {
+          this.ordersFromIndexedDB.push(order);
         });
+      }
+      this.indexDbService.getOrdersFromOrdersOutbox().then(ordersInOutboxTable => {
+        ordersInOutboxTable.forEach(order => {
+          this.ordersFromIndexedDB.push(order);
+        });
+        this.dataSource = new MatTableDataSource(this.ordersFromIndexedDB);
       });
+    });
     // }
   }
 

@@ -8,6 +8,7 @@ import { CloudFirestoreService } from './cloudFirestore.service';
 @Injectable()
 export class IndexedDBService {
   public isAlreadyInDB: boolean;
+  private orderIds: number[] = [];
 
   constructor(private timeRecordsDb: Database, private cloudFirestore: CloudFirestoreService) {
     this.isAlreadyInDB = false;
@@ -237,6 +238,25 @@ export class IndexedDBService {
     });
   }
 
+  public addOrderToOrdersTable(orders: IOrder[]) {
+    if (orders.length > 0) {
+      orders.forEach(order => {
+        this.getOrdersFromOrdersTable().then(ordersInIndexedDB => {
+          if (ordersInIndexedDB !== undefined) {
+            ordersInIndexedDB.forEach(cachedOrder => {
+              this.orderIds.push(cachedOrder.id);
+            });
+            orders.forEach(_order => {
+              if (!this.orderIds.includes(_order.id)) {
+                this.addToOrdersTable(order);
+              }
+            });
+          }
+        });
+      });
+    }
+  }
+
   // delete order in indexedDb ordersOutbox
   public deleteOrderInOutbox(orderId) {
     this.deleteOrderInOrdersOutbox(orderId).then(() => {});
@@ -262,16 +282,18 @@ export class IndexedDBService {
       .equals(orderId)
       .toArray(orders => {
         if (orders !== undefined) {
-          const records = orders[0].records;
-          // if order has no record
-          if (records === undefined) {
-            orders[0].records = [];
+          if (orders.length > 0) {
+            const records = orders[0].records;
+            // if order has no record
+            if (records === undefined) {
+              orders[0].records = [];
+            }
+            orders[0].records.push(record);
+            this.timeRecordsDb.orders
+              .where('id')
+              .equals(orderId)
+              .modify(orders[0]);
           }
-          orders[0].records.push(record);
-          this.timeRecordsDb.orders
-            .where('id')
-            .equals(orderId)
-            .modify(orders[0]);
         }
       });
   }
@@ -496,22 +518,20 @@ export class IndexedDBService {
     const id: number = +record.id;
     record.id = id;
     return new Promise((resolve, reject) => {
-      return (
-        this.timeRecordsDb.recordsOutbox
-          .where('id')
-          .equals(record.id)
-          .modify(record)
-          .then(updated => {
-            if (updated) {
-              resolve(true);
-            } else {
-              resolve(false);
-            }
-          })
-          .catch(error => {
-            console.error('Error: indexedDB recordsOutbox: can not update record: ', error);
-          })
-      );
+      return this.timeRecordsDb.recordsOutbox
+        .where('id')
+        .equals(record.id)
+        .modify(record)
+        .then(updated => {
+          if (updated) {
+            resolve(true);
+          } else {
+            resolve(false);
+          }
+        })
+        .catch(error => {
+          console.error('Error: indexedDB recordsOutbox: can not update record: ', error);
+        });
     });
   }
 }
