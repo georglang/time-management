@@ -3,12 +3,9 @@ import { FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { TimeRecord, ITimeRecord } from '../data-classes/ITimeRecords';
 import { DateAdapter } from '@angular/material';
-import { ToastrService } from 'ngx-toastr';
 import { CloudFirestoreService } from '../service/cloudFirestore.service';
 import { MessageService } from './../service/message.service';
 import { IndexedDBService } from './../service/indexedDb.service';
-
-import * as moment from 'moment';
 
 @Component({
   selector: 'app-edit-record',
@@ -27,7 +24,6 @@ export class EditRecordComponent implements OnInit {
     private router: Router,
     private route: ActivatedRoute,
     private dateAdapter: DateAdapter<Date>,
-    private toastrService: ToastrService,
     private cloudFirestoreService: CloudFirestoreService,
     private messageService: MessageService,
     private indexedDBService: IndexedDBService
@@ -49,7 +45,19 @@ export class EditRecordComponent implements OnInit {
 
     this.route.params.subscribe(params => {
       this.recordId = params['id'];
-      this.getRecordById(this.orderId, this.recordId);
+
+      // if (this.isConnected()) {
+
+      //   // ordersOutbox
+      //   this.getRecordByIdFromFirebase(this.orderId, this.recordId);
+      // } else {
+
+      //   // Kombination von ordersOutbox und recordsOutbox
+
+      //   this.getRecordsByIdFromRecordsOutbox(+this.recordId);
+      // }
+
+      this.getRecordsByIdFromRecordsOutbox(+this.recordId);
     });
 
     // ToDo implement change detection notification
@@ -62,7 +70,7 @@ export class EditRecordComponent implements OnInit {
     return navigator.onLine;
   }
 
-  public getRecordById(orderId: string, recordId: string): void {
+  public getRecordByIdFromFirebase(orderId: string, recordId: string): void {
     this.cloudFirestoreService.getRecordById(orderId, recordId).then(record => {
       this.record = record;
       if (this.record !== undefined) {
@@ -70,26 +78,27 @@ export class EditRecordComponent implements OnInit {
       }
     });
   }
-  public navigateToOrderList() {
+
+  public getRecordsByIdFromRecordsOutbox(recordId: number): void {
+    this.indexedDBService.getRecordByIdFromRecordsOutbox(recordId).then(record => {
+      this.record = record;
+      if (this.record !== undefined) {
+        this.setControl(this.record);
+      }
+    });
+  }
+
+  public navigateToOrderList(): void {
     this.router.navigate(['/order-details', this.orderId]);
   }
 
   public setControl(record: TimeRecord): void {
-    const date: any = record.date;
     this.editRecordForm.setValue({
-      id: this.recordId,
-      date: new Date(moment.unix(date.seconds).format('MM.DD.YYYY')),
+      id: record.id,
+      date: record.date,
       description: record.description,
       workingHours: record.workingHours
     });
-  }
-
-  public showMessageUpdatedSuccessful() {
-    const successConfig = {
-      positionClass: 'toast-bottom-center',
-      timeout: 500
-    };
-    this.toastrService.success('Erfolgreich aktualisiert', 'Eintrag', successConfig);
   }
 
   public onSubmit() {
@@ -97,39 +106,61 @@ export class EditRecordComponent implements OnInit {
       date: this.editRecordForm.controls.date.value,
       description: this.editRecordForm.controls.description.value,
       workingHours: this.editRecordForm.controls.workingHours.value,
-      recordId: this.recordId,
-      orderId: this.orderId
-    };
-
-    this.cloudFirestoreService
-      .checkIfRecordExistsInOrderInFirestore(this.orderId, newRecord)
-      .then(doesRecordExist => {
-        if (!doesRecordExist) {
-          this.update();
-        } else {
-          this.messageService.recordAlreadyExists();
-        }
-      });
-  }
-
-  private update() {
-    const newRecord = {
-      date: this.editRecordForm.controls.date.value,
-      description: this.editRecordForm.controls.description.value,
-      workingHours: this.editRecordForm.controls.workingHours.value,
       id: this.recordId,
       orderId: this.orderId
     };
 
+    if (this.isConnected()) {
+      this.cloudFirestoreService
+        .checkIfRecordExistsInOrderInFirestore(this.orderId, newRecord)
+        .then(doesRecordExist => {
+          if (!doesRecordExist) {
+            this.updateRecordInFirestore(this.orderId, newRecord);
+          } else {
+            this.messageService.recordAlreadyExists();
+          }
+        });
+    } else {
+      this.updateRecordInRecordsOutbox(newRecord);
+    }
+  }
+
+  private updateRecordInFirestore(orderId: string, record: ITimeRecord): void {
     this.cloudFirestoreService.ordersCollection
-      .doc(this.orderId)
+      .doc(orderId)
       .collection('records')
       .doc(this.recordId)
-      .update(newRecord)
+      .update(record)
       .then(() => {
-        this.indexedDBService.updateRecordInOrdersTable(newRecord, this.orderId).then(() => {
-          this.showMessageUpdatedSuccessful();
-        });
+        this.updateRecordInOrdersTable(+orderId, record);
+      });
+  }
+
+  private updateRecordInOrdersTable(orderId, record): void {
+    this.indexedDBService.updateRecordInOrdersTable(orderId, record).then(() => {
+      this.messageService.recordUpdatedSuccessful();
+    });
+  }
+
+  private updateRecordInRecordsOutbox(record: ITimeRecord): void {
+    this.indexedDBService
+      .doesRecordsOutboxContainRecords()
+      .then(doesRecordsOutboxContainRecords => {
+        this.indexedDBService
+          .checkIfRecordIsInRecordsOutboxTable(record)
+          .then(isAlreadyInRecordsOutboxTable => {
+            if (!isAlreadyInRecordsOutboxTable) {
+              if (doesRecordsOutboxContainRecords) {
+                if (this.indexedDBService.updateRecordInRecordsOutboxTable(record)) {
+                  this.messageService.recordUpdatedSuccessful();
+                } else {
+                  this.messageService.recordCouldNotBeUpdated();
+                }
+              }
+            } else {
+              this.messageService.recordAlreadyExists();
+            }
+          });
       });
   }
 }
