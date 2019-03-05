@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
-import { FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { IndexedDBService } from '../service/indexedDb.service';
 import { ITimeRecord } from '../data-classes/ITimeRecords';
 import { ToastrService, Toast } from 'ngx-toastr';
@@ -64,7 +64,7 @@ export class CreateRecordComponent implements OnInit {
         if (!doesRecordExist) {
           this.cloudFirestoreService.addTimeRecord(orderId, newRecord).then(timeRecordResponse => {
             console.log('Time Record Response', timeRecordResponse);
-            this.messageService.recordSuccessfulCreated();
+            this.messageService.recordCreatedSuccessful();
             this.router.navigate(['order-details', orderId]);
           });
         } else {
@@ -77,26 +77,15 @@ export class CreateRecordComponent implements OnInit {
   // if the order which the record belongs to is not in recordsOutbox table, add record to recordsOutbox table
   public createRecordIfOffline(newRecord: ITimeRecord, orderId: string) {
     this.indexDbService
-      .checkByIdIfOrderIsInIndexedDBOrdersOutboxTable(orderId)
-      .then(isOrderInOrdersOutbox => {
-        if (isOrderInOrdersOutbox) {
-          this.indexDbService.addRecordToOrdersOutboxTable(newRecord, orderId).then(data => {
-            this.messageService.recordSuccessfulCreated();
+      .checkIfRecordIsInRecordsOutboxTable(newRecord)
+      .then(isAlreadyInRecordsOutboxTable => {
+        if (!isAlreadyInRecordsOutboxTable) {
+          newRecord.orderId = orderId;
+          this.indexDbService.addRecordToRecordsOutboxTable(newRecord).then(() => {
+            this.messageService.recordCreatedSuccessful();
           });
         } else {
-          this.indexDbService
-            .checkIfRecordIsInRecordsOutboxTable(newRecord, orderId)
-            .then(isAlreadyInRecordsOutboxTable => {
-              if (!isAlreadyInRecordsOutboxTable) {
-                newRecord.orderId = orderId;
-                this.indexDbService.addRecordToRecordsOutboxTable(newRecord)
-                  .then(() => {
-                    this.messageService.recordSuccessfulCreated();
-                  });
-              } else {
-                this.messageService.recordAlreadyExists();
-              }
-            });
+          this.messageService.recordAlreadyExists();
         }
       });
   }
