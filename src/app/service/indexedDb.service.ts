@@ -139,7 +139,7 @@ export class IndexedDBService {
   }
 
   // check if record is in recordsOutbox table
-  public checkIfRecordIsInRecordsOutboxTable(record: ITimeRecord, orderId: string) {
+  public checkIfRecordIsInRecordsOutboxTable(record: ITimeRecord) {
     let isAlreadyInRecordsOutboxTable = true;
     return new Promise((resolve, reject) => {
       const records = [];
@@ -328,18 +328,27 @@ export class IndexedDBService {
   public getRecordsFromRecordsOutboxTable(): Promise<any> {
     return this.timeRecordsDb.recordsOutbox
       .toArray()
-      .then(result => {
-        return result;
+      .then(records => {
+        return records;
       })
       .catch(e => {
         console.error('IndexDB getRecordsFromRecordsOutboxTable: ', e);
       });
   }
 
-  public getOrderByIdFromOutbox(paramId: number) {
+  public getRecordByIdFromRecordsOutbox(recordId: number) {
+    return this.timeRecordsDb.recordsOutbox
+      .where('id')
+      .equals(recordId)
+      .toArray(record => {
+        return record[0];
+      });
+  }
+
+  public getOrderByIdFromOrdersOutbox(orderId: number) {
     return this.timeRecordsDb.ordersOutbox
       .where('id')
-      .equals(paramId)
+      .equals(orderId)
       .toArray(order => {
         return order;
       });
@@ -457,33 +466,52 @@ export class IndexedDBService {
       });
   }
 
-  // public updateRecord(updatedRecord: TimeRecord, orderId: string) {
-  //   return this.timeRecordsDb.orders
-  //     .where('id')
-  //     .equals(orderId)
-  //     .toArray(order => {
-  //       const records = order[0].records;
-  //       for (let index = 0; index < records.length; index++) {
-  //         const element = records[index];
-  //         if (updatedRecord.id === element.id) {
-  //           if (!_.isEqual(updatedRecord, element)) {
-  //             records.splice(index, 1);
-  //             order[0].records.push(updatedRecord);
-  //             this.timeRecordsDb.orders
-  //               .where('id')
-  //               .equals(orderId)
-  //               .modify((value, ref) => {
-  //                 ref.value.records = records;
+  public updateRecordInOrdersTable(orderId: number, record: any) {
+    return this.timeRecordsDb.orders
+      .where('id')
+      .equals(orderId)
+      .toArray(order => {
+        const records = order[0].records;
+        for (let index = 0; index < records.length; index++) {
+          const element = records[index];
+          if (record.id === element.id) {
+            if (!_.isEqual(record, element)) {
+              records.splice(index, 1);
+              order[0].records.push(record);
+              this.timeRecordsDb.orders
+                .where('id')
+                .equals(orderId)
+                .modify((value, ref) => {
+                  ref.value.records = records;
+                });
+            }
+          }
+        }
+      });
+  }
 
-  //                 this.cloudFirestore
-  //                   .updateRecord(orderId.toString(), order[0].records);
-  //                   .then(data => {
-  //                     console.log('Updated in firestore');
-  //                   });
-  //               });
-  //           }
-  //         }
-  //       }
-  //     });
-  // }
+  public updateRecordInRecordsOutboxTable(record: any): Promise<boolean> {
+    // record id in indexedDb recordsOutbox is a number
+    // record id in firebase is a string
+    const id: number = +record.id;
+    record.id = id;
+    return new Promise((resolve, reject) => {
+      return (
+        this.timeRecordsDb.recordsOutbox
+          .where('id')
+          .equals(record.id)
+          .modify(record)
+          .then(updated => {
+            if (updated) {
+              resolve(true);
+            } else {
+              resolve(false);
+            }
+          })
+          .catch(error => {
+            console.error('Error: indexedDB recordsOutbox: can not update record: ', error);
+          })
+      );
+    });
+  }
 }
