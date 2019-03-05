@@ -7,7 +7,7 @@ import { ToastrService } from 'ngx-toastr';
 export class MessageService {
   constructor(private toastr: ToastrService) {}
 
-  public orderSuccessfulCreated() {
+  public orderCreatedSuccessful() {
     const successConfig = {
       positionClass: 'toast-bottom-center',
       timeout: 2000
@@ -16,11 +16,11 @@ export class MessageService {
   }
 
   public orderAlreadyExists() {
-    const successConfig = {
+    const errorConfig = {
       positionClass: 'toast-bottom-center',
       timeout: 2000
     };
-    this.toastr.error('Existiert bereits', 'Auftrag', successConfig);
+    this.toastr.error('Existiert bereits', 'Auftrag', errorConfig);
   }
 
   public recordAlreadyExists() {
@@ -31,12 +31,36 @@ export class MessageService {
     this.toastr.error('Existiert bereits', 'Eintrag', errorConfig);
   }
 
-  public recordSuccessfulCreated() {
+  public recordDoesNotExist() {
+    const errorConfig = {
+      positionClass: 'toast-bottom-center',
+      timeout: 2000
+    };
+    this.toastr.error('Nicht gefunden', 'Eintrag', errorConfig);
+  }
+
+  public recordCreatedSuccessful() {
     const successConfig = {
       positionClass: 'toast-bottom-center',
       timeout: 2000
     };
     this.toastr.success('Erfolgreich erstellt', 'Eintrag', successConfig);
+  }
+
+  public recordUpdatedSuccessful() {
+    const successConfig = {
+      positionClass: 'toast-bottom-center',
+      timeout: 2000
+    };
+    this.toastr.success('Erfolgreich aktualisiert', 'Eintrag', successConfig);
+  }
+
+  public recordCouldNotBeUpdated() {
+    const warningConfig = {
+      positionClass: 'toast-bottom-center',
+      timeout: 500
+    };
+    this.toastr.warning('Konnte nicht aktualisiert werden', 'Eintrag', warningConfig);
   }
 
   public recordDeletedSuccessful() {
