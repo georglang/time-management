@@ -96,7 +96,7 @@ export class CreateOrderComponent implements OnInit {
           .then(isInOrdersOutbox => {
             if (!isInOrdersOutbox) {
               this.indexDbService.addOrderToOutbox(newOrder).then(data => {
-                this.messageService.orderSuccessfulCreated();
+                this.messageService.orderCreatedSuccessful();
                 this.router.navigate(['/order-details/' + newOrder.id]);
               });
             } else {
@@ -118,7 +118,7 @@ export class CreateOrderComponent implements OnInit {
           this.cloudFirestoreService
             .addOrder(order)
             .then(id => {
-              this.messageService.orderSuccessfulCreated();
+              this.messageService.orderCreatedSuccessful();
               this.router.navigate(['/order-details/' + id]);
             })
             .catch(e => {

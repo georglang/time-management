@@ -39,12 +39,12 @@ export class CloudFirestoreService {
     this.ordersCollection = this.afs.collection<IOrder>('orders');
   }
 
-  public checkIfOrderIsInFirestore(order: IOrder): Promise<boolean> {
+  public checkIfOrderExistsInFirestore(order: IOrder): Promise<boolean> {
     let isAlreadyInFirestore = true;
     const orders: IFlattenOrder[] = []; // without id and createdAt properties
 
     return new Promise((resolve, reject) => {
-      this.getDocumentsInOrdersCollection().then(ordersInFirestore => {
+      this.getOrdersFromOrdersCollection().then(ordersInFirestore => {
         if (ordersInFirestore !== undefined) {
           if (ordersInFirestore.length > 0) {
             const newOrder = {
@@ -110,12 +110,11 @@ export class CloudFirestoreService {
     return isRecordAlreadyOnline;
   }
 
-  public getDocumentsInOrdersCollection() {
+  public getOrdersFromOrdersCollection() {
     return this.ordersCollection.ref.get().then(querySnapshot => {
       querySnapshot.forEach(doc => {
         console.log(doc.data());
         this.ordersInFirestore.push(doc.data());
-        debugger;
         return doc.data();
       });
       return this.ordersInFirestore;
@@ -126,7 +125,7 @@ export class CloudFirestoreService {
     const object = dToDO.payload.doc.data();
     object.id = dToDO.payload.doc.id;
     return object;
-  };
+  }
 
   public getOrders() {
     return (this.orders = this.ordersCollection

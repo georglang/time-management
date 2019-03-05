@@ -35,11 +35,16 @@ export class OrderListComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.connectionService.monitor().subscribe(isConnected => {
-    });
-    this.synchronizationService.synchronizeIndexedDBWithFirebase();
 
-    this.getOrdersIfOffline();
+    this.cloudFirestoreService.getOrdersFromOrdersCollection()
+      .then((orders) => {
+        console.log('Orders: ', orders);
+      });
+
+    this.connectionService.monitor().subscribe(isConnected => {});
+    // this.synchronizationService.synchronizeIndexedDbOrdersOutboxTableWithFirebase();
+
+    this.getOrdersIfOnline();
     // this.getOrdersFromIndexedDB();
 
     // if (this.isOnline()) {
@@ -56,7 +61,7 @@ export class OrderListComponent implements OnInit {
 
   // if internet connection persists, get data from firebase and save it to indexedDB
   // the firebase unique id will be used as indexedDB key
-  public getOrdersOnline() {
+  public getOrdersIfOnline() {
     if (this.isOnline) {
       this.ordersObs = this.cloudFirestoreService.getOrders();
       this.ordersObs.subscribe(orders => {
@@ -64,14 +69,16 @@ export class OrderListComponent implements OnInit {
         if (this.orders.length !== 0) {
           this.orders.forEach(order => {
             this.indexDbService.getOrdersFromOrdersTable().then(ordersInIndexedDB => {
-              ordersInIndexedDB.forEach(cachedOrder => {
-                this.orderIds.push(cachedOrder.id);
-              });
-              this.orders.forEach(_order => {
-                if (!this.orderIds.includes(_order.id)) {
-                  this.indexDbService.addToOrdersTable(order);
-                }
-              });
+              if (ordersInIndexedDB !== undefined) {
+                ordersInIndexedDB.forEach(cachedOrder => {
+                  this.orderIds.push(cachedOrder.id);
+                });
+                this.orders.forEach(_order => {
+                  if (!this.orderIds.includes(_order.id)) {
+                    this.indexDbService.addToOrdersTable(order);
+                  }
+                });
+              }
             });
             this.dataSource = new MatTableDataSource(this.orders);
           });
@@ -83,21 +90,21 @@ export class OrderListComponent implements OnInit {
   // if no internet connection persists
   // orders from indexedDB orders and ordersOutbox tables will be fetched
   public getOrdersIfOffline() {
-    if (!this.isOnline()) {
+    // if (!this.isOnline()) {
       this.indexDbService.getOrdersFromOrdersTable().then(ordersInOrdersTabel => {
         if (ordersInOrdersTabel.length > 0) {
           ordersInOrdersTabel.forEach(order => {
             this.ordersFromIndexedDB.push(order);
           });
         }
-        this.indexDbService.getOrdersFromOutbox().then(ordersInOutboxTable => {
+        this.indexDbService.getOrdersFromOrdersOutbox().then(ordersInOutboxTable => {
           ordersInOutboxTable.forEach(order => {
             this.ordersFromIndexedDB.push(order);
           });
           this.dataSource = new MatTableDataSource(this.ordersFromIndexedDB);
         });
       });
-    }
+    // }
   }
 
   public applyFilter(filterValue: string) {

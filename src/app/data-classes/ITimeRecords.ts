@@ -5,7 +5,7 @@ export interface ITimeRecord {
   date: string;
   description: string;
   workingHours: number;
-  id?: string;
+  id?: string;      // is necessary when deleting local record after synchronization
   orderId?: string;
 }
 
