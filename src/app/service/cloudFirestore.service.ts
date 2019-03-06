@@ -1,5 +1,5 @@
 import { Injectable, OnInit } from '@angular/core';
-import { Timestamp } from '@firebase/firestore-types';
+import { Timestamp, QuerySnapshot } from '@firebase/firestore-types';
 
 // import * as firebase from 'firebase';
 // import 'firebase/firestore';
@@ -7,44 +7,117 @@ import { Timestamp } from '@firebase/firestore-types';
 
 import { IOrder, Order, IFlattenOrder } from '../data-classes/Order';
 import { TimeRecord, ITimeRecord } from '../data-classes/ITimeRecords';
+import { FirestoreRecordService } from './firestore-record.service';
 import {
   AngularFirestore,
-  AngularFirestoreCollection,
   AngularFirestoreDocument,
+  AngularFirestoreCollection,
   DocumentChangeAction,
-  DocumentReference
+  Action,
+  DocumentSnapshotDoesNotExist,
+  DocumentSnapshotExists
 } from '@angular/fire/firestore';
 
-import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { Observable, from } from 'rxjs';
+import { map, tap, take, switchMap, mergeMap, expand, takeWhile } from 'rxjs/operators';
 import _ from 'lodash';
 
 @Injectable({
   providedIn: 'root'
 })
 export class CloudFirestoreService {
-  private ordersDocument: AngularFirestoreDocument<IOrder>;
-
   public ordersCollection: AngularFirestoreCollection<IOrder>;
+  public recordsCollection: AngularFirestoreCollection<ITimeRecord>;
   public order: Observable<IOrder[]>;
-
   private orders: Observable<IOrder[]>;
-  private orderDoc: AngularFirestoreDocument<IOrder>;
-
   private ordersInFirestore: any[] = [];
 
-  private data: any;
-  constructor(private afs: AngularFirestore) {
-    this.ordersDocument = afs.doc<IOrder>('orders/1');
-    this.ordersCollection = this.afs.collection<IOrder>('orders');
+  constructor(private firestore: AngularFirestore, private firestoreRecordService: FirestoreRecordService) {
+    this.ordersCollection = this.firestore.collection<IOrder>('orders');
+    this.recordsCollection = this.firestore.collection<ITimeRecord>('records');
   }
 
-  public checkIfOrderExistsInFirestore(order: IOrder): Promise<boolean> {
-    let isAlreadyInFirestore = true;
-    const orders: IFlattenOrder[] = []; // without id and createdAt properties
+  /// orders collection methods
 
+  public getOrders(): Observable<IOrder[]> {
+    return (this.orders = this.ordersCollection
+      .snapshotChanges()
+      .pipe(map(actions => actions.map(this.documentToDomainObject))));
+  }
+
+  public getOrdersFromOrdersCollection(): Promise<IOrder[]> {
+    return this.ordersCollection.ref.get().then(querySnapshot => {
+      querySnapshot.forEach(doc => {
+        this.ordersInFirestore.push(doc.data());
+        return doc.data();
+      });
+      return this.ordersInFirestore;
+    });
+  }
+
+  documentToDomainObject = dToDO => {
+    const object = dToDO.payload.doc.data();
+    object.id = dToDO.payload.doc.id;
+    return object;
+  };
+
+  // add order and return new created firebase id
+  public addOrder(order: IOrder): Promise<any> {
+    const _order = JSON.parse(JSON.stringify(order));
+    delete _order.id;
+    return this.ordersCollection
+      .add(_order)
+      .then(docReference => {
+        return docReference.id;
+      })
+      .catch(error => {
+        console.error('Error adding order: ', error);
+      });
+  }
+
+  public getOrderById(orderId: string): Promise<any> {
+    return this.ordersCollection
+      .doc(orderId)
+      .ref.get()
+      .then(doc => {
+        if (doc.exists) {
+          const data: IOrder = Object.assign(doc.data());
+          return data;
+        }
+      })
+      .catch(function(error) {
+        console.log('getOrderById: no order found', error);
+      });
+  }
+
+  // get orders from orders collection with depending records from records collection
+  public getOrdersWithRecords(): Promise<IOrder[]> {
+    const _orders: IOrder[] = [];
     return new Promise((resolve, reject) => {
-      this.getOrdersFromOrdersCollection().then(ordersInFirestore => {
+      this.getOrdersFromOrdersCollection().then((orders: IOrder[]) => {
+        if (orders.length > 0) {
+          orders.forEach(order => {
+            this.firestoreRecordService.getRecordsByOrderId(order.id).subscribe((records: ITimeRecord[]) => {
+              if (records.length > 0) {
+                order.records = records;
+                _orders.push(order);
+              } else {
+                _orders.push(order);
+              }
+              resolve(_orders);
+            });
+          });
+        }
+      });
+    });
+  }
+
+  // Todo: evt. auch order. record in flatten order aufnehmen
+  public checkIfOrderExists(order: IOrder): Promise<boolean> {
+    let isAlreadyInFirestore = true;
+    const orders: IFlattenOrder[] = []; // without id
+    return new Promise((resolve, reject) => {
+      this.getOrdersFromOrdersCollection().then((ordersInFirestore: IOrder[]) => {
         if (ordersInFirestore !== undefined) {
           if (ordersInFirestore.length > 0) {
             const newOrder = {
@@ -67,154 +140,6 @@ export class CloudFirestoreService {
           }
         }
       });
-    });
-  }
-
-  // check if record is in firebase
-  public checkIfRecordExistsInOrderInFirestore(
-    orderId: string,
-    newRecord: ITimeRecord
-  ): Promise<boolean> {
-    let doesRecordExist = true;
-    return new Promise((resolve, reject) => {
-      this.getRecords(orderId).subscribe((records: any) => {
-        if (records.length > 0) {
-          if (this.compareIfRecordIsOnline(newRecord, records)) {
-            doesRecordExist = true;
-          } else {
-            doesRecordExist = false;
-          }
-        } else {
-          doesRecordExist = false;
-        }
-        resolve(doesRecordExist);
-      });
-    });
-  }
-
-  private compareIfRecordIsOnline(newRecord: ITimeRecord, records): boolean {
-    let isRecordAlreadyOnline = false;
-    const recordToCompare: ITimeRecord = Object();
-    Object.assign(recordToCompare, newRecord);
-    delete recordToCompare.id;
-    records.forEach(recordOnline => {
-      delete recordOnline.createdAt;
-      delete recordOnline.id;
-      // convert firebase timestamp to js date
-      recordOnline.date = (recordOnline['date'] as Timestamp).toDate();
-      if (_.isEqual(recordOnline, recordToCompare)) {
-        isRecordAlreadyOnline = true;
-        return;
-      }
-    });
-    return isRecordAlreadyOnline;
-  }
-
-  public getOrdersFromOrdersCollection() {
-    return this.ordersCollection.ref.get().then(querySnapshot => {
-      querySnapshot.forEach(doc => {
-        console.log(doc.data());
-        this.ordersInFirestore.push(doc.data());
-        return doc.data();
-      });
-      return this.ordersInFirestore;
-    });
-  }
-
-  documentToDomainObject = dToDO => {
-    const object = dToDO.payload.doc.data();
-    object.id = dToDO.payload.doc.id;
-    return object;
-  }
-
-  public getOrders() {
-    return (this.orders = this.ordersCollection
-      .snapshotChanges()
-      .pipe(map(actions => actions.map(this.documentToDomainObject))));
-  }
-
-  public getRecords(orderId: string) {
-    return this.ordersCollection
-      .doc(orderId)
-      .collection('records')
-      .snapshotChanges()
-      .pipe(map(actions => actions.map(this.documentToDomainObject)));
-  }
-
-  public getOrderById(orderId: string) {
-    return this.ordersCollection
-      .doc(orderId)
-      .ref.get()
-      .then(doc => {
-        if (doc.exists) {
-          const data: Order = Object.assign(doc.data());
-          return data;
-        }
-      })
-      .catch(function(error) {
-        console.log('getOrderById: no order found', error);
-      });
-  }
-
-  public getRecordById(orderId: string, recordId: string) {
-    return this.ordersCollection
-      .doc(orderId)
-      .collection('records')
-      .doc(recordId)
-      .ref.get()
-      .then(doc => {
-        if (doc.exists) {
-          const data: TimeRecord = Object.assign(doc.data());
-          console.log('data', data);
-
-          return data;
-        }
-      })
-      .catch(function(error) {
-        console.log('getOrderById: no order found', error);
-      });
-  }
-
-  public deleteRecord(orderId: string, recordId) {
-    return this.ordersCollection
-      .doc(orderId)
-      .collection('records')
-      .doc(recordId)
-      .delete()
-      .then(data => {
-        return data;
-      });
-  }
-
-  public addOrder(order: IOrder) {
-    const _order = JSON.parse(JSON.stringify(order));
-    delete _order.id;
-    return this.ordersCollection
-      .add(_order)
-      .then(docReference => {
-        return docReference.id;
-      })
-      .catch(error => {
-        console.error('Error adding order: ', error);
-      });
-  }
-
-  public addTimeRecord(orderId: string, record: any) {
-    return this.ordersCollection
-      .doc(orderId)
-      .collection('records')
-      .add(record)
-      .then(docReference => {
-        return docReference.id;
-      })
-      .catch(error => {
-        console.error('Error adding record: ', error);
-      });
-  }
-
-  public updateRecord(orderId: string, newRecords: any) {
-    const records = newRecords.map(obj => {
-      return Object.assign({}, obj);
     });
   }
 }
