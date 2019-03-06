@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { IndexedDBService } from './indexedDb.service';
-import { CloudFirestoreService } from './cloudFirestore.service';
+import { FirestoreOrderService } from './firestore-order.service';
+import { FirestoreRecordService } from './firestore-record.service';
 import { MessageService } from './../service/message.service';
 import _ from 'lodash';
 
@@ -10,7 +11,8 @@ import _ from 'lodash';
 export class SynchronizationService {
   constructor(
     private indexedDBService: IndexedDBService,
-    private cloudFirestoreService: CloudFirestoreService,
+    private firestoreOrderService: FirestoreOrderService,
+    private firestoreRecordService: FirestoreRecordService,
     private messageService: MessageService
   ) {}
 
@@ -47,13 +49,13 @@ export class SynchronizationService {
         if (ordersInOutbox !== undefined) {
           if (ordersInOutbox.length > 0) {
             ordersInOutbox.forEach(order => {
-              return this.cloudFirestoreService
-                .checkIfOrderExistsInFirestore(order)
+              return this.firestoreOrderService
+                .checkIfOrderExists(order)
                 .then(doesOrderExist => {
                   if (!doesOrderExist) {
                     const localId = order.id;
                     delete order.id;
-                    this.cloudFirestoreService.addOrder(order).then((idFromFirebase: string) => {
+                    this.firestoreOrderService.addOrder(order).then((idFromFirebase: string) => {
                       order.id = idFromFirebase;
                       // update depending records in recordsOutbox
                       this.indexedDBService
@@ -98,13 +100,13 @@ export class SynchronizationService {
         if (records !== undefined) {
           if (records.length > 0) {
             records.forEach(record => {
-              return this.cloudFirestoreService
+              return this.firestoreRecordService
                 .checkIfRecordExistsInOrderInFirestore(record.orderId, record)
                 .then(doesRecordExist => {
                   if (!doesRecordExist) {
                     const localId = record.id;
                     delete record.id;
-                    this.cloudFirestoreService.addTimeRecord(record.orderId, record).then((idFromFirebase: string) => {
+                    this.firestoreRecordService.addTimeRecord(record.orderId, record).then((idFromFirebase: string) => {
                       record.id = idFromFirebase;
                       this.indexedDBService
                         .addRecordToOrdersTable(record, record.orderId)

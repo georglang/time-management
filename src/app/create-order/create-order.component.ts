@@ -7,7 +7,7 @@ import { SynchronizationService } from './../service/synchronization.service';
 import { Order, IOrder } from '../data-classes/Order';
 
 import { ToastrService } from 'ngx-toastr';
-import { CloudFirestoreService } from '../service/cloudFirestore.service';
+import { FirestoreOrderService } from '../service/firestore-order.service';
 import { ConnectionService } from 'ng-connection-service';
 import { MessageService } from './../service/message.service';
 import _ from 'lodash';
@@ -31,7 +31,7 @@ export class CreateOrderComponent implements OnInit {
     private indexDbService: IndexedDBService,
     private router: Router,
     private toastr: ToastrService,
-    private cloudFirestoreService: CloudFirestoreService,
+    private firestoreOrderService: FirestoreOrderService,
     private synchronizationService: SynchronizationService,
     private connectionService: ConnectionService,
     private messageService: MessageService
@@ -70,9 +70,10 @@ export class CreateOrderComponent implements OnInit {
     const newOrder = new Order(
       formInput.companyName,
       formInput.location,
-      new Date(),
       formInput.contactPerson
     );
+
+    newOrder.records = [];
 
     this.createOrderIfOffline(newOrder);
 
@@ -112,10 +113,10 @@ export class CreateOrderComponent implements OnInit {
   public createOrderIfOnline(order: IOrder): void {
     if (this.isConnected()) {
       // check if order is already in firestore
-      this.cloudFirestoreService.checkIfOrderExistsInFirestore(order).then(isAlreadyInFirestore => {
+      this.firestoreOrderService.checkIfOrderExists(order).then(isAlreadyInFirestore => {
         // if order is not in firestore add it
         if (!isAlreadyInFirestore) {
-          this.cloudFirestoreService
+          this.firestoreOrderService
             .addOrder(order)
             .then(id => {
               this.messageService.orderCreatedSuccessful();

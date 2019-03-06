@@ -4,7 +4,8 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { IndexedDBService } from '../service/indexedDb.service';
 import { ITimeRecord } from '../data-classes/ITimeRecords';
 import { ToastrService, Toast } from 'ngx-toastr';
-import { CloudFirestoreService } from '../service/cloudFirestore.service';
+import { FirestoreOrderService } from '../service/firestore-order.service';
+import { FirestoreRecordService } from '../service/firestore-record.service';
 import { MessageService } from './../service/message.service';
 
 @Component({
@@ -22,7 +23,8 @@ export class CreateRecordComponent implements OnInit {
     private formBuilder: FormBuilder,
     private indexDbService: IndexedDBService,
     private toastr: ToastrService,
-    private cloudFirestoreService: CloudFirestoreService,
+    private firestoreOrderService: FirestoreOrderService,
+    private firestoreRecordService: FirestoreRecordService,
     private messageService: MessageService
   ) {}
 
@@ -58,11 +60,11 @@ export class CreateRecordComponent implements OnInit {
   }
 
   public createRecordIfOnline(newRecord: ITimeRecord, orderId: string) {
-    this.cloudFirestoreService
+    this.firestoreRecordService
       .checkIfRecordExistsInOrderInFirestore(orderId, newRecord)
       .then(doesRecordExist => {
         if (!doesRecordExist) {
-          this.cloudFirestoreService.addTimeRecord(orderId, newRecord).then(timeRecordResponse => {
+          this.firestoreRecordService.addTimeRecord(orderId, newRecord).then(timeRecordResponse => {
             console.log('Time Record Response', timeRecordResponse);
             this.messageService.recordCreatedSuccessful();
             this.router.navigate(['order-details', orderId]);

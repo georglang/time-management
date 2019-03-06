@@ -7,7 +7,8 @@ import { DateAdapter } from '@angular/material';
 import { TimeRecord, ITimeRecord } from '../data-classes/ITimeRecords';
 import { ConfirmDeleteDialogComponent } from './../confirm-delete-dialog/confirm-delete-dialog.component';
 import { ToastrService } from 'ngx-toastr';
-import { CloudFirestoreService } from '../service/cloudFirestore.service';
+import { FirestoreOrderService } from '../service/firestore-order.service';
+import { FirestoreRecordService } from '../service/firestore-record.service';
 import { SynchronizationService } from './../service/synchronization.service';
 import { MessageService } from './../service/message.service';
 
@@ -30,7 +31,7 @@ export class OrderDetailComponent implements OnInit {
   public order: any;
   public columns: string[];
   public totalTime = 0.0;
-  public records: TimeRecord[] = [];
+  public records: ITimeRecord[] = [];
   public displayedColumns = ['date', 'description', 'workingHours', 'action'];
   public dataSource: MatTableDataSource<ITimeRecord>;
   private orderIds: number[] = [];
@@ -43,7 +44,8 @@ export class OrderDetailComponent implements OnInit {
     private toastrService: ToastrService,
     public dialog: MatDialog,
     private readonly connectionService: ConnectionService,
-    private cloudFirestoreService: CloudFirestoreService,
+    private firestoreOrderService: FirestoreOrderService,
+    private firestoreRecordService: FirestoreRecordService,
     private synchronizationService: SynchronizationService,
     private messageService: MessageService
   ) {
@@ -65,8 +67,16 @@ export class OrderDetailComponent implements OnInit {
       } else {
         console.log('Get records from indexedDB');
       }
-      this.getOrderById(this.paramId);
-      this.getRecordsFromOutbox(this.paramId);
+
+      // this.getOrderById(this.paramId);
+      // this.getRecordsFromOrdersOutbox(this.paramId);
+
+      this.getRecordsFromRecordsOutbox(this.paramId).then(records => {
+        this.records = records;
+        this.dataSource = new MatTableDataSource<ITimeRecord>(this.records);
+      });
+
+      // this.records = this.getRecordsFromRecordsOutbox(this.paramId);
     });
 
     this.connectionService.monitor().subscribe(isOnline => {
@@ -76,7 +86,7 @@ export class OrderDetailComponent implements OnInit {
             orders.forEach(order => {
               const id = order.id;
               delete order.id;
-              this.cloudFirestoreService.addOrder(order).then(() => {
+              this.firestoreOrderService.addOrder(order).then(() => {
                 this.indexDbService.getOrdersFromOrdersTable().then(ordersInIndexedDB => {
                   ordersInIndexedDB.forEach(cachedOrder => {
                     this.orderIds.push(cachedOrder.id);
@@ -119,11 +129,11 @@ export class OrderDetailComponent implements OnInit {
     const records: TimeRecord[] = [];
 
     if (this.isConnected()) {
-      this.cloudFirestoreService.getOrderById(orderId).then(order => {
+      this.firestoreOrderService.getOrderById(orderId).then(order => {
         console.log('Order', order);
       });
 
-      this.cloudFirestoreService.getRecords(orderId).subscribe(recordsInFirebase => {
+      this.firestoreRecordService.getRecordsByOrderId(orderId).subscribe(recordsInFirebase => {
         if (recordsInFirebase !== undefined) {
           if (recordsInFirebase.length > 0) {
             recordsInFirebase.forEach(record => {
@@ -142,7 +152,7 @@ export class OrderDetailComponent implements OnInit {
     }
   }
 
-  public getRecordsFromOutbox(orderId: string) {
+  public getRecordsFromOrdersOutbox(orderId: string) {
     this.indexDbService.getOrdersFromOrdersOutbox().then(records => {
       // records.forEach(record => {
       //   record.date = new Date(record.date);
@@ -153,9 +163,15 @@ export class OrderDetailComponent implements OnInit {
     });
   }
 
+  public getRecordsFromRecordsOutbox(orderId: string): Promise<any> {
+    return this.indexDbService.getRecordsFromRecordsOutboxTable().then(records => {
+      return records;
+    });
+  }
+
   public getOrderById(orderId: string) {
     if (this.isConnected()) {
-      this.cloudFirestoreService.getOrderById(orderId).then(order => {
+      this.firestoreOrderService.getOrderById(orderId).then(order => {
         this.order = order;
       });
     } else {
@@ -211,14 +227,13 @@ export class OrderDetailComponent implements OnInit {
     const dialogRef = this.dialog.open(ConfirmDeleteDialogComponent, dialogConfig);
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        this.cloudFirestoreService.deleteRecord(this.paramId, _recordId).then(data => {
+        this.firestoreRecordService.deleteRecord(this.paramId, _recordId).then(data => {
           // load records after deletion
           this.getRecords(this.paramId);
           // delete record in indexedDB orders table
-          this.indexDbService.deleteRecordInOrdersTable(this.paramId, _recordId)
-            .then(() => {
-              this.messageService.recordDeletedSuccessful();
-            });
+          this.indexDbService.deleteRecordInOrdersTable(this.paramId, _recordId).then(() => {
+            this.messageService.recordDeletedSuccessful();
+          });
         });
       }
     });
@@ -280,5 +295,17 @@ export class OrderDetailComponent implements OnInit {
   // Erstellen Order und Record Offline: schauen in ordersOutbox
   public synchronizeOrdersAndRecords() {
     this.synchronizationService.synchronizeWithFirebase();
+  }
+
+  public updateRecords() {
+    const newRecord = {
+      date: new Date(),
+      description: 'Servus Servus',
+      workingHours: 2222,
+      id: 1,
+      orderId: 'TyclJFilyldgrBb7GR3J'
+    };
+
+    this.indexDbService.updateRecordInRecordsOutboxTable(newRecord);
   }
 }

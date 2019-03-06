@@ -25,7 +25,7 @@ import _ from 'lodash';
 @Injectable({
   providedIn: 'root'
 })
-export class CloudFirestoreService {
+export class FirestoreOrderService {
   public ordersCollection: AngularFirestoreCollection<IOrder>;
   public recordsCollection: AngularFirestoreCollection<ITimeRecord>;
   public order: Observable<IOrder[]>;

@@ -4,7 +4,7 @@ import { MatSort, MatTableDataSource } from '@angular/material';
 import { Observable } from 'rxjs';
 
 import { IndexedDBService } from '../service/indexedDb.service';
-import { CloudFirestoreService } from '../service/cloudFirestore.service';
+import { FirestoreOrderService } from '../service/firestore-order.service';
 import { ConnectionService } from 'ng-connection-service';
 import { SynchronizationService } from './../service/synchronization.service';
 import { IOrder } from '../data-classes/Order';
@@ -30,7 +30,7 @@ export class OrderListComponent implements OnInit {
   constructor(
     private indexDbService: IndexedDBService,
     private router: Router,
-    private cloudFirestoreService: CloudFirestoreService,
+    private firestoreOrderService: FirestoreOrderService,
     private connectionService: ConnectionService,
     private synchronizationService: SynchronizationService
   ) {}
@@ -50,10 +50,16 @@ export class OrderListComponent implements OnInit {
     //   console.warn('No internet connection');
     //   this.getOrdersFromIndexedDB();
     // }
+
+
+    // offline ordersOutox durchsuchen, wenn ordersoutbox vorhanden, dann kann es auch records dazu geben,
+    // oder anhand von orders id in orders table kann es records in records outbox geben
+
+
   }
 
   private getOrdersWithRecordsFromFirebase() {
-    this.cloudFirestoreService.getOrdersWithRecords().then(orders => {
+    this.firestoreOrderService.getOrdersWithRecords().then(orders => {
       if (orders.length > 0) {
         this.dataSource = new MatTableDataSource(orders);
       }
@@ -64,17 +70,17 @@ export class OrderListComponent implements OnInit {
     return navigator.onLine;
   }
 
-  // if internet connection persists, get data from firebase and save it to indexedDB
+  // get data from firebase and save it to indexedDB
   // the firebase unique id will be used as indexedDB key
   public getOrdersIfOnline() {
-    if (this.isOnline) {
-      this.cloudFirestoreService.getOrdersWithRecords()
-        .then(orders => {
+    // if (this.isOnline) {
+      this.firestoreOrderService.getOrdersWithRecords()
+        .then((orders: IOrder[]) => {
           this.orders = orders;
           this.dataSource = new MatTableDataSource(this.orders);
           this.indexDbService.addOrderToOrdersTable(orders);
       });
-    }
+    // }
   }
 
   // if no internet connection persists

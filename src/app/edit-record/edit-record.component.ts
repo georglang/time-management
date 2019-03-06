@@ -3,7 +3,8 @@ import { FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { TimeRecord, ITimeRecord } from '../data-classes/ITimeRecords';
 import { DateAdapter } from '@angular/material';
-import { CloudFirestoreService } from '../service/cloudFirestore.service';
+import { FirestoreOrderService } from '../service/firestore-order.service';
+import { FirestoreRecordService } from '../service/firestore-record.service';
 import { MessageService } from './../service/message.service';
 import { IndexedDBService } from './../service/indexedDb.service';
 
@@ -24,7 +25,8 @@ export class EditRecordComponent implements OnInit {
     private router: Router,
     private route: ActivatedRoute,
     private dateAdapter: DateAdapter<Date>,
-    private cloudFirestoreService: CloudFirestoreService,
+    private firestoreOrderService: FirestoreOrderService,
+    private firestoreRecordService: FirestoreRecordService,
     private messageService: MessageService,
     private indexedDBService: IndexedDBService
   ) {
@@ -71,7 +73,7 @@ export class EditRecordComponent implements OnInit {
   }
 
   public getRecordByIdFromFirebase(orderId: string, recordId: string): void {
-    this.cloudFirestoreService.getRecordById(orderId, recordId).then(record => {
+    this.firestoreRecordService.getRecordById(orderId, recordId).then(record => {
       this.record = record;
       if (this.record !== undefined) {
         this.setControl(this.record);
@@ -111,7 +113,7 @@ export class EditRecordComponent implements OnInit {
     };
 
     if (this.isConnected()) {
-      this.cloudFirestoreService
+      this.firestoreRecordService
         .checkIfRecordExistsInOrderInFirestore(this.orderId, newRecord)
         .then(doesRecordExist => {
           if (!doesRecordExist) {
@@ -126,7 +128,7 @@ export class EditRecordComponent implements OnInit {
   }
 
   private updateRecordInFirestore(orderId: string, record: ITimeRecord): void {
-    this.cloudFirestoreService.ordersCollection
+    this.firestoreOrderService.ordersCollection
       .doc(orderId)
       .collection('records')
       .doc(this.recordId)

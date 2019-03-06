@@ -36,6 +36,8 @@ import {
 } from '@angular/material';
 
 // services
+import { FirestoreOrderService } from './service/firestore-order.service';
+import { FirestoreRecordService } from './service/firestore-record.service';
 import { IndexedDBService } from './service/indexedDb.service';
 import { SynchronizationService } from './service/synchronization.service';
 
@@ -85,7 +87,14 @@ import { ConfirmDeleteDialogComponent } from './confirm-delete-dialog/confirm-de
     AngularFireModule.initializeApp(environment.firebase),
     AngularFirestoreModule
   ],
-  providers: [IndexedDBService, SynchronizationService, Database, SortFormArrayByDate],
+  providers: [
+    IndexedDBService,
+    SynchronizationService,
+    FirestoreOrderService,
+    FirestoreRecordService,
+    Database,
+    SortFormArrayByDate
+  ],
   entryComponents: [ConfirmDeleteDialogComponent],
   bootstrap: [AppComponent]
 })
