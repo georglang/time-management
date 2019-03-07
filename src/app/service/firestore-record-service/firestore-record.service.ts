@@ -1,21 +1,17 @@
 import { Injectable } from '@angular/core';
 import { Timestamp } from '@firebase/firestore-types';
-import { TimeRecord, ITimeRecord } from '../data-classes/ITimeRecords';
-import { IOrder } from '../data-classes/Order';
+import { TimeRecord, ITimeRecord } from '../../data-classes/ITimeRecords';
+import { IOrder } from '../../data-classes/Order';
 import {
   AngularFirestore,
-  AngularFirestoreDocument,
   AngularFirestoreCollection,
-  DocumentChangeAction,
-  Action,
-  DocumentSnapshotDoesNotExist,
-  DocumentSnapshotExists,
   DocumentData
 } from '@angular/fire/firestore';
 
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import _ from 'lodash';
+import { resolve } from 'q';
 
 @Injectable({
   providedIn: 'root'
@@ -30,6 +26,7 @@ export class FirestoreRecordService {
   }
 
   documentToDomainObject = dToDO => {
+    debugger;
     const object = dToDO.payload.doc.data();
     object.id = dToDO.payload.doc.id;
     return object;
@@ -55,18 +52,19 @@ export class FirestoreRecordService {
   ): Promise<boolean> {
     let doesRecordExist = true;
     return new Promise((resolve, reject) => {
-      this.getRecordsByOrderId(orderId).subscribe((records: any) => {
-        if (records.length > 0) {
-          if (this.compareIfRecordIsOnline(newRecord, records)) {
-            doesRecordExist = true;
-          } else {
-            doesRecordExist = false;
-          }
-        } else {
-          doesRecordExist = false;
-        }
-        resolve(doesRecordExist);
-      });
+      // this.getRecordsByOrderId(orderId).subscribe((records: any) => {
+      //   if (records.length > 0) {
+      //     if (this.compareIfRecordIsOnline(newRecord, records)) {
+      //       doesRecordExist = true;
+      //     } else {
+      //       doesRecordExist = false;
+      //     }
+      //   } else {
+      //     doesRecordExist = false;
+      //   }
+      //   resolve(doesRecordExist);
+      // });
+      resolve(false);
     });
   }
 
@@ -74,6 +72,7 @@ export class FirestoreRecordService {
     const records: DocumentData[] = [];
     return this.recordsCollection.ref.get().then(querySnapshot => {
       querySnapshot.forEach(doc => {
+        debugger;
         console.log(doc.data());
         records.push(doc.data());
         return doc.data();
@@ -82,31 +81,54 @@ export class FirestoreRecordService {
     });
   }
 
-  public getRecordsByOrderId(orderId: string): Observable<any> {
+  // public getRecordsByOrderId(orderId: string): Observable<any> {
+  //   return this.ordersCollection
+  //     .doc(orderId)
+  //     .collection('records')
+  //     .snapshotChanges()
+  //     .pipe(map(actions => actions.map(this.documentToDomainObject)));
+  // }
+
+  public getRecordsByOrderId() {
+    this.recordsCollection.snapshotChanges().pipe(
+      map(actions => actions.map(a => {
+        const data = a.payload.doc.data() as any;
+        const id = a.payload.doc.id;
+        return { id, ...data };
+      }))
+    );
+    }
+
+  // public getRecordById(orderId: string, recordId: string) {
+  //   return this.ordersCollection
+  //     .doc(orderId)
+  //     .collection('records')
+  //     .doc(recordId)
+  //     .ref.get()
+  //     .then(doc => {
+  //       if (doc.exists) {
+  //         const data: TimeRecord = Object.assign(doc.data());
+  //         console.log('data', data);
+
+  //         return data;
+  //       }
+  //     })
+  //     .catch(function(error) {
+  //       console.log('getOrderById: no order found', error);
+  //     });
+  // }
+
+  getRecordById(id) {
     return this.ordersCollection
-      .doc(orderId)
+      .doc(id)
       .collection('records')
       .snapshotChanges()
-      .pipe(map(actions => actions.map(this.documentToDomainObject)));
-  }
-
-  public getRecordById(orderId: string, recordId: string) {
-    return this.ordersCollection
-      .doc(orderId)
-      .collection('records')
-      .doc(recordId)
-      .ref.get()
-      .then(doc => {
-        if (doc.exists) {
-          const data: TimeRecord = Object.assign(doc.data());
-          console.log('data', data);
-
-          return data;
-        }
-      })
-      .catch(function(error) {
-        console.log('getOrderById: no order found', error);
-      });
+      .pipe(
+        map(actions => actions.map(a => {
+          const data = a.payload.doc.data() as any;
+          const _id = a.payload.doc.id;
+          return { id, ...data };
+        })));
   }
 
   public deleteRecord(orderId: string, recordId) {

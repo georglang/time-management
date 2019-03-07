@@ -1,16 +1,16 @@
 import { Injectable } from '@angular/core';
-import { Database } from '../database/Database';
-import { TimeRecord, ITimeRecord } from '../data-classes/ITimeRecords';
+import { Database } from '../../database/Database';
+import { TimeRecord, ITimeRecord } from '../../data-classes/ITimeRecords';
 import _ from 'lodash';
-import { IOrder } from '../data-classes/Order';
-import { CloudFirestoreService } from './cloudFirestore.service';
+import { IOrder } from '../../data-classes/Order';
+import { FirestoreOrderService } from '../firestore-order-service/firestore-order.service';
 
 @Injectable()
 export class IndexedDBService {
   public isAlreadyInDB: boolean;
   private orderIds: number[] = [];
 
-  constructor(private timeRecordsDb: Database, private cloudFirestore: CloudFirestoreService) {
+  constructor(private timeRecordsDb: Database, private cloudFirestore: FirestoreOrderService) {
     this.isAlreadyInDB = false;
   }
 
@@ -238,16 +238,23 @@ export class IndexedDBService {
     });
   }
 
-  public addOrderToOrdersTable(orders: IOrder[]) {
+  // check if orders are in orders table
+  // if not: add order that is not in orders table yet
+
+// Fehler beim schreiben in indexedDB ueberprufen, ob oder mit records bereits in orders Table
+
+  public addOrderToOrdersTable(orders: IOrder[]): void {
     if (orders.length > 0) {
       orders.forEach(order => {
-        this.getOrdersFromOrdersTable().then(ordersInIndexedDB => {
+        this.getOrdersFromOrdersTable().then((ordersInIndexedDB: IOrder[]) => {
           if (ordersInIndexedDB !== undefined) {
+            this.orderIds = [];
             ordersInIndexedDB.forEach(cachedOrder => {
               this.orderIds.push(cachedOrder.id);
             });
             orders.forEach(_order => {
               if (!this.orderIds.includes(_order.id)) {
+                debugger;
                 this.addToOrdersTable(order);
               }
             });
@@ -383,14 +390,15 @@ export class IndexedDBService {
     });
   }
 
-  public getOrdersFromOrdersTable(): Promise<any> {
+  // get orders from orders table
+  public getOrdersFromOrdersTable(): Promise<IOrder[]> {
     return this.timeRecordsDb.orders
       .toArray()
-      .then(result => {
+      .then((result: any) => {
         return result;
       })
       .catch(e => {
-        console.error('IndexDB getAllOrders: ', e);
+        console.error('Error: indexedDB can not get orders from orders table: Message: ', e);
       });
   }
 
@@ -460,7 +468,7 @@ export class IndexedDBService {
       .where('id')
       .equals(orderId)
       .toArray(order => {
-        const records: TimeRecord[] = order[0].records;
+        const records: ITimeRecord[] = order[0].records;
         for (let index = 0; index < records.length; index++) {
           const element = records[index];
           if (element.id === recordId) {
@@ -482,7 +490,7 @@ export class IndexedDBService {
       .equals(orderId)
       .toArray(order => {
         if (order.length !== 0) {
-          const records: TimeRecord[] = order[0].records;
+          const records: ITimeRecord[] = order[0].records;
           return records;
         }
       });

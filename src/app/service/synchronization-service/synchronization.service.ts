@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
-import { IndexedDBService } from './indexedDb.service';
-import { FirestoreOrderService } from './firestore-order.service';
-import { FirestoreRecordService } from './firestore-record.service';
-import { MessageService } from './../service/message.service';
+import { IndexedDBService } from './../indexedDb-service/indexedDb.service';
+import { FirestoreOrderService } from './../firestore-order-service/firestore-order.service';
+import { FirestoreRecordService } from './../firestore-record-service/firestore-record.service';
+import { MessageService } from '../message-service/message.service';
 import _ from 'lodash';
 
 @Injectable({
@@ -96,6 +96,7 @@ export class SynchronizationService {
   // update order with new records depending on orderId
   public synchronizeIndexedDbRecordsTableWithFirebase(): Promise<boolean> {
     return new Promise((resolve, reject) => {
+      debugger;
       this.indexedDBService.getRecordsFromRecordsOutboxTable().then(records => {
         if (records !== undefined) {
           if (records.length > 0) {
