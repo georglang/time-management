@@ -26,7 +26,6 @@ export class FirestoreRecordService {
   }
 
   documentToDomainObject = dToDO => {
-    debugger;
     const object = dToDO.payload.doc.data();
     object.id = dToDO.payload.doc.id;
     return object;
@@ -72,7 +71,6 @@ export class FirestoreRecordService {
     const records: DocumentData[] = [];
     return this.recordsCollection.ref.get().then(querySnapshot => {
       querySnapshot.forEach(doc => {
-        debugger;
         console.log(doc.data());
         records.push(doc.data());
         return doc.data();
@@ -127,7 +125,7 @@ export class FirestoreRecordService {
         map(actions => actions.map(a => {
           const data = a.payload.doc.data() as any;
           const _id = a.payload.doc.id;
-          return { id, ...data };
+          return { _id, ...data };
         })));
   }
 
