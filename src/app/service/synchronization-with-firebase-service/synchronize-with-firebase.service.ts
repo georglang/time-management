@@ -1,14 +1,14 @@
 import { Injectable } from '@angular/core';
-import { IndexedDBService } from './../indexedDb-service/indexedDb.service';
-import { FirestoreOrderService } from './../firestore-order-service/firestore-order.service';
-import { FirestoreRecordService } from './../firestore-record-service/firestore-record.service';
+import { IndexedDBService } from '../indexedDb-service/indexedDb.service';
+import { FirestoreOrderService } from '../firestore-order-service/firestore-order.service';
+import { FirestoreRecordService } from '../firestore-record-service/firestore-record.service';
 import { MessageService } from '../message-service/message.service';
 import _ from 'lodash';
 
 @Injectable({
   providedIn: 'root'
 })
-export class SynchronizationService {
+export class SynchronizeWithFirebaseService {
   constructor(
     private indexedDBService: IndexedDBService,
     private firestoreOrderService: FirestoreOrderService,
@@ -20,7 +20,7 @@ export class SynchronizationService {
   // if orders are synchronized, check if indexedDB recordsOutbox contains records
   // if recordsOutbox contains records, synchronize it with firebase records table
   // if indexedDB ordersOutbox do not contain orders, sychronize record from recordsOutbox
-  public synchronizeWithFirebase(): Promise<boolean> {
+  public synchronize(): Promise<boolean> {
     return new Promise((resolve, reject) => {
       this.indexedDBService.doesOrdersOutboxContainOrders().then(doesOrdersExist => {
         if (doesOrdersExist) {
