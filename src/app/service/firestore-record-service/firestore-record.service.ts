@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Timestamp } from '@firebase/firestore-types';
-import { TimeRecord, ITimeRecord } from '../../data-classes/ITimeRecords';
+import { TimeRecord, ITimeRecord } from '../../data-classes/TimeRecords';
 import { IOrder } from '../../data-classes/Order';
 import {
   AngularFirestore,
@@ -19,10 +19,10 @@ import { resolve } from 'q';
 export class FirestoreRecordService {
   private ordersCollection: AngularFirestoreCollection<IOrder>;
   private recordsCollection: AngularFirestoreCollection<ITimeRecord>;
-
-  constructor(private firestore: AngularFirestore) {
-    this.ordersCollection = this.firestore.collection<IOrder>('orders');
-    this.recordsCollection = this.firestore.collection<ITimeRecord>('records');
+  constructor(private afs: AngularFirestore
+  ) {
+    this.ordersCollection = this.afs.collection<IOrder>('orders');
+    this.recordsCollection = this.afs.collection<ITimeRecord>('records');
   }
 
   documentToDomainObject = dToDO => {
@@ -51,18 +51,18 @@ export class FirestoreRecordService {
   ): Promise<boolean> {
     let doesRecordExist = true;
     return new Promise((resolve, reject) => {
-      // this.getRecordsByOrderId(orderId).subscribe((records: any) => {
-      //   if (records.length > 0) {
-      //     if (this.compareIfRecordIsOnline(newRecord, records)) {
-      //       doesRecordExist = true;
-      //     } else {
-      //       doesRecordExist = false;
-      //     }
-      //   } else {
-      //     doesRecordExist = false;
-      //   }
-      //   resolve(doesRecordExist);
-      // });
+      this.getRecordById(orderId).subscribe((records: any) => {
+        if (records.length > 0) {
+          if (this.compareIfRecordIsOnline(newRecord, records)) {
+            doesRecordExist = true;
+          } else {
+            doesRecordExist = false;
+          }
+        } else {
+          doesRecordExist = false;
+        }
+        resolve(doesRecordExist);
+      });
       resolve(false);
     });
   }
@@ -89,44 +89,34 @@ export class FirestoreRecordService {
 
   public getRecordsByOrderId() {
     this.recordsCollection.snapshotChanges().pipe(
-      map(actions => actions.map(a => {
-        const data = a.payload.doc.data() as any;
-        const id = a.payload.doc.id;
-        return { id, ...data };
-      }))
+      map(actions =>
+        actions.map(a => {
+          const data = a.payload.doc.data() as any;
+          const id = a.payload.doc.id;
+          return { id, ...data };
+        })
+      )
     );
-    }
+  }
 
-  // public getRecordById(orderId: string, recordId: string) {
-  //   return this.ordersCollection
-  //     .doc(orderId)
-  //     .collection('records')
-  //     .doc(recordId)
-  //     .ref.get()
-  //     .then(doc => {
-  //       if (doc.exists) {
-  //         const data: TimeRecord = Object.assign(doc.data());
-  //         console.log('data', data);
 
-  //         return data;
-  //       }
-  //     })
-  //     .catch(function(error) {
-  //       console.log('getOrderById: no order found', error);
-  //     });
-  // }
-
-  getRecordById(id) {
+  getRecordById(orderId) {
     return this.ordersCollection
-      .doc(id)
+      .doc(orderId)
       .collection('records')
       .snapshotChanges()
       .pipe(
-        map(actions => actions.map(a => {
-          const data = a.payload.doc.data() as any;
-          const _id = a.payload.doc.id;
-          return { _id, ...data };
-        })));
+        map(actions =>
+          actions.map(a => {
+            const data = a.payload.doc.data() as TimeRecord;
+            const timestamp: any = data.date;
+            data.date = (timestamp as Timestamp).toDate();
+            const id = a.payload.doc.id;
+            return { id, ...data };
+
+          })
+        )
+      );
   }
 
   public deleteRecord(orderId: string, recordId) {
