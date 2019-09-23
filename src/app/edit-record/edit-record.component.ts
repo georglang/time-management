@@ -1,12 +1,12 @@
 import { Component, OnInit, Inject } from '@angular/core';
 import { FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
-import { TimeRecord, ITimeRecord } from '../data-classes/ITimeRecords';
+import { TimeRecord, ITimeRecord } from '../data-classes/TimeRecords';
 import { DateAdapter } from '@angular/material';
-import { FirestoreOrderService } from '../service/firestore-order.service';
-import { FirestoreRecordService } from '../service/firestore-record.service';
-import { MessageService } from './../service/message.service';
-import { IndexedDBService } from './../service/indexedDb.service';
+import { FirestoreOrderService } from '../service/firestore-order-service/firestore-order.service';
+import { FirestoreRecordService } from '../service/firestore-record-service/firestore-record.service';
+import { MessageService } from '../service/message-service/message.service';
+import { IndexedDBService } from '../service/indexedDb-service/indexedDb.service';
 
 @Component({
   selector: 'app-edit-record',
@@ -73,12 +73,12 @@ export class EditRecordComponent implements OnInit {
   }
 
   public getRecordByIdFromFirebase(orderId: string, recordId: string): void {
-    this.firestoreRecordService.getRecordById(orderId, recordId).then(record => {
-      this.record = record;
-      if (this.record !== undefined) {
-        this.setControl(this.record);
-      }
-    });
+    // this.firestoreRecordService.getRecordById(orderId, recordId).then(record => {
+    //   this.record = record;
+    //   if (this.record !== undefined) {
+    //     this.setControl(this.record);
+    //   }
+    // });
   }
 
   public getRecordsByIdFromRecordsOutbox(recordId: number): void {

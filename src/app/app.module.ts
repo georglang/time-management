@@ -10,6 +10,8 @@ import { environment } from '../environments/environment';
 import { AngularFireModule } from '@angular/fire';
 import { AngularFirestoreModule } from '@angular/fire/firestore';
 import { AngularFireAuthModule } from '@angular/fire/auth';
+import { FirestoreSettingsToken } from 'angularfire2/firestore';
+
 
 // own modules
 import { AppRoutingModule } from './router/app.routing.module';
@@ -36,10 +38,10 @@ import {
 } from '@angular/material';
 
 // services
-import { FirestoreOrderService } from './service/firestore-order.service';
-import { FirestoreRecordService } from './service/firestore-record.service';
-import { IndexedDBService } from './service/indexedDb.service';
-import { SynchronizationService } from './service/synchronization.service';
+import { FirestoreOrderService } from './service/firestore-order-service/firestore-order.service';
+import { FirestoreRecordService } from './service/firestore-record-service/firestore-record.service';
+import { IndexedDBService } from './service/indexedDb-service/indexedDb.service';
+import { SynchronizeIdxDBWithFirebaseService } from './service/synchronize-idxDb-with-firebase-service/synchronize-idxDb-with-firebase.service';
 
 // components
 import { OrderListComponent } from './order-list/order-list.component';
@@ -85,11 +87,11 @@ import { ConfirmDeleteDialogComponent } from './confirm-delete-dialog/confirm-de
     ToastrModule.forRoot(),
     ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production }),
     AngularFireModule.initializeApp(environment.firebase),
-    AngularFirestoreModule
+    AngularFirestoreModule,
   ],
   providers: [
     IndexedDBService,
-    SynchronizationService,
+    SynchronizeIdxDBWithFirebaseService,
     FirestoreOrderService,
     FirestoreRecordService,
     Database,

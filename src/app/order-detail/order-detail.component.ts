@@ -2,15 +2,15 @@ import { Component, OnInit, Input } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { MatTableDataSource, MatDialog, MatDialogConfig } from '@angular/material';
 
-import { IndexedDBService } from '../service/indexedDb.service';
+import { IndexedDBService } from '../service/indexedDb-service/indexedDb.service';
 import { DateAdapter } from '@angular/material';
-import { TimeRecord, ITimeRecord } from '../data-classes/ITimeRecords';
+import { TimeRecord, ITimeRecord } from '../data-classes/TimeRecords';
 import { ConfirmDeleteDialogComponent } from './../confirm-delete-dialog/confirm-delete-dialog.component';
 import { ToastrService } from 'ngx-toastr';
-import { FirestoreOrderService } from '../service/firestore-order.service';
-import { FirestoreRecordService } from '../service/firestore-record.service';
-import { SynchronizationService } from './../service/synchronization.service';
-import { MessageService } from './../service/message.service';
+import { FirestoreOrderService } from '../service/firestore-order-service/firestore-order.service';
+import { FirestoreRecordService } from '../service/firestore-record-service/firestore-record.service';
+import { SynchronizeIdxDBWithFirebaseService } from '../service/synchronize-idxDb-with-firebase-service/synchronize-idxDb-with-firebase.service';
+import { MessageService } from '../service/message-service/message.service';
 
 declare var jsPDF: any;
 import 'jspdf-autotable';
@@ -46,7 +46,7 @@ export class OrderDetailComponent implements OnInit {
     private readonly connectionService: ConnectionService,
     private firestoreOrderService: FirestoreOrderService,
     private firestoreRecordService: FirestoreRecordService,
-    private synchronizationService: SynchronizationService,
+    private synchronizeIdxDBWithFirebase: SynchronizeIdxDBWithFirebaseService,
     private messageService: MessageService
   ) {
     this.dateAdapter.setLocale('de');
@@ -133,19 +133,22 @@ export class OrderDetailComponent implements OnInit {
         console.log('Order', order);
       });
 
-      this.firestoreRecordService.getRecordsByOrderId(orderId).subscribe(recordsInFirebase => {
-        if (recordsInFirebase !== undefined) {
-          if (recordsInFirebase.length > 0) {
-            recordsInFirebase.forEach(record => {
-              record.date = moment.unix(record.date.seconds).format('MM.DD.YYYY');
-              records.push(record);
-              this.getSumOfWorkingHours(records);
-            });
-          } else {
-            this.sumOfWorkingHours = 0;
-          }
-        }
-      });
+      this.firestoreRecordService.getRecordsFromRecordsCollection();
+
+
+      // this.firestoreRecordService.getRecordsByOrderId(orderId).subscribe(recordsInFirebase => {
+      //   if (recordsInFirebase !== undefined) {
+      //     if (recordsInFirebase.length > 0) {
+      //       recordsInFirebase.forEach(record => {
+      //         record.date = moment.unix(record.date.seconds).format('MM.DD.YYYY');
+      //         records.push(record);
+      //         this.getSumOfWorkingHours(records);
+      //       });
+      //     } else {
+      //       this.sumOfWorkingHours = 0;
+      //     }
+      //   }
+      // });
       this.dataSource.data = records;
     } else {
       console.log('Get Data from Indexed DB');
@@ -283,18 +286,14 @@ export class OrderDetailComponent implements OnInit {
     iframe.src = pdf.output('datauristring');
   }
 
-  public synchronizeRecordsTable() {
-    this.synchronizationService.synchronizeIndexedDbRecordsTableWithFirebase();
-  }
-
   public synchronizeWithOrdersTable() {
-    this.synchronizationService.synchronizeIndexedDbOrdersOutboxTableWithFirebase();
+    this.synchronizeIdxDBWithFirebase.synchronizeIndexedDbOrdersOutboxTableWithFirebase();
   }
 
   // Beim allgemeinen synchronisieren muss zuerst herausgefunden werden, was ueberhaut sychronisiert werden muss
   // Erstellen Order und Record Offline: schauen in ordersOutbox
   public synchronizeOrdersAndRecords() {
-    this.synchronizationService.synchronizeWithFirebase();
+    this.synchronizeIdxDBWithFirebase.synchronizeWithFirebase();
   }
 
   public updateRecords() {
