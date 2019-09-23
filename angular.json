@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "time-management": {
+    "angular-pwa": {
       "root": "",
       "sourceRoot": "src",
       "projectType": "application",
@@ -13,7 +13,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
-            "outputPath": "dist/time-management",
+            "outputPath": "dist/angular-pwa",
             "index": "src/index.html",
             "main": "src/main.ts",
             "polyfills": "src/polyfills.ts",
@@ -57,18 +57,18 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "time-management:build"
+            "browserTarget": "angular-pwa:build"
           },
           "configurations": {
             "production": {
-              "browserTarget": "time-management:build:production"
+              "browserTarget": "angular-pwa:build:production"
             }
           }
         },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "time-management:build"
+            "browserTarget": "angualr-pwa:build"
           }
         },
         "test": {
