@@ -6,7 +6,7 @@ import { Timestamp, QuerySnapshot } from '@firebase/firestore-types';
 // import 'firebase/database';
 
 import { IOrder, Order, IFlattenOrder } from '../../data-classes/Order';
-import { TimeRecord, ITimeRecord } from '../../data-classes/ITimeRecords';
+import { TimeRecord, ITimeRecord } from '../../data-classes/TimeRecords';
 import { FirestoreRecordService } from '../firestore-record-service/firestore-record.service';
 import {
   AngularFirestore,

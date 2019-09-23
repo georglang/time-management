@@ -3,12 +3,14 @@ import { Router } from '@angular/router';
 import { MatSort, MatTableDataSource } from '@angular/material';
 import { Observable } from 'rxjs';
 
-import { IndexedDBService } from '../service/indexedDb.service';
-import { FirestoreOrderService } from '../service/firestore-order.service';
+import { IndexedDBService } from '../service/indexedDb-service/indexedDb.service';
+import { FirestoreOrderService } from '../service/firestore-order-service/firestore-order.service';
+import { FirestoreRecordService } from '../service/firestore-record-service/firestore-record.service';
 import { ConnectionService } from 'ng-connection-service';
-import { SynchronizationService } from './../service/synchronization.service';
+import { SynchronizeIdxDBWithFirebaseService } from './../service/synchronize-idxDb-with-firebase-service/synchronize-idxDb-with-firebase.service';
+import { SynchronizeFirebaseWithIdxDbService } from './../service/synchronize-firebase-with-idxDb.service/synchronize-firebase-with-idxDb.service';
 import { IOrder } from '../data-classes/Order';
-import { ITimeRecord } from '../data-classes/ITimeRecords';
+import { ITimeRecord } from '../data-classes/TimeRecords';
 
 @Component({
   selector: 'app-order-list',
@@ -31,56 +33,53 @@ export class OrderListComponent implements OnInit {
     private indexDbService: IndexedDBService,
     private router: Router,
     private firestoreOrderService: FirestoreOrderService,
+    private firestoreRecordService: FirestoreRecordService,
     private connectionService: ConnectionService,
-    private synchronizationService: SynchronizationService
+    private synchronizeIdxDbWithFirebase: SynchronizeIdxDBWithFirebaseService,
+    private synchronizeFirebaseWithIdxDb: SynchronizeFirebaseWithIdxDbService
   ) {}
 
   ngOnInit() {
+    // wenn online vorher synchronisieren, wenn offline direkt aus orders table
+    // und in oders outbox, records outbox nachschauen
+    // orders immer aus indexedDB orders table laden
+    // synch with firebase
+    // offline
+    // else {
+    // this.indexDbService.getOrdersFromOrdersTable().then((orders: IOrder[]) => {
+    //   this.dataSource = new MatTableDataSource(orders);
+    // });
+    // }
     // this.getOrdersWithRecordsFromFirebase();
-
     // this.connectionService.monitor().subscribe(isConnected => {});
     // this.synchronizationService.synchronizeIndexedDbOrdersOutboxTableWithFirebase();
-
-    this.getOrdersIfOnline();
     // this.getOrdersFromIndexedDB();
-
     // if (this.isOnline()) {
     //   this.getOrdersOnline();
     // } else {
     //   console.warn('No internet connection');
     //   this.getOrdersFromIndexedDB();
     // }
-
-
     // offline ordersOutox durchsuchen, wenn ordersoutbox vorhanden, dann kann es auch records dazu geben,
     // oder anhand von orders id in orders table kann es records in records outbox geben
-
-
   }
 
-  private getOrdersWithRecordsFromFirebase() {
-    this.firestoreOrderService.getOrdersWithRecords().then(orders => {
-      if (orders.length > 0) {
-        this.dataSource = new MatTableDataSource(orders);
+  public sync() {
+    this.synchronizeFirebaseWithIdxDb.synchronize().then(synchCompleted => {
+      if (synchCompleted) {
       }
+    });
+  }
+
+  public getOrdersFromIndexedDb() {
+    this.indexDbService.getOrdersFromOrdersTable().then((orders: IOrder[]) => {
+      debugger;
+      this.dataSource = new MatTableDataSource(orders);
     });
   }
 
   public isOnline() {
     return navigator.onLine;
-  }
-
-  // get data from firebase and save it to indexedDB
-  // the firebase unique id will be used as indexedDB key
-  public getOrdersIfOnline() {
-    // if (this.isOnline) {
-      this.firestoreOrderService.getOrdersWithRecords()
-        .then((orders: IOrder[]) => {
-          this.orders = orders;
-          this.dataSource = new MatTableDataSource(this.orders);
-          this.indexDbService.addOrderToOrdersTable(orders);
-      });
-    // }
   }
 
   // if no internet connection persists
