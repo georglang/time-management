@@ -1,11 +1,11 @@
-import { TimeRecord } from './ITimeRecords';
+import { ITimeRecord } from './TimeRecords';
 
 export interface IOrder {
   companyName: string;
   contactPerson?: string;
   location: string;
-  records?: TimeRecord[];
-  createdAt: Date;
+  records?: ITimeRecord[];
+  id?: any;
 }
 
 export interface IFlattenOrder {
@@ -18,24 +18,28 @@ export class Order implements IOrder {
   public companyName: string;
   public contactPerson: string;
   public location: string;
-  public records: TimeRecord[];
-  public createdAt: Date;
+  public records: ITimeRecord[];
+  public id: any;
 
   constructor(
     companyName: string,
     location: string,
-    createdAt: Date,
     contactPerson?: string,
-    record?: TimeRecord
+    records?: ITimeRecord[],
+    id?: any
   ) {
     this.companyName = companyName;
     this.location = location;
-    if (record) {
-      this.records.push(record);
+    if (records === undefined) {
+      this.records = [];
+    } else {
+      this.records = records;
     }
     if (contactPerson) {
       this.contactPerson = contactPerson;
     }
-    this.createdAt = new Date();
+    if (id) {
+      this.id = id;
+    }
   }
 }
