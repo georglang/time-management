@@ -19,8 +19,7 @@ import { resolve } from 'q';
 export class FirestoreRecordService {
   private ordersCollection: AngularFirestoreCollection<IOrder>;
   private recordsCollection: AngularFirestoreCollection<ITimeRecord>;
-  constructor(private afs: AngularFirestore
-  ) {
+  constructor(private afs: AngularFirestore) {
     this.ordersCollection = this.afs.collection<IOrder>('orders');
     this.recordsCollection = this.afs.collection<ITimeRecord>('records');
   }
@@ -51,7 +50,10 @@ export class FirestoreRecordService {
   ): Promise<boolean> {
     let doesRecordExist = true;
     return new Promise((resolve, reject) => {
-      this.getRecordById(orderId).subscribe((records: any) => {
+      // Funktioniert nicht wegen
+      debugger;
+      this.getRecordsFromRecordsCollectionTest(orderId).then((records: any) => {
+        debugger;
         if (records.length > 0) {
           if (this.compareIfRecordIsOnline(newRecord, records)) {
             doesRecordExist = true;
@@ -67,38 +69,69 @@ export class FirestoreRecordService {
     });
   }
 
+  // public getRecordsFromRecordsCollection() {
+  //   const records: DocumentData[] = [];
+  //   return this.recordsCollection.ref.get().then(querySnapshot => {
+  //     querySnapshot.forEach(doc => {
+  //       console.log(doc.data());
+  //       records.push(doc.data());
+  //       return doc.data();
+  //     });
+  //     return records;
+  //   });
+  // }
+
   public getRecordsFromRecordsCollection() {
     const records: DocumentData[] = [];
     return this.recordsCollection.ref.get().then(querySnapshot => {
       querySnapshot.forEach(doc => {
-        console.log(doc.data());
-        records.push(doc.data());
-        return doc.data();
+        const data = doc.data() as TimeRecord;
+        const timestamp: any = data.date;
+        data.date = (timestamp as Timestamp).toDate();
+        records.push(data);
       });
       return records;
     });
   }
 
-  // public getRecordsByOrderId(orderId: string): Observable<any> {
-  //   return this.ordersCollection
-  //     .doc(orderId)
-  //     .collection('records')
-  //     .snapshotChanges()
-  //     .pipe(map(actions => actions.map(this.documentToDomainObject)));
-  // }
-
-  public getRecordsByOrderId() {
-    this.recordsCollection.snapshotChanges().pipe(
-      map(actions =>
-        actions.map(a => {
-          const data = a.payload.doc.data() as any;
-          const id = a.payload.doc.id;
-          return { id, ...data };
-        })
-      )
-    );
+  public getRecordsFromRecordsCollectionTest(orderId): Promise<any> {
+    const records: ITimeRecord[] = [];
+    return new Promise((resolve, reject) => {
+      this.recordsCollection.ref.get().then(querySnapshot => {
+        querySnapshot.forEach(doc => {
+          const data = doc.data() as TimeRecord;
+          const timestamp: any = data.date;
+          data.date = (timestamp as Timestamp).toDate();
+          if (data.orderId === orderId) {
+            records.push(data);
+          }
+          console.log('RRRRRecords ', records);
+        });
+        debugger;
+        resolve(records);
+      });
+    });
   }
 
+  public getRecordsByOrderId(orderId: string): Observable<any> {
+    return this.ordersCollection
+      .doc(orderId)
+      .collection('records')
+      .snapshotChanges()
+      .pipe(map(actions => actions.map(this.documentToDomainObject)));
+  }
+
+  // public getRecordsByOrderId() {
+  //   this.recordsCollection.snapshotChanges().pipe(
+  //     map(actions =>
+  //       actions.map(a => {
+  //         const data = a.payload.doc.data() as any;
+  //         const id = a.payload.doc.id;
+  //         return { id, ...data };
+  //       })
+  //     )
+  //   );
+  // }
 
   getRecordById(orderId) {
     return this.ordersCollection
@@ -113,7 +146,6 @@ export class FirestoreRecordService {
             data.date = (timestamp as Timestamp).toDate();
             const id = a.payload.doc.id;
             return { id, ...data };
-
           })
         )
       );
@@ -136,10 +168,8 @@ export class FirestoreRecordService {
     Object.assign(recordToCompare, newRecord);
     delete recordToCompare.id;
     records.forEach(recordOnline => {
-      delete recordOnline.createdAt;
       delete recordOnline.id;
-      // convert firebase timestamp to js date
-      recordOnline.date = (recordOnline['date'] as Timestamp).toDate();
+      debugger;
       if (_.isEqual(recordOnline, recordToCompare)) {
         isRecordAlreadyOnline = true;
         return;
