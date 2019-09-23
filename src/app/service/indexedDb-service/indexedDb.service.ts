@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Database } from '../../database/Database';
-import { TimeRecord, ITimeRecord } from '../../data-classes/ITimeRecords';
+import { TimeRecord, ITimeRecord } from '../../data-classes/TimeRecords';
 import _ from 'lodash';
 import { IOrder } from '../../data-classes/Order';
 import { FirestoreOrderService } from '../firestore-order-service/firestore-order.service';
@@ -8,7 +8,6 @@ import { FirestoreOrderService } from '../firestore-order-service/firestore-orde
 @Injectable()
 export class IndexedDBService {
   public isAlreadyInDB: boolean;
-  private orderIds: number[] = [];
 
   constructor(private timeRecordsDb: Database, private cloudFirestore: FirestoreOrderService) {
     this.isAlreadyInDB = false;
@@ -240,28 +239,44 @@ export class IndexedDBService {
 
   // check if orders are in orders table
   // if not: add order that is not in orders table yet
-
-// Fehler beim schreiben in indexedDB ueberprufen, ob oder mit records bereits in orders Table
-
-  public addOrderToOrdersTable(orders: IOrder[]): void {
-    if (orders.length > 0) {
-      orders.forEach(order => {
+  public addOrderWithRecordsToOrdersTable(orders: IOrder[]): Promise<boolean> {
+    let orderIds: number[] = [];
+    return new Promise((resolve, reject) => {
+      if (orders.length > 0) {
         this.getOrdersFromOrdersTable().then((ordersInIndexedDB: IOrder[]) => {
+          orderIds = [];
           if (ordersInIndexedDB !== undefined) {
-            this.orderIds = [];
             ordersInIndexedDB.forEach(cachedOrder => {
-              this.orderIds.push(cachedOrder.id);
-            });
-            orders.forEach(_order => {
-              if (!this.orderIds.includes(_order.id)) {
-                debugger;
-                this.addToOrdersTable(order);
-              }
+              orderIds.push(cachedOrder.id);
             });
           }
+          orders.forEach(order => {
+            if (ordersInIndexedDB !== undefined) {
+              ordersInIndexedDB.forEach(cachedOrder => {
+                orderIds.push(cachedOrder.id);
+              });
+
+              if (!orderIds.includes(order.id)) {
+                this.addToOrdersTable(order).then(data => {});
+              } else {
+                if (order.records.length > 0) {
+                  order.records.forEach(record => {
+                    this.checkIfRecordIsInOrdersTable(record, record.orderId).then(
+                      doesRecordExist => {
+                        if (!doesRecordExist) {
+                          this.addRecordToOrdersTable(record, record.orderId);
+                        }
+                      }
+                    );
+                  });
+                  resolve(true);
+                }
+              }
+            }
+          });
         });
-      });
-    }
+      }
+    });
   }
 
   // delete order in indexedDb ordersOutbox
