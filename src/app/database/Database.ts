@@ -1,6 +1,6 @@
 import Dexie from 'dexie';
 import relationships from 'dexie-relationships';
-import { ITimeRecord } from '../data-classes/ITimeRecords';
+import { ITimeRecord } from '../data-classes/TimeRecords';
 import { IOrder } from '../data-classes/Order';
 
 export class Database extends Dexie {
@@ -9,7 +9,7 @@ export class Database extends Dexie {
   public recordsOutbox: Dexie.Table<ITimeRecord, 'string'>;
 
   constructor() {
-    super('TimeRecords', { addons: [relationships] });
+    super('TimeManagement', { addons: [relationships] });
     this.version(1).stores({
       orders: '++id, companyName, location, contactPerson, records',
       ordersOutbox: '++id, companyName, location, contactPerson, records',
