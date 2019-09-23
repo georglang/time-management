@@ -1,7 +1,7 @@
 {
-  "name": "angular-pwa",
-  "short_name": "angular-pwa",
-  "theme_color": "#1976d2",
+  "name": "Forstbetrieb Tschabi",
+  "short_name": "Forstbetrieb Tschabi",
+  "theme_color": "#00792f",
   "background_color": "#fafafa",
   "display": "standalone",
   "scope": "/",
