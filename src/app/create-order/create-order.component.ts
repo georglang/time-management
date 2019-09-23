@@ -2,14 +2,14 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
 
-import { IndexedDBService } from '../service/indexedDb.service';
-import { SynchronizationService } from './../service/synchronization.service';
+import { IndexedDBService } from '../service/indexedDb-service/indexedDb.service';
+import { SynchronizeIdxDBWithFirebaseService } from './../service/synchronize-idxDb-with-firebase-service/synchronize-idxDb-with-firebase.service';
 import { Order, IOrder } from '../data-classes/Order';
 
 import { ToastrService } from 'ngx-toastr';
-import { FirestoreOrderService } from '../service/firestore-order.service';
+import { FirestoreOrderService } from '../service/firestore-order-service/firestore-order.service';
 import { ConnectionService } from 'ng-connection-service';
-import { MessageService } from './../service/message.service';
+import { MessageService } from '../service/message-service/message.service';
 import _ from 'lodash';
 
 @Component({
@@ -32,7 +32,7 @@ export class CreateOrderComponent implements OnInit {
     private router: Router,
     private toastr: ToastrService,
     private firestoreOrderService: FirestoreOrderService,
-    private synchronizationService: SynchronizationService,
+    private synchronizeIdxDBWithFirebase: SynchronizeIdxDBWithFirebaseService,
     private connectionService: ConnectionService,
     private messageService: MessageService
   ) {
@@ -53,7 +53,7 @@ export class CreateOrderComponent implements OnInit {
     //     this.checkIfOrdersAreInOrdersTable();
     //   }
     // });
-    this.synchronizationService.synchronizeIndexedDbOrdersOutboxTableWithFirebase();
+    this.synchronizeIdxDBWithFirebase.synchronizeIndexedDbOrdersOutboxTableWithFirebase();
   }
 
   public isConnected() {

@@ -1,12 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { IndexedDBService } from '../service/indexedDb.service';
-import { ITimeRecord } from '../data-classes/ITimeRecords';
+import { IndexedDBService } from '../service/indexedDb-service/indexedDb.service';
+import { ITimeRecord } from '../data-classes/TimeRecords';
 import { ToastrService, Toast } from 'ngx-toastr';
-import { FirestoreOrderService } from '../service/firestore-order.service';
-import { FirestoreRecordService } from '../service/firestore-record.service';
-import { MessageService } from './../service/message.service';
+import { FirestoreOrderService } from '../service/firestore-order-service/firestore-order.service';
+import { FirestoreRecordService } from '../service/firestore-record-service/firestore-record.service';
+import { MessageService } from '../service/message-service/message.service';
 
 @Component({
   selector: 'app-create-record',
