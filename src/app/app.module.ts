@@ -7,11 +7,8 @@ import { ServiceWorkerModule } from '@angular/service-worker';
 import { environment } from '../environments/environment';
 
 // firebase modulese
-import { AngularFireModule } from '@angular/fire';
+import { FirebaseOptionsToken } from '@angular/fire';
 import { AngularFirestoreModule } from '@angular/fire/firestore';
-import { AngularFireAuthModule } from '@angular/fire/auth';
-import { FirestoreSettingsToken } from 'angularfire2/firestore';
-
 
 // own modules
 import { AppRoutingModule } from './router/app.routing.module';
@@ -21,21 +18,19 @@ import { ToastrModule } from 'ngx-toastr';
 import { SortFormArrayByDate } from './pipes/sort-form-array-by-date.pipe';
 
 // Angular Material
-import {
-  MatButtonModule,
-  MatIconModule,
-  MatListModule,
-  MatCardModule,
-  MatInputModule,
-  MatDatepickerModule,
-  MatNativeDateModule,
-  MatFormFieldModule,
-  MatMenuModule,
-  MatToolbarModule,
-  MatTabsModule,
-  MatTableModule,
-  MatDialogModule
-} from '@angular/material';
+import { MatButtonModule } from '@angular/material/button';
+import { MatCardModule } from '@angular/material/card';
+import { MatNativeDateModule } from '@angular/material/core';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatDialogModule } from '@angular/material/dialog';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
+import { MatListModule } from '@angular/material/list';
+import { MatMenuModule } from '@angular/material/menu';
+import { MatTableModule } from '@angular/material/table';
+import { MatTabsModule } from '@angular/material/tabs';
+import { MatToolbarModule } from '@angular/material/toolbar';
 
 // services
 import { FirestoreOrderService } from './service/firestore-order-service/firestore-order.service';
@@ -86,8 +81,7 @@ import { ConfirmDeleteDialogComponent } from './confirm-delete-dialog/confirm-de
     MatDialogModule,
     ToastrModule.forRoot(),
     ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production }),
-    AngularFireModule.initializeApp(environment.firebase),
-    AngularFirestoreModule,
+    AngularFirestoreModule
   ],
   providers: [
     IndexedDBService,
@@ -95,7 +89,8 @@ import { ConfirmDeleteDialogComponent } from './confirm-delete-dialog/confirm-de
     FirestoreOrderService,
     FirestoreRecordService,
     Database,
-    SortFormArrayByDate
+    SortFormArrayByDate,
+    { provide: FirebaseOptionsToken, useValue: environment.firebase }
   ],
   entryComponents: [ConfirmDeleteDialogComponent],
   bootstrap: [AppComponent]
