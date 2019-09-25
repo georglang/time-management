@@ -1,6 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
-import { MatSort, MatTableDataSource } from '@angular/material';
+import { MatSort } from '@angular/material/sort';
+import { MatTableDataSource } from '@angular/material/table';
 import { Observable } from 'rxjs';
 
 import { IndexedDBService } from '../service/indexedDb-service/indexedDb.service';
@@ -26,9 +27,9 @@ export class OrderListComponent implements OnInit {
   private ordersObs: Observable<IOrder[]>;
   private orderIds: number[] = [];
 
-  @ViewChild(MatSort)
+  @ViewChild(MatSort, { static: false })
   sort: MatSort;
-
+x
   constructor(
     private indexDbService: IndexedDBService,
     private router: Router,

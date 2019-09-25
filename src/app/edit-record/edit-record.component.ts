@@ -2,7 +2,7 @@ import { Component, OnInit, Inject } from '@angular/core';
 import { FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { TimeRecord, ITimeRecord } from '../data-classes/TimeRecords';
-import { DateAdapter } from '@angular/material';
+import { DateAdapter } from '@angular/material/core';
 import { FirestoreOrderService } from '../service/firestore-order-service/firestore-order.service';
 import { FirestoreRecordService } from '../service/firestore-record-service/firestore-record.service';
 import { MessageService } from '../service/message-service/message.service';

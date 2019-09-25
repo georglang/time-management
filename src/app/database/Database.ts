@@ -2,7 +2,9 @@ import Dexie from 'dexie';
 import relationships from 'dexie-relationships';
 import { ITimeRecord } from '../data-classes/TimeRecords';
 import { IOrder } from '../data-classes/Order';
+import { Injectable } from "@angular/core";
 
+@Injectable()
 export class Database extends Dexie {
   public orders: Dexie.Table<IOrder, 'string'>;
   public ordersOutbox: Dexie.Table<IOrder, 'string'>;

@@ -1,9 +1,10 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
-import { MatTableDataSource, MatDialog, MatDialogConfig } from '@angular/material';
+import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
+import { MatTableDataSource } from '@angular/material/table';
 
 import { IndexedDBService } from '../service/indexedDb-service/indexedDb.service';
-import { DateAdapter } from '@angular/material';
+import { DateAdapter } from '@angular/material/core';
 import { TimeRecord, ITimeRecord } from '../data-classes/TimeRecords';
 import { ConfirmDeleteDialogComponent } from './../confirm-delete-dialog/confirm-delete-dialog.component';
 import { ToastrService } from 'ngx-toastr';
