@@ -47,7 +47,7 @@ export class FirestoreOrderService {
       return this.ordersCollection
         .snapshotChanges()
         .pipe(map(actions => actions.map(this.documentToDomainObject)))
-        .subscribe((orders) => {
+        .subscribe((orders: IOrder[]) => {
           resolve(orders);
         });
     });
