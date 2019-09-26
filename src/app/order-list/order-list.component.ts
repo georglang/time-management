@@ -13,6 +13,9 @@ import { SynchronizeFirebaseWithIdxDbService } from './../service/synchronize-fi
 import { IOrder } from '../data-classes/Order';
 import { ITimeRecord } from '../data-classes/TimeRecords';
 
+// ToDo
+// Initially fetch the existing orders
+
 @Component({
   selector: 'app-order-list',
   templateUrl: './order-list.component.html',
@@ -29,9 +32,9 @@ export class OrderListComponent implements OnInit {
 
   @ViewChild(MatSort, { static: false })
   sort: MatSort;
-x
+  x;
   constructor(
-    private indexDbService: IndexedDBService,
+    private indexedDbService: IndexedDBService,
     private router: Router,
     private firestoreOrderService: FirestoreOrderService,
     private firestoreRecordService: FirestoreRecordService,
@@ -41,28 +44,60 @@ x
   ) {}
 
   ngOnInit() {
-    // wenn online vorher synchronisieren, wenn offline direkt aus orders table
-    // und in oders outbox, records outbox nachschauen
-    // orders immer aus indexedDB orders table laden
-    // synch with firebase
-    // offline
-    // else {
-    // this.indexDbService.getOrdersFromOrdersTable().then((orders: IOrder[]) => {
-    //   this.dataSource = new MatTableDataSource(orders);
-    // });
-    // }
-    // this.getOrdersWithRecordsFromFirebase();
-    // this.connectionService.monitor().subscribe(isConnected => {});
-    // this.synchronizationService.synchronizeIndexedDbOrdersOutboxTableWithFirebase();
-    // this.getOrdersFromIndexedDB();
-    // if (this.isOnline()) {
-    //   this.getOrdersOnline();
-    // } else {
-    //   console.warn('No internet connection');
-    //   this.getOrdersFromIndexedDB();
-    // }
+    if (this.isOnline()) {
+      this.getOrdersFromCloudDatabase();
+    } else {
+      console.warn('No internet connection');
+      this.getOrdersFromIndexedDb();
+    }
+
+    // ToDo: Connection turns from Offline to online
+    if (this.connectionService !== undefined) {
+      this.connectionService.monitor().subscribe(isOnline => {});
+    }
+
     // offline ordersOutox durchsuchen, wenn ordersoutbox vorhanden, dann kann es auch records dazu geben,
     // oder anhand von orders id in orders table kann es records in records outbox geben
+  }
+
+  public isOnline(): boolean {
+    return navigator.onLine;
+  }
+
+  public navigateToCreateOrder(): void {
+    this.router.navigate(['/create-order']);
+  }
+
+  //
+  // Online Handling
+  //
+
+  public getOrdersFromCloudDatabase(): void {
+    if (this.firestoreOrderService !== undefined) {
+      this.firestoreOrderService.getOrders().then((orders: IOrder[]) => {
+        if (orders !== undefined) {
+          this.dataSource = new MatTableDataSource(orders);
+          this.saveOrdersInIndexedDBOrdersTable(orders);
+        }
+      });
+    }
+  }
+
+  public saveOrdersInIndexedDBOrdersTable(orders: IOrder[]): void {
+    this.indexedDbService.addOrdersWithRecordsToOrdersTable(orders);
+  }
+
+  //
+  // Offline Handling
+  //
+
+  // if offline get orders from indexedDB orders table
+  public getOrdersFromIndexedDb() {
+    if (this.indexedDbService !== undefined) {
+      this.indexedDbService.getOrdersFromOrdersTable().then((orders: IOrder[]) => {
+        this.dataSource = new MatTableDataSource(orders);
+      });
+    }
   }
 
   public sync() {
@@ -72,35 +107,24 @@ x
     });
   }
 
-  public getOrdersFromIndexedDb() {
-    this.indexDbService.getOrdersFromOrdersTable().then((orders: IOrder[]) => {
-      debugger;
-      this.dataSource = new MatTableDataSource(orders);
-    });
-  }
-
-  public isOnline() {
-    return navigator.onLine;
-  }
-
   // if no internet connection persists
   // orders from indexedDB orders and ordersOutbox tables will be fetched
   public getOrdersIfOffline() {
-    // if (!this.isOnline()) {
-    this.indexDbService.getOrdersFromOrdersTable().then(ordersInOrdersTabel => {
-      if (ordersInOrdersTabel.length > 0) {
-        ordersInOrdersTabel.forEach(order => {
-          this.ordersFromIndexedDB.push(order);
+    if (!this.isOnline()) {
+      this.indexedDbService.getOrdersFromOrdersTable().then(ordersInOrdersTabel => {
+        if (ordersInOrdersTabel.length > 0) {
+          ordersInOrdersTabel.forEach(order => {
+            this.ordersFromIndexedDB.push(order);
+          });
+        }
+        this.indexedDbService.getOrdersFromOrdersOutbox().then(ordersInOutboxTable => {
+          ordersInOutboxTable.forEach(order => {
+            this.ordersFromIndexedDB.push(order);
+          });
+          this.dataSource = new MatTableDataSource(this.ordersFromIndexedDB);
         });
-      }
-      this.indexDbService.getOrdersFromOrdersOutbox().then(ordersInOutboxTable => {
-        ordersInOutboxTable.forEach(order => {
-          this.ordersFromIndexedDB.push(order);
-        });
-        this.dataSource = new MatTableDataSource(this.ordersFromIndexedDB);
       });
-    });
-    // }
+    }
   }
 
   public applyFilter(filterValue: string) {
@@ -111,9 +135,5 @@ x
 
   getRecord(row: any) {
     this.router.navigate(['/order-details/' + row.id]);
-  }
-
-  navigateToCreateOrder() {
-    this.router.navigate(['/create-order']);
   }
 }
