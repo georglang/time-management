@@ -99,7 +99,7 @@
         <mat-row *matRowDef="let row; columns: displayedColumns"></mat-row>
       </mat-table>
 
-      <h5 id="no-records-found" *ngIf="dataSource.data.length === 0">Keine Einträge gefunden</h5>
+      <h5 id="no-records-found" *ngIf="this.records.length === 0">Keine Einträge gefunden</h5>
     </div>
   </div>
 </div>
@@ -113,5 +113,3 @@
     <i class="material-icons">add</i>
   </button>
 </div>
-
-<h2>{{ isOnline }}</h2>
