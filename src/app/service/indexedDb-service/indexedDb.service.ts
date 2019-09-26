@@ -239,7 +239,7 @@ export class IndexedDBService {
 
   // check if orders are in orders table
   // if not: add order that is not in orders table yet
-  public addOrderWithRecordsToOrdersTable(orders: IOrder[]): Promise<boolean> {
+  public addOrdersWithRecordsToOrdersTable(orders: IOrder[]): Promise<boolean> {
     let orderIds: number[] = [];
     return new Promise((resolve, reject) => {
       if (orders.length > 0) {
