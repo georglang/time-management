@@ -134,6 +134,9 @@ export class OrderDetailComponent implements OnInit {
           if (records.length > 0) {
             this.dataSource = new MatTableDataSource<ITimeRecord>(records);
             this.getSumOfWorkingHours(records);
+          } else {
+            this.dataSource = new MatTableDataSource<ITimeRecord>();
+            this.sumOfWorkingHours = 0;
           }
         });
     }
@@ -241,27 +244,30 @@ export class OrderDetailComponent implements OnInit {
     this.toastrService.success('Erfolgreich erstellt', 'Eintrag', successConfig);
   }
 
-  public openDeleteRecordDialog(recordId) {
-    const _recordId = recordId;
+  public openDeleteRecordDialog(recordId: string): void {
     const dialogConfig = new MatDialogConfig();
     dialogConfig.disableClose = true;
     dialogConfig.autoFocus = true;
-    dialogConfig.data = {
-      id: 1,
-      title: 'Löschen'
-    };
+
     const dialogRef = this.dialog.open(ConfirmDeleteDialogComponent, dialogConfig);
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        this.firestoreRecordService.deleteRecord(this.paramId, _recordId).then(data => {
-          // load records after deletion
-          this.getRecords(this.paramId);
-          // delete record in indexedDB orders table
-          this.indexDbService.deleteRecordInOrdersTable(this.paramId, _recordId).then(() => {
-            this.messageService.recordDeletedSuccessful();
-          });
-        });
+    dialogRef.afterClosed().subscribe(shouldDelete => {
+      if (shouldDelete) {
+        this.deleteRecordInFirebase(recordId);
       }
+    });
+  }
+
+  public deleteRecordInFirebase(recordId: string): void {
+    this.firestoreRecordService.deleteRecord(this.paramId, recordId).then(data => {
+      this.showDeleteMessage();
+      // load records after deletion
+      this.getRecordsFromCloudDatabase(this.paramId);
+
+      // ToDo Offline Handling
+      // delete record in indexedDB orders table
+      // this.indexDbService.deleteRecordInOrdersTable(this.paramId, _recordId).then(() => {
+      //   this.messageService.recordDeletedSuccessful();
+      // });
     });
   }
 
