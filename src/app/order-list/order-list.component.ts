@@ -72,9 +72,21 @@ export class OrderListComponent implements OnInit {
   // Online Handling
   //
 
+  // ToDo: Promise --> Observable
+  // public getOrdersFromCloudDatabase(): void {
+  //   if (this.firestoreOrderService !== undefined) {
+  //     this.firestoreOrderService.getOrders().then((orders: IOrder[]) => {
+  //       if (orders !== undefined) {
+  //         this.dataSource = new MatTableDataSource(orders);
+  //         this.saveOrdersInIndexedDBOrdersTable(orders);
+  //       }
+  //     });
+  //   }
+  // }
+
   public getOrdersFromCloudDatabase(): void {
     if (this.firestoreOrderService !== undefined) {
-      this.firestoreOrderService.getOrders().then((orders: IOrder[]) => {
+      this.firestoreOrderService.getOrders().subscribe((orders: IOrder[]) => {
         if (orders !== undefined) {
           this.dataSource = new MatTableDataSource(orders);
           this.saveOrdersInIndexedDBOrdersTable(orders);
@@ -101,7 +113,7 @@ export class OrderListComponent implements OnInit {
   }
 
   public sync() {
-    this.synchronizeFirebaseWithIdxDb.synchronize().then(synchCompleted => {
+    this.synchronizeFirebaseWithIdxDb.synchronize().subscribe(synchCompleted => {
       if (synchCompleted) {
       }
     });

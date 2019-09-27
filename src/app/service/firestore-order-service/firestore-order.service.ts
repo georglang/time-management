@@ -40,17 +40,18 @@ export class FirestoreOrderService {
     this.recordsCollection = this.firestore.collection<ITimeRecord>('records');
   }
 
-  /// orders collection methods
-
-  public getOrders(): Promise<IOrder[]> {
-    return new Promise((resolve, reject) => {
-      return this.ordersCollection
+  public getOrders(): Observable<IOrder[]> {
+    const observable = new Observable<IOrder[]>(observer => {
+      this.ordersCollection
         .snapshotChanges()
         .pipe(map(actions => actions.map(this.documentToDomainObject)))
         .subscribe((orders: IOrder[]) => {
-          resolve(orders);
+          if (orders.length > 0) {
+            observer.next(orders);
+          }
         });
     });
+    return observable;
   }
 
   public getOrdersFromOrdersCollection(): Promise<IOrder[]> {
