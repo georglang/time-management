@@ -48,10 +48,11 @@ export class EditRecordComponent implements OnInit {
     this.route.params.subscribe(params => {
       this.recordId = params['id'];
 
-      // if (this.isConnected()) {
+      if (this.isOnline()) {
+        this.getRecordByIdFromFirebase(this.orderId, this.recordId);
+      }
 
       //   // ordersOutbox
-      //   this.getRecordByIdFromFirebase(this.orderId, this.recordId);
       // } else {
 
       //   // Kombination von ordersOutbox und recordsOutbox
@@ -59,7 +60,7 @@ export class EditRecordComponent implements OnInit {
       //   this.getRecordsByIdFromRecordsOutbox(+this.recordId);
       // }
 
-      this.getRecordsByIdFromRecordsOutbox(+this.recordId);
+      // this.getRecordsByIdFromRecordsOutbox(+this.recordId);
     });
 
     // ToDo implement change detection notification
@@ -68,17 +69,16 @@ export class EditRecordComponent implements OnInit {
     });
   }
 
-  public isConnected() {
+  public isOnline(): boolean {
     return navigator.onLine;
   }
 
   public getRecordByIdFromFirebase(orderId: string, recordId: string): void {
-    // this.firestoreRecordService.getRecordById(orderId, recordId).then(record => {
-    //   this.record = record;
-    //   if (this.record !== undefined) {
-    //     this.setControl(this.record);
-    //   }
-    // });
+    this.firestoreRecordService.getRecordById(orderId).subscribe((record: ITimeRecord) => {
+      if (record !== undefined) {
+        this.setControl(record[0]);
+      }
+    });
   }
 
   public getRecordsByIdFromRecordsOutbox(recordId: number): void {
@@ -104,7 +104,7 @@ export class EditRecordComponent implements OnInit {
   }
 
   public onSubmit() {
-    const newRecord = {
+    const record = {
       date: this.editRecordForm.controls.date.value,
       description: this.editRecordForm.controls.description.value,
       workingHours: this.editRecordForm.controls.workingHours.value,
@@ -112,18 +112,18 @@ export class EditRecordComponent implements OnInit {
       orderId: this.orderId
     };
 
-    if (this.isConnected()) {
+    if (this.isOnline()) {
       this.firestoreRecordService
-        .checkIfRecordExistsInOrderInFirestore(this.orderId, newRecord)
+        .checkIfRecordExistsInOrderInFirestore(record)
         .then(doesRecordExist => {
           if (!doesRecordExist) {
-            this.updateRecordInFirestore(this.orderId, newRecord);
+            this.updateRecordInFirestore(this.orderId, record);
           } else {
             this.messageService.recordAlreadyExists();
           }
         });
     } else {
-      this.updateRecordInRecordsOutbox(newRecord);
+      this.updateRecordInRecordsOutbox(record);
     }
   }
 
