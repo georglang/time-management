@@ -27,7 +27,7 @@ moment.locale('de');
 export class OrderDetailComponent implements OnInit {
   @Input() customer;
   private paramId;
-  public isOnline;
+  public _isOnline;
   public sumOfWorkingHours;
   public order: any;
   public columns: string[];
@@ -53,7 +53,6 @@ export class OrderDetailComponent implements OnInit {
     this.dateAdapter.setLocale('de');
     this.columns = ['Date', 'Description', 'Time', 'Delete'];
     this.sumOfWorkingHours = 0;
-    this.dataSource = new MatTableDataSource<ITimeRecord>();
 
     if (window.indexedDB) {
       console.log('IndexedDB is supported');
@@ -63,25 +62,32 @@ export class OrderDetailComponent implements OnInit {
   ngOnInit() {
     this.route.params.subscribe(params => {
       this.paramId = params['id'];
-      if (this.isConnected()) {
-        this.getRecords(this.paramId);
-      } else {
-        console.log('Get records from indexedDB');
+
+      if (this.isOnline()) {
+        this.getRecordsFromCloudDatabase(this.paramId);
       }
+
+      // if (this.isOnline()) {
+      //   this.getRecords(this.paramId);
+      // } else {
+      //   console.log('Get records from indexedDB');
+      // }
 
       // this.getOrderById(this.paramId);
       // this.getRecordsFromOrdersOutbox(this.paramId);
 
       this.getRecordsFromRecordsOutbox(this.paramId).then(records => {
-        this.records = records;
-        this.dataSource = new MatTableDataSource<ITimeRecord>(this.records);
+        if (records !== undefined) {
+          this.records = records;
+          this.dataSource = new MatTableDataSource<ITimeRecord>(this.records);
+        }
       });
 
       // this.records = this.getRecordsFromRecordsOutbox(this.paramId);
     });
 
     this.connectionService.monitor().subscribe(isOnline => {
-      if (this.isOnline) {
+      if (this._isOnline) {
         this.indexDbService.getOrdersFromOrdersOutbox().then(orders => {
           if (orders.length !== 0) {
             orders.forEach(order => {
@@ -108,8 +114,37 @@ export class OrderDetailComponent implements OnInit {
     });
   }
 
-  public navigateToOrderList() {
+  public isOnline() {
+    return navigator.onLine;
+  }
+
+  public navigateToOrderList(): void {
     this.router.navigate(['/']);
+  }
+
+  //
+  // Online Handling
+  //
+
+  public getRecordsFromCloudDatabase(orderId: string): any {
+    if (this.firestoreOrderService !== undefined) {
+      this.firestoreRecordService
+        .getRecordsByOrderId(orderId)
+        .subscribe((records: ITimeRecord[]) => {
+          if (records !== undefined) {
+            if (records.length > 0) {
+              records.forEach(record => {
+                record.date = new Date(record.date);
+                records.push(record);
+                this.getSumOfWorkingHours(records);
+              });
+            } else {
+              this.sumOfWorkingHours = 0;
+            }
+          }
+          this.dataSource = new MatTableDataSource<ITimeRecord>(records);
+        });
+    }
   }
 
   public getSumOfWorkingHours(records: ITimeRecord[]) {
@@ -121,21 +156,16 @@ export class OrderDetailComponent implements OnInit {
     }
   }
 
-  public isConnected() {
-    return navigator.onLine;
-  }
-
   // records from firebase and indexedDB
   public getRecords(orderId: string) {
     const records: TimeRecord[] = [];
 
-    if (this.isConnected()) {
+    if (this.isOnline()) {
       this.firestoreOrderService.getOrderById(orderId).then(order => {
         console.log('Order', order);
       });
 
-      this.firestoreRecordService.getRecordsFromRecordsCollection();
-
+      // this.firestoreRecordService.getRecords();
 
       // this.firestoreRecordService.getRecordsByOrderId(orderId).subscribe(recordsInFirebase => {
       //   if (recordsInFirebase !== undefined) {
@@ -174,7 +204,7 @@ export class OrderDetailComponent implements OnInit {
   }
 
   public getOrderById(orderId: string) {
-    if (this.isConnected()) {
+    if (this.isOnline()) {
       this.firestoreOrderService.getOrderById(orderId).then(order => {
         this.order = order;
       });
