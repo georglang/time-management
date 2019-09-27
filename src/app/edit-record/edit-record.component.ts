@@ -7,6 +7,7 @@ import { FirestoreOrderService } from '../service/firestore-order-service/firest
 import { FirestoreRecordService } from '../service/firestore-record-service/firestore-record.service';
 import { MessageService } from '../service/message-service/message.service';
 import { IndexedDBService } from '../service/indexedDb-service/indexedDb.service';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-edit-record',
@@ -28,7 +29,8 @@ export class EditRecordComponent implements OnInit {
     private firestoreOrderService: FirestoreOrderService,
     private firestoreRecordService: FirestoreRecordService,
     private messageService: MessageService,
-    private indexedDBService: IndexedDBService
+    private indexedDBService: IndexedDBService,
+    private toastrService: ToastrService
   ) {
     this.dateAdapter.setLocale('de');
   }
@@ -128,20 +130,19 @@ export class EditRecordComponent implements OnInit {
   }
 
   private updateRecordInFirestore(orderId: string, record: ITimeRecord): void {
-    this.firestoreOrderService.ordersCollection
-      .doc(orderId)
-      .collection('records')
-      .doc(this.recordId)
-      .update(record)
-      .then(() => {
-        this.updateRecordInOrdersTable(+orderId, record);
+    if (this.firestoreRecordService !== undefined) {
+      this.firestoreRecordService.updateRecord(orderId, record).then(data => {
+        this.showUpdateMessage();
       });
+    }
   }
 
-  private updateRecordInOrdersTable(orderId, record): void {
-    this.indexedDBService.updateRecordInOrdersTable(orderId, record).then(() => {
-      this.messageService.recordUpdatedSuccessful();
-    });
+  private showUpdateMessage() {
+    const successConfig = {
+      positionClass: 'toast-bottom-center',
+      timeout: 500
+    };
+    this.toastrService.success('Erfolgreich aktualisiert', 'Eintrag', successConfig);
   }
 
   private updateRecordInRecordsOutbox(record: ITimeRecord): void {
