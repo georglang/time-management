@@ -34,16 +34,18 @@
       </ng-container>
 
       <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-      <tr mat-row *matRowDef="let row; columns: displayedColumns" (click)="getRecord(row)"></tr>
+      <tr
+        mat-row
+        *matRowDef="let row; columns: displayedColumns"
+        (click)="navigateToOrder(row.id)"
+      ></tr>
     </table>
 
     <h5 id="no-orders-found" *ngIf="dataSource.data.length === 0">Keine Aufträge gefunden</h5>
-
-
   </div>
 </div>
 <div id="bottom-nav">
-    <button
+  <button
     type="button"
     id="create-order-btn"
     type="submit"

@@ -2,19 +2,12 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
-import { Observable } from 'rxjs';
 
-import { IndexedDBService } from '../service/indexedDb-service/indexedDb.service';
-import { FirestoreOrderService } from '../service/firestore-order-service/firestore-order.service';
-import { FirestoreRecordService } from '../service/firestore-record-service/firestore-record.service';
 import { ConnectionService } from 'ng-connection-service';
-import { SynchronizeIdxDBWithFirebaseService } from './../service/synchronize-idxDb-with-firebase-service/synchronize-idxDb-with-firebase.service';
-import { SynchronizeFirebaseWithIdxDbService } from './../service/synchronize-firebase-with-idxDb.service/synchronize-firebase-with-idxDb.service';
-import { IOrder } from '../data-classes/Order';
-import { ITimeRecord } from '../data-classes/TimeRecords';
 
-// ToDo
-// Initially fetch the existing orders
+import { FirestoreOrderService } from '../service/firestore-order-service/firestore-order.service';
+import { IndexedDBService } from '../service/indexedDb-service/indexedDb.service';
+import { IOrder } from '../data-classes/Order';
 
 @Component({
   selector: 'app-order-list',
@@ -26,21 +19,15 @@ export class OrderListComponent implements OnInit {
   public dataSource = new MatTableDataSource();
   public displayedColumns = ['customer', 'contactPerson', 'location', 'detail'];
   public isOnlineService: boolean;
-  private ordersFromIndexedDB: any = [];
-  private ordersObs: Observable<IOrder[]>;
-  private orderIds: number[] = [];
 
   @ViewChild(MatSort, { static: false })
   sort: MatSort;
-  x;
+
   constructor(
     private indexedDbService: IndexedDBService,
     private router: Router,
     private firestoreOrderService: FirestoreOrderService,
-    private firestoreRecordService: FirestoreRecordService,
-    private connectionService: ConnectionService,
-    private synchronizeIdxDbWithFirebase: SynchronizeIdxDBWithFirebaseService,
-    private synchronizeFirebaseWithIdxDb: SynchronizeFirebaseWithIdxDbService
+    private connectionService: ConnectionService
   ) {}
 
   ngOnInit() {
@@ -55,17 +42,10 @@ export class OrderListComponent implements OnInit {
     if (this.connectionService !== undefined) {
       this.connectionService.monitor().subscribe(isOnline => {});
     }
-
-    // offline ordersOutox durchsuchen, wenn ordersoutbox vorhanden, dann kann es auch records dazu geben,
-    // oder anhand von orders id in orders table kann es records in records outbox geben
   }
 
   public isOnline(): boolean {
     return navigator.onLine;
-  }
-
-  public navigateToCreateOrder(): void {
-    this.router.navigate(['/create-order']);
   }
 
   //
@@ -96,7 +76,7 @@ export class OrderListComponent implements OnInit {
     }
   }
 
-  public getOrdersFromIndexedDb() {
+  public getOrdersFromIndexedDb(): void {
     if (this.indexedDbService !== undefined) {
       this.indexedDbService.getOrdersFromOrdersTable().then((orders: IOrder[]) => {
         if (orders.length > 0) {
@@ -109,20 +89,17 @@ export class OrderListComponent implements OnInit {
     }
   }
 
-  public sync() {
-    this.synchronizeFirebaseWithIdxDb.synchronize().subscribe(synchCompleted => {
-      if (synchCompleted) {
-      }
-    });
-  }
-
-  public applyFilter(filterValue: string) {
+  public applyFilter(filterValue: string): void {
     filterValue = filterValue.trim();
     filterValue = filterValue.toLocaleLowerCase();
     this.dataSource.filter = filterValue;
   }
 
-  getRecord(row: any) {
-    this.router.navigate(['/order-details/' + row.id]);
+  public navigateToOrder(orderId: string): void {
+    this.router.navigate(['/order-details/' + orderId]);
+  }
+
+  public navigateToCreateOrder(): void {
+    this.router.navigate(['/create-order']);
   }
 }
