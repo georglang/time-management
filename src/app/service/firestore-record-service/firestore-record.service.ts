@@ -30,11 +30,12 @@ export class FirestoreRecordService {
     return object;
   };
 
-  public addTimeRecord(orderId: string, record: any) {
+  public addTimeRecord(record: ITimeRecord) {
+    const _record = JSON.parse(JSON.stringify(record));
     return this.ordersCollection
-      .doc(orderId)
+      .doc(_record.orderId)
       .collection('records')
-      .add(record)
+      .add(_record)
       .then(docReference => {
         return docReference.id;
       })
@@ -44,18 +45,13 @@ export class FirestoreRecordService {
   }
 
   // check if record is in firebase
-  public checkIfRecordExistsInOrderInFirestore(
-    orderId: string,
-    newRecord: ITimeRecord
-  ): Promise<boolean> {
+  public checkIfRecordExistsInOrderInFirestore(record: ITimeRecord): Promise<boolean> {
     let doesRecordExist = true;
     return new Promise((resolve, reject) => {
       // Funktioniert nicht wegen
-      debugger;
-      this.getRecordsFromRecordsCollectionTest(orderId).then((records: any) => {
-        debugger;
+      this.getRecordsFromRecordsCollectionTest(record.orderId).then((records: any) => {
         if (records.length > 0) {
-          if (this.compareIfRecordIsOnline(newRecord, records)) {
+          if (this.compareIfRecordIsOnline(record, records)) {
             doesRecordExist = true;
           } else {
             doesRecordExist = false;
@@ -107,13 +103,12 @@ export class FirestoreRecordService {
           }
           console.log('RRRRRecords ', records);
         });
-        debugger;
         resolve(records);
       });
     });
   }
 
-  public getRecordsByOrderId(orderId: string): Observable<any> {
+  public getRecordsByOrderId(orderId: string): Observable<ITimeRecord[]> {
     return this.ordersCollection
       .doc(orderId)
       .collection('records')
@@ -169,7 +164,6 @@ export class FirestoreRecordService {
     delete recordToCompare.id;
     records.forEach(recordOnline => {
       delete recordOnline.id;
-      debugger;
       if (_.isEqual(recordOnline, recordToCompare)) {
         isRecordAlreadyOnline = true;
         return;
