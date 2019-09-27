@@ -116,26 +116,6 @@ export class OrderListComponent implements OnInit {
     });
   }
 
-  // if no internet connection persists
-  // orders from indexedDB orders and ordersOutbox tables will be fetched
-  public getOrdersIfOffline() {
-    if (!this.isOnline()) {
-      this.indexedDbService.getOrdersFromOrdersTable().then(ordersInOrdersTabel => {
-        if (ordersInOrdersTabel.length > 0) {
-          ordersInOrdersTabel.forEach(order => {
-            this.ordersFromIndexedDB.push(order);
-          });
-        }
-        this.indexedDbService.getOrdersFromOrdersOutbox().then(ordersInOutboxTable => {
-          ordersInOutboxTable.forEach(order => {
-            this.ordersFromIndexedDB.push(order);
-          });
-          this.dataSource = new MatTableDataSource(this.ordersFromIndexedDB);
-        });
-      });
-    }
-  }
-
   public applyFilter(filterValue: string) {
     filterValue = filterValue.trim();
     filterValue = filterValue.toLocaleLowerCase();
