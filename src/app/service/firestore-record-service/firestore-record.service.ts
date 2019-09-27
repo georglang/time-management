@@ -30,6 +30,10 @@ export class FirestoreRecordService {
     return object;
   };
 
+  //
+  // Online
+  //
+
   public addTimeRecord(record: ITimeRecord) {
     const _record = JSON.parse(JSON.stringify(record));
     return this.ordersCollection
@@ -43,6 +47,32 @@ export class FirestoreRecordService {
         console.error('Error adding record: ', error);
       });
   }
+
+  public getRecordsByOrderId(orderId: string): Observable<ITimeRecord[]> {
+    return this.ordersCollection
+      .doc(orderId)
+      .collection('records')
+      .snapshotChanges()
+      .pipe(map(actions => actions.map(this.documentToDomainObject)));
+  }
+
+  public getRecordById(orderId): any {
+    return this.ordersCollection
+      .doc(orderId)
+      .collection('records')
+      .snapshotChanges()
+      .pipe(
+        map(actions =>
+          actions.map(a => {
+            const data = a.payload.doc.data() as any;
+            const id = a.payload.doc.id;
+            return { id, ...data };
+          })
+        )
+      );
+  }
+
+  // last method
 
   // check if record is in firebase
   public checkIfRecordExistsInOrderInFirestore(record: ITimeRecord): Promise<boolean> {
@@ -106,44 +136,6 @@ export class FirestoreRecordService {
         resolve(records);
       });
     });
-  }
-
-  public getRecordsByOrderId(orderId: string): Observable<ITimeRecord[]> {
-    return this.ordersCollection
-      .doc(orderId)
-      .collection('records')
-      .snapshotChanges()
-      .pipe(map(actions => actions.map(this.documentToDomainObject)));
-  }
-
-  // public getRecordsByOrderId() {
-  //   this.recordsCollection.snapshotChanges().pipe(
-  //     map(actions =>
-  //       actions.map(a => {
-  //         const data = a.payload.doc.data() as any;
-  //         const id = a.payload.doc.id;
-  //         return { id, ...data };
-  //       })
-  //     )
-  //   );
-  // }
-
-  getRecordById(orderId) {
-    return this.ordersCollection
-      .doc(orderId)
-      .collection('records')
-      .snapshotChanges()
-      .pipe(
-        map(actions =>
-          actions.map(a => {
-            const data = a.payload.doc.data() as TimeRecord;
-            const timestamp: any = data.date;
-            data.date = (timestamp as Timestamp).toDate();
-            const id = a.payload.doc.id;
-            return { id, ...data };
-          })
-        )
-      );
   }
 
   public deleteRecord(orderId: string, recordId) {
