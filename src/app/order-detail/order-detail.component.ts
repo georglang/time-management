@@ -76,12 +76,12 @@ export class OrderDetailComponent implements OnInit {
       // this.getOrderById(this.paramId);
       // this.getRecordsFromOrdersOutbox(this.paramId);
 
-      this.getRecordsFromRecordsOutbox(this.paramId).then(records => {
-        if (records !== undefined) {
-          this.records = records;
-          this.dataSource = new MatTableDataSource<ITimeRecord>(this.records);
-        }
-      });
+      // this.getRecordsFromRecordsOutbox(this.paramId).then(records => {
+      //   if (records !== undefined) {
+      //     this.records = records;
+      //     this.dataSource = new MatTableDataSource<ITimeRecord>(this.records);
+      //   }
+      // });
 
       // this.records = this.getRecordsFromRecordsOutbox(this.paramId);
     });
@@ -131,18 +131,10 @@ export class OrderDetailComponent implements OnInit {
       this.firestoreRecordService
         .getRecordsByOrderId(orderId)
         .subscribe((records: ITimeRecord[]) => {
-          if (records !== undefined) {
-            if (records.length > 0) {
-              records.forEach(record => {
-                record.date = new Date(record.date);
-                records.push(record);
-                this.getSumOfWorkingHours(records);
-              });
-            } else {
-              this.sumOfWorkingHours = 0;
-            }
+          if (records.length > 0) {
+            this.dataSource = new MatTableDataSource<ITimeRecord>(records);
+            this.getSumOfWorkingHours(records);
           }
-          this.dataSource = new MatTableDataSource<ITimeRecord>(records);
         });
     }
   }
@@ -167,7 +159,7 @@ export class OrderDetailComponent implements OnInit {
 
       // this.firestoreRecordService.getRecords();
 
-      // this.firestoreRecordService.getRecordsByOrderId(orderId).subscribe(recordsInFirebase => {
+      // this.firestoreRecordService.x(orderId).subscribe(recordsInFirebase => {
       //   if (recordsInFirebase !== undefined) {
       //     if (recordsInFirebase.length > 0) {
       //       recordsInFirebase.forEach(record => {
