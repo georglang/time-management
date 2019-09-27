@@ -72,42 +72,39 @@ export class OrderListComponent implements OnInit {
   // Online Handling
   //
 
-  // ToDo: Promise --> Observable
-  // public getOrdersFromCloudDatabase(): void {
-  //   if (this.firestoreOrderService !== undefined) {
-  //     this.firestoreOrderService.getOrders().then((orders: IOrder[]) => {
-  //       if (orders !== undefined) {
-  //         this.dataSource = new MatTableDataSource(orders);
-  //         this.saveOrdersInIndexedDBOrdersTable(orders);
-  //       }
-  //     });
-  //   }
-  // }
-
   public getOrdersFromCloudDatabase(): void {
     if (this.firestoreOrderService !== undefined) {
       this.firestoreOrderService.getOrders().subscribe((orders: IOrder[]) => {
         if (orders !== undefined) {
-          this.dataSource = new MatTableDataSource(orders);
+          this.dataSource = new MatTableDataSource<IOrder>(orders);
           this.saveOrdersInIndexedDBOrdersTable(orders);
+        } else {
+          this.dataSource = new MatTableDataSource<IOrder>();
+          // ToDo: Meldung in HTML kein Aufträge vorhanden
         }
       });
     }
-  }
-
-  public saveOrdersInIndexedDBOrdersTable(orders: IOrder[]): void {
-    this.indexedDbService.addOrdersWithRecordsToOrdersTable(orders);
   }
 
   //
   // Offline Handling
   //
 
-  // if offline get orders from indexedDB orders table
+  public saveOrdersInIndexedDBOrdersTable(orders: IOrder[]): void {
+    if (this.indexedDbService !== undefined) {
+      this.indexedDbService.addOrdersWithRecordsToOrdersTable(orders);
+    }
+  }
+
   public getOrdersFromIndexedDb() {
     if (this.indexedDbService !== undefined) {
       this.indexedDbService.getOrdersFromOrdersTable().then((orders: IOrder[]) => {
-        this.dataSource = new MatTableDataSource(orders);
+        if (orders.length > 0) {
+          this.dataSource = new MatTableDataSource<IOrder>(orders);
+        } else {
+          // ToDo: Meldung in HTML kein Aufträge vorhanden
+          this.dataSource = new MatTableDataSource<IOrder>();
+        }
       });
     }
   }
