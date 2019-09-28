@@ -17,6 +17,7 @@ declare var jsPDF: any;
 import 'jspdf-autotable';
 import * as moment from 'moment';
 import { ConnectionService } from 'ng-connection-service';
+import { IOrder } from '../data-classes/Order';
 moment.locale('de');
 
 @Component({
@@ -26,15 +27,16 @@ moment.locale('de');
 })
 export class OrderDetailComponent implements OnInit {
   @Input() customer;
-  private paramId;
+  private paramOrderId;
   public _isOnline;
   public sumOfWorkingHours;
-  public order: any;
+  public order: IOrder;
   public columns: string[];
   public totalTime = 0.0;
   public records: ITimeRecord[] = [];
   public displayedColumns = ['date', 'description', 'workingHours', 'action'];
   public dataSource: MatTableDataSource<ITimeRecord>;
+  public hasRecordsFound: boolean = false;
   private orderIds: number[] = [];
 
   constructor(
@@ -61,10 +63,10 @@ export class OrderDetailComponent implements OnInit {
 
   ngOnInit() {
     this.route.params.subscribe(params => {
-      this.paramId = params['id'];
+      this.paramOrderId = params['id'];
 
       if (this.isOnline()) {
-        this.getRecordsFromCloudDatabase(this.paramId);
+        this.getOrderByIdFromCloudDatabase(this.paramOrderId);
       }
 
       // if (this.isOnline()) {
@@ -126,19 +128,35 @@ export class OrderDetailComponent implements OnInit {
   // Online Handling
   //
 
+  public getOrderByIdFromCloudDatabase(orderId: string) {
+    this.firestoreOrderService.getOrderById(orderId).subscribe((order: IOrder) => {
+      if (order !== undefined) {
+        this.order = order;
+        this.getRecordsFromCloudDatabase(orderId);
+      }
+    });
+  }
+
   public getRecordsFromCloudDatabase(orderId: string): any {
     if (this.firestoreOrderService !== undefined) {
       this.firestoreRecordService
         .getRecordsByOrderId(orderId)
         .subscribe((records: ITimeRecord[]) => {
-          if (records.length > 0) {
-            this.dataSource = new MatTableDataSource<ITimeRecord>(records);
-            this.getSumOfWorkingHours(records);
-          } else {
-            this.dataSource = new MatTableDataSource<ITimeRecord>();
-            this.sumOfWorkingHours = 0;
-          }
+          this.order.records = records;
+          this.setRecordDataSource(records);
         });
+    }
+  }
+
+  public setRecordDataSource(records: ITimeRecord[]) {
+    if (records.length > 0) {
+      this.dataSource = new MatTableDataSource<ITimeRecord>(records);
+      this.getSumOfWorkingHours(records);
+      this.hasRecordsFound = true;
+    } else {
+      this.dataSource = new MatTableDataSource<ITimeRecord>();
+      this.sumOfWorkingHours = 0;
+      this.hasRecordsFound = false;
     }
   }
 
@@ -156,10 +174,6 @@ export class OrderDetailComponent implements OnInit {
     const records: TimeRecord[] = [];
 
     if (this.isOnline()) {
-      this.firestoreOrderService.getOrderById(orderId).then(order => {
-        console.log('Order', order);
-      });
-
       // this.firestoreRecordService.getRecords();
 
       // this.firestoreRecordService.x(orderId).subscribe(recordsInFirebase => {
@@ -198,30 +212,30 @@ export class OrderDetailComponent implements OnInit {
     });
   }
 
-  public getOrderById(orderId: string) {
-    if (this.isOnline()) {
-      this.firestoreOrderService.getOrderById(orderId).then(order => {
-        this.order = order;
-      });
-    } else {
-      this.indexDbService.getOrderById(orderId).then(order => {
-        if (order.length !== 0) {
-          if (order[0].hasOwnProperty('records')) {
-            this.order = order[0];
-            this.records = order[0].records;
-            this.dataSource = new MatTableDataSource<ITimeRecord>(this.records);
-          }
-        }
-      });
-    }
-  }
+  // public getOrderById(orderId: string) {
+  //   if (this.isOnline()) {
+  //     this.firestoreOrderService.getOrderById(orderId).then(order => {
+  //       this.order = order;
+  //     });
+  //   } else {
+  //     this.indexDbService.getOrderById(orderId).then(order => {
+  //       if (order.length !== 0) {
+  //         if (order[0].hasOwnProperty('records')) {
+  //           this.order = order[0];
+  //           this.records = order[0].records;
+  //           this.dataSource = new MatTableDataSource<ITimeRecord>(this.records);
+  //         }
+  //       }
+  //     });
+  //   }
+  // }
 
   public createNewRecord() {
-    this.router.navigate(['/order-details/' + this.paramId + /create-record/]);
+    this.router.navigate(['/order-details/' + this.paramOrderId + /create-record/]);
   }
 
   public editRecord(id: any) {
-    this.router.navigate(['/order-details/' + this.paramId + /edit-record/ + id]);
+    this.router.navigate(['/order-details/' + this.paramOrderId + /edit-record/ + id]);
   }
 
   public deleteRecord(recordId) {
@@ -258,10 +272,10 @@ export class OrderDetailComponent implements OnInit {
   }
 
   public deleteRecordInFirebase(recordId: string): void {
-    this.firestoreRecordService.deleteRecord(this.paramId, recordId).then(data => {
+    this.firestoreRecordService.deleteRecord(this.paramOrderId, recordId).then(data => {
       this.showDeleteMessage();
       // load records after deletion
-      this.getRecordsFromCloudDatabase(this.paramId);
+      this.getRecordsFromCloudDatabase(this.paramOrderId);
 
       // ToDo Offline Handling
       // delete record in indexedDB orders table
