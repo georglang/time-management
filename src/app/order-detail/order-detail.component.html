@@ -26,7 +26,12 @@
     </div>
 
     <div class="order-detail-table-wrapper">
-      <mat-table #table [dataSource]="dataSource" matSort *ngIf="dataSource?.data.length > 0">
+      <mat-table
+        #table
+        [dataSource]="dataSource"
+        matSort
+        *ngIf="hasRecordsFound; else noRecordsFoundTemplate"
+      >
         <ng-container matColumnDef="id">
           <mat-header-cell *matHeaderCellDef> Id</mat-header-cell>
           <mat-cell *matCellDef="let element">
@@ -99,7 +104,9 @@
         <mat-row *matRowDef="let row; columns: displayedColumns"></mat-row>
       </mat-table>
 
-      <h5 id="no-records-found" *ngIf="this.records.length === 0">Keine Einträge gefunden</h5>
+      <ng-template #noRecordsFoundTemplate>
+        Keine Einträge gefunden
+      </ng-template>
     </div>
   </div>
 </div>
