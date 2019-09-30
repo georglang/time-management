@@ -11,7 +11,6 @@ import { FirestoreOrderService } from '../service/firestore-order-service/firest
 import { ConnectionService } from 'ng-connection-service';
 import { MessageService } from '../service/message-service/message.service';
 import _ from 'lodash';
-import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-create-order',
@@ -72,17 +71,18 @@ export class CreateOrderComponent implements OnInit {
   // if not in orders table, check if order is in indexedDB ordersOutbox
   // if not in ordersOutbox add to ordersOutbox
   // if in ordersOutbox, send message "order already exists"
-  public createOrderIfOffline(newOrder) {
-    this.indexedDbService.checkIfOrderIsInIndexedDBOrdersTable(newOrder).then(isInOrdersTable => {
+  public createOrderIfOffline(order) {
+    this.indexedDbService.checkIfOrderIsInIndexedDBOrdersTable(order).then(isInOrdersTable => {
       if (!isInOrdersTable) {
+        this.indexedDbService.addOrderToOrdersTable(order).then(data => {
+          this.messageService.orderCreatedSuccessful();
+          this.router.navigate(['/order-details/' + order.id]);
+        });
         return this.indexedDbService
-          .checkIfOrderIsInIndexedDBOrdersOutboxTable(newOrder)
+          .checkIfOrderIsInIndexedDBOrdersOutboxTable(order)
           .then(isInOrdersOutbox => {
             if (!isInOrdersOutbox) {
-              this.indexedDbService.addOrderToOutbox(newOrder).then(data => {
-                this.messageService.orderCreatedSuccessful();
-                this.router.navigate(['/order-details/' + newOrder.id]);
-              });
+              this.indexedDbService.addOrderToOutbox(order);
             } else {
               this.messageService.orderAlreadyExists();
             }
@@ -92,14 +92,14 @@ export class CreateOrderComponent implements OnInit {
       }
     });
   }
-  public createOrder(formInput: any): void {
-    const newOrder = new Order(formInput.companyName, formInput.location, formInput.contactPerson);
-    newOrder.records = [];
 
+  public createOrder(formInput: any): void {
+    const order = new Order(formInput.companyName, formInput.location, formInput.contactPerson);
+    order.records = [];
     if (this.isOnline()) {
-      this.addOrderToFirebaseOrdersTable(newOrder);
+      this.addOrderToFirebaseOrdersTable(order);
     } else {
-      // this.createOrderIfOffline(newOrder);
+      this.createOrderIfOffline(order);
     }
   }
 
