@@ -5,12 +5,8 @@
     >
   </div>
 
-  <button
-    type="button"
-    class="sub-nav-btn"
-    (click)="documentEditForm.ngSubmit.emit()"
-    [disabled]="!documentEditForm.form.valid"
-  >
+  <button type="button" class="sub-nav-btn" (click)="documentEditForm.ngSubmit.emit()">
+    <!-- [disabled]="!documentEditForm.form.valid" -->
     <mat-icon class="order-complete-icon float-right">check</mat-icon>
   </button>
 </div>

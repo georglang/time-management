@@ -11,6 +11,7 @@ import { FirestoreOrderService } from '../service/firestore-order-service/firest
 import { ConnectionService } from 'ng-connection-service';
 import { MessageService } from '../service/message-service/message.service';
 import _ from 'lodash';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-create-order',
@@ -23,12 +24,12 @@ export class CreateOrderComponent implements OnInit {
   private newOrder: IOrder;
   private ordersOnline: IOrder[] = [];
   private tempOrders: any[] = [];
-  public isOnline: boolean;
+  public _isOnline: boolean;
   public orders: any[]; // IOrder coudn´t be used because of firebase auto generated id,
 
   constructor(
     private formBuilder: FormBuilder,
-    private indexDbService: IndexedDBService,
+    private indexedDbService: IndexedDBService,
     private router: Router,
     private toastr: ToastrService,
     private firestoreOrderService: FirestoreOrderService,
@@ -50,38 +51,20 @@ export class CreateOrderComponent implements OnInit {
     // this.connectionService.monitor().subscribe(isConnected => {
     //   this.isOnline = isConnected;
     //   if (this.isOnline) {
-    //     this.checkIfOrdersAreInOrdersTable();
+    //     // this.checkIfOrdersAreInOrdersTable();
     //   }
     // });
-    this.synchronizeIdxDBWithFirebase.synchronizeIndexedDbOrdersOutboxTableWithFirebase();
+    // this.synchronizeIdxDBWithFirebase.synchronizeIndexedDbOrdersOutboxTableWithFirebase();
+    // if (this.isOnline()) {
+    // }
   }
 
-  public isConnected() {
+  public isOnline() {
     return navigator.onLine;
   }
 
   public navigateToOrderList() {
     this.router.navigate(['/']);
-  }
-
-
-
-  public createOrder(formInput: any) {
-    const newOrder = new Order(
-      formInput.companyName,
-      formInput.location,
-      formInput.contactPerson
-    );
-
-    newOrder.records = [];
-
-    this.createOrderIfOffline(newOrder);
-
-    // if (this.isConnected()) {
-    //   this.createOrderIfOnline();
-    // } else {
-    //   this.createOrderIfOffline();
-    // }
   }
 
   // check if new order is already in indexedDB orders table (same orders than online)
@@ -90,13 +73,13 @@ export class CreateOrderComponent implements OnInit {
   // if not in ordersOutbox add to ordersOutbox
   // if in ordersOutbox, send message "order already exists"
   public createOrderIfOffline(newOrder) {
-    this.indexDbService.checkIfOrderIsInIndexedDBOrdersTable(newOrder).then(isInOrdersTable => {
+    this.indexedDbService.checkIfOrderIsInIndexedDBOrdersTable(newOrder).then(isInOrdersTable => {
       if (!isInOrdersTable) {
-        return this.indexDbService
+        return this.indexedDbService
           .checkIfOrderIsInIndexedDBOrdersOutboxTable(newOrder)
           .then(isInOrdersOutbox => {
             if (!isInOrdersOutbox) {
-              this.indexDbService.addOrderToOutbox(newOrder).then(data => {
+              this.indexedDbService.addOrderToOutbox(newOrder).then(data => {
                 this.messageService.orderCreatedSuccessful();
                 this.router.navigate(['/order-details/' + newOrder.id]);
               });
@@ -109,18 +92,29 @@ export class CreateOrderComponent implements OnInit {
       }
     });
   }
+  public createOrder(formInput: any): void {
+    const newOrder = new Order(formInput.companyName, formInput.location, formInput.contactPerson);
+    newOrder.records = [];
 
-  public createOrderIfOnline(order: IOrder): void {
-    if (this.isConnected()) {
+    if (this.isOnline()) {
+      this.addOrderToFirebaseOrdersTable(newOrder);
+    } else {
+      // this.createOrderIfOffline(newOrder);
+    }
+  }
+
+  public addOrderToFirebaseOrdersTable(order: IOrder): void {
+    if (this.firestoreOrderService !== undefined) {
       // check if order is already in firestore
-      this.firestoreOrderService.checkIfOrderExists(order).then(isAlreadyInFirestore => {
-        // if order is not in firestore add it
+      this.firestoreOrderService.checkIfOrderExists(order).then((isAlreadyInFirestore: boolean) => {
         if (!isAlreadyInFirestore) {
           this.firestoreOrderService
             .addOrder(order)
-            .then(id => {
+            .then((id: string) => {
               this.messageService.orderCreatedSuccessful();
               this.router.navigate(['/order-details/' + id]);
+              order.id = id;
+              this.addOrdersToIndexedDbOrdersTable(order);
             })
             .catch(e => {
               console.error('can´t create order to firebase', e);
@@ -131,6 +125,12 @@ export class CreateOrderComponent implements OnInit {
         }
       });
     }
+  }
+
+  public addOrdersToIndexedDbOrdersTable(order: IOrder): void {
+    const _orders: IOrder[] = [];
+    _orders.push(order);
+    this.indexedDbService.addOrdersWithRecordsToOrdersTable(_orders);
   }
 
   public onSubmit() {
