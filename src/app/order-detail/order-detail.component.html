@@ -12,17 +12,15 @@
   </div>
   <div id="detail-component-content">
     <div id="customer-info">
-      <div>
-        <span>Kunde:</span
-        ><span id="customer">{{ order?.companyName }} {{ order?.contactPerson }}</span>
-      </div>
-      <div>
-        <span>Ort:</span><span id="location">{{ order?.location }}</span>
-      </div>
-      <div id="sum-of-working-hours">
-        <span><strong>Gesamtstunden:</strong></span
-        ><span>{{ sumOfWorkingHours }}</span>
-      </div>
+      <mat-form-field>
+        <input matInput placeholder="Kunde" [ngModel]="order?.companyName" disabled />
+      </mat-form-field>
+      <mat-form-field>
+        <input matInput placeholder="Ort" [ngModel]="order?.location" disabled />
+      </mat-form-field>
+      <mat-form-field>
+        <input matInput placeholder="Gesamtstunden" [ngModel]="sumOfWorkingHours" disabled />
+      </mat-form-field>
     </div>
 
     <div class="order-detail-table-wrapper">

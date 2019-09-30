@@ -121,9 +121,6 @@ td
   right: 0px
   position: absolute
 
-.mat-form-field
-  display: none
-
 #bottom-nav
   background-color: #fff
   height: 50px
@@ -133,6 +130,11 @@ td
   box-shadow: 0px 2px 15px 0px rgba(0, 0, 0, 0.12)
   z-index: 1030
 
+.disable-on-mobile
+    display: none
+
+.mat-form-field-wrapper
+  padding-top: 16px
 
 @media screen and (max-width: 576px)
   .table-responsive-stack
@@ -158,6 +160,7 @@ td
 
   .disable-on-mobile
     display: none
+
 
   .mat-form-field
     display: block
