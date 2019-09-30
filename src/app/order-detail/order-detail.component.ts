@@ -283,6 +283,8 @@ export class OrderDetailComponent implements OnInit {
       //   this.messageService.recordDeletedSuccessful();
       // });
     });
+
+    this.indexDbService.deleteRecordInOrdersTable(this.paramOrderId, recordId).then(data => {});
   }
 
   public print() {
