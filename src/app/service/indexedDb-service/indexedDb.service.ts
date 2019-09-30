@@ -310,7 +310,7 @@ export class IndexedDBService {
             if (records === undefined) {
               orders[0].records = [];
             }
-            orders[0].records.push(record);
+            orders[0].records.push(record[0]);
             this.timeRecordsDb.orders
               .where('id')
               .equals(orderId)
@@ -407,14 +407,16 @@ export class IndexedDBService {
 
   // get orders from orders table
   public getOrdersFromOrdersTable(): Promise<IOrder[]> {
-    return this.timeRecordsDb.orders
-      .toArray()
-      .then((result: any) => {
-        return result;
-      })
-      .catch(e => {
-        console.error('Error: indexedDB can not get orders from orders table: Message: ', e);
-      });
+    if (this.timeRecordsDb !== undefined) {
+      return this.timeRecordsDb.orders
+        .toArray()
+        .then((result: any) => {
+          return result;
+        })
+        .catch(e => {
+          console.error('Error: indexedDB can not get orders from orders table: Message: ', e);
+        });
+    }
   }
 
   public getOrdersFromOrdersOutbox(): Promise<any> {
