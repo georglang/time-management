@@ -20,7 +20,7 @@ import { SortFormArrayByDate } from './pipes/sort-form-array-by-date.pipe';
 // Angular Material
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
-import { MatNativeDateModule } from '@angular/material/core';
+import { MatNativeDateModule, MAT_DATE_LOCALE } from '@angular/material/core';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -90,7 +90,14 @@ import { ConfirmDeleteDialogComponent } from './confirm-delete-dialog/confirm-de
     FirestoreRecordService,
     Database,
     SortFormArrayByDate,
-    { provide: FirebaseOptionsToken, useValue: environment.firebase }
+    {
+      provide: FirebaseOptionsToken,
+      useValue: environment.firebase
+    },
+    {
+      provide: MAT_DATE_LOCALE,
+      useValue: 'de-DE'
+    }
   ],
   entryComponents: [ConfirmDeleteDialogComponent],
   bootstrap: [AppComponent]
