@@ -43,7 +43,7 @@ export class OrderDetailComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private dateAdapter: DateAdapter<Date>,
-    private indexDbService: IndexedDBService,
+    private indexedDbService: IndexedDBService,
     private toastrService: ToastrService,
     public dialog: MatDialog,
     private readonly connectionService: ConnectionService,
@@ -63,11 +63,11 @@ export class OrderDetailComponent implements OnInit {
 
   ngOnInit() {
     this.route.params.subscribe(params => {
-      this.paramOrderId = params['id'];
+      this.paramOrderId = +params['id'];
 
-      if (this.isOnline()) {
-        this.getOrderByIdFromCloudDatabase(this.paramOrderId);
-      }
+      // if (this.isOnline()) {
+      //   this.getOrderByIdFromCloudDatabase(this.paramOrderId);
+      // }
 
       // if (this.isOnline()) {
       //   this.getRecords(this.paramId);
@@ -76,7 +76,7 @@ export class OrderDetailComponent implements OnInit {
       // }
 
       // this.getOrderById(this.paramId);
-      // this.getRecordsFromOrdersOutbox(this.paramId);
+      this.getOrderByIdFromIndexedDbOrders(this.paramOrderId);
 
       // this.getRecordsFromRecordsOutbox(this.paramId).then(records => {
       //   if (records !== undefined) {
@@ -90,20 +90,20 @@ export class OrderDetailComponent implements OnInit {
 
     this.connectionService.monitor().subscribe(isOnline => {
       if (this._isOnline) {
-        this.indexDbService.getOrdersFromOrdersOutbox().then(orders => {
+        this.indexedDbService.getOrdersFromOrdersOutbox().then(orders => {
           if (orders.length !== 0) {
             orders.forEach(order => {
               const id = order.id;
               delete order.id;
               this.firestoreOrderService.addOrder(order).then(() => {
-                this.indexDbService.getOrdersFromOrdersTable().then(ordersInIndexedDB => {
+                this.indexedDbService.getOrdersFromOrdersTable().then(ordersInIndexedDB => {
                   ordersInIndexedDB.forEach(cachedOrder => {
                     this.orderIds.push(cachedOrder.id);
                   });
                   orders.forEach(_order => {
                     if (!this.orderIds.includes(_order.id)) {
-                      this.indexDbService.addToOrdersTable(order).then(() => {
-                        this.indexDbService.deleteOrderInOrdersOutbox(id);
+                      this.indexedDbService.addToOrdersTable(order).then(() => {
+                        this.indexedDbService.deleteOrderInOrdersOutbox(id);
                       });
                     }
                   });
@@ -169,6 +169,19 @@ export class OrderDetailComponent implements OnInit {
     }
   }
 
+  //
+  // Offline
+  //
+
+  public getOrderByIdFromIndexedDbOrders(orderId: number) {
+    this.indexedDbService.getOrderById(orderId).then((order: IOrder[]) => {
+      if (order.length > 0) {
+        this.order = order[0];
+        this.setRecordDataSource(this.order.records);
+      }
+    });
+  }
+
   // records from firebase and indexedDB
   public getRecords(orderId: string) {
     const records: TimeRecord[] = [];
@@ -196,7 +209,7 @@ export class OrderDetailComponent implements OnInit {
   }
 
   public getRecordsFromOrdersOutbox(orderId: string) {
-    this.indexDbService.getOrdersFromOrdersOutbox().then(records => {
+    this.indexedDbService.getOrdersFromOrdersOutbox().then(records => {
       // records.forEach(record => {
       //   record.date = new Date(record.date);
       // });
@@ -207,7 +220,7 @@ export class OrderDetailComponent implements OnInit {
   }
 
   public getRecordsFromRecordsOutbox(orderId: string): Promise<any> {
-    return this.indexDbService.getRecordsFromRecordsOutboxTable().then(records => {
+    return this.indexedDbService.getRecordsFromRecordsOutboxTable().then(records => {
       return records;
     });
   }
@@ -284,7 +297,7 @@ export class OrderDetailComponent implements OnInit {
       // });
     });
 
-    this.indexDbService.deleteRecordInOrdersTable(this.paramOrderId, recordId).then(data => {});
+    this.indexedDbService.deleteRecordInOrdersTable(this.paramOrderId, recordId).then(data => {});
   }
 
   public print() {
@@ -350,6 +363,6 @@ export class OrderDetailComponent implements OnInit {
       orderId: 'TyclJFilyldgrBb7GR3J'
     };
 
-    this.indexDbService.updateRecordInRecordsOutboxTable(newRecord);
+    this.indexedDbService.updateRecordInRecordsOutboxTable(newRecord);
   }
 }
