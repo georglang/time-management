@@ -3,8 +3,6 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { IndexedDBService } from '../service/indexedDb-service/indexedDb.service';
 import { ITimeRecord, TimeRecord } from '../data-classes/TimeRecords';
-import { ToastrService, Toast } from 'ngx-toastr';
-import { FirestoreOrderService } from '../service/firestore-order-service/firestore-order.service';
 import { FirestoreRecordService } from '../service/firestore-record-service/firestore-record.service';
 import { MessageService } from '../service/message-service/message.service';
 
@@ -22,8 +20,6 @@ export class CreateRecordComponent implements OnInit {
     private route: ActivatedRoute,
     private formBuilder: FormBuilder,
     private indexedDbService: IndexedDBService,
-    private toastr: ToastrService,
-    private firestoreOrderService: FirestoreOrderService,
     private firestoreRecordService: FirestoreRecordService,
     private messageService: MessageService
   ) {}
@@ -56,10 +52,12 @@ export class CreateRecordComponent implements OnInit {
   public createRecord(formInput: any, orderId: string): void {
     const record = new TimeRecord(formInput.date, formInput.description, formInput.workingHours);
     record.orderId = orderId;
-    if (this.isOnline()) {
-      this.addRecordToFirebaseRecordsTable(record);
-    } else {
-    }
+    // if (this.isOnline()) {
+    //   this.addRecordToFirebaseRecordsTable(record);
+    // } else {
+    //   this.createRecordIfOffline(orderId, record);
+    // }
+    this.createRecordIfOffline(record);
   }
 
   addRecordToFirebaseRecordsTable(record: any): void {
@@ -75,7 +73,7 @@ export class CreateRecordComponent implements OnInit {
                 this.messageService.recordCreatedSuccessful();
                 this.router.navigate(['order-details', record.orderId]);
                 record.id = id;
-                this.addRecordsToIndexedDbRecordsTable(record);
+                this.addRecordToIndexedDbRecordsTable(record);
               })
               .catch(e => {
                 console.error('can´t create record to firebase', e);
@@ -87,35 +85,32 @@ export class CreateRecordComponent implements OnInit {
     }
   }
 
-  public addRecordsToIndexedDbRecordsTable(record: ITimeRecord): void {
-    const _records: ITimeRecord[] = [];
-    _records.push(record);
-    this.indexedDbService.addRecordToOrdersTable(_records, record.orderId);
+  public addRecordToIndexedDbRecordsTable(record: ITimeRecord): void {
+    this.indexedDbService.addRecordToOrdersTable(record);
   }
 
-  public showSuccess() {
-    const successConfig = {
-      positionClass: 'toast-bottom-center',
-      timeout: 2000
-    };
-    this.toastr.success('Erfolgreich erstellt', 'Eintrag', successConfig);
-  }
+  public createRecordIfOffline(record: ITimeRecord) {
+    // this.indexedDbService
+    //   .checkIfRecordIsInOrdersOutboxTable(record)
+    //   .then(isAlreadyInOrdersOutboxTable => {
+    //     if (!isAlreadyInOrdersOutboxTable) {
+    //       record.orderId = orderId;
+    //       this.indexedDbService.addRecordToOrdersTable(orderId, record).then(() => {
+    //         this.messageService.recordCreatedSuccessful();
+    //       });
+    //     } else {
+    //       this.messageService.recordAlreadyExists();
+    //     }
+    //   });
 
-  // if the order which the record belongs to is in ordersOutbox table, add record to order in ordersOutbox table
-  // if the order which the record belongs to is not in recordsOutbox table, add record to recordsOutbox table
-  public createRecordIfOffline(newRecord: ITimeRecord, orderId: string) {
-    this.indexedDbService
-      .checkIfRecordIsInRecordsOutboxTable(newRecord)
-      .then(isAlreadyInRecordsOutboxTable => {
-        if (!isAlreadyInRecordsOutboxTable) {
-          newRecord.orderId = orderId;
-          this.indexedDbService.addRecordToRecordsOutboxTable(newRecord).then(() => {
-            this.messageService.recordCreatedSuccessful();
-          });
-        } else {
-          this.messageService.recordAlreadyExists();
-        }
-      });
+    this.indexedDbService.checkIfRecordIsInIndexedDbOrdersTable(record).then(doesRecordExists => {
+      if (!doesRecordExists) {
+        this.indexedDbService.addRecordToOrdersTable(record);
+        this.indexedDbService.addRecordToOrdersOutboxTable(record);
+      } else {
+        this.messageService.recordAlreadyExists();
+      }
+    });
   }
 
   public onSubmit() {
