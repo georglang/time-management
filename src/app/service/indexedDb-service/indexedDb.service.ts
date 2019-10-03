@@ -304,7 +304,6 @@ export class IndexedDBService {
                 if (order.records.length > 0) {
                   order.records.forEach(record => {
                     this.checkIfRecordIsInIndexedDbOrdersTable(record).then(doesRecordExist => {
-                      debugger;
                       if (!doesRecordExist) {
                         this.addRecordToOrdersTable(record);
                       }
@@ -318,22 +317,6 @@ export class IndexedDBService {
         });
       }
     });
-  }
-
-  // delete order in indexedDb ordersOutbox
-  public deleteOrderInOutbox(orderId) {
-    this.deleteOrderInOrdersOutbox(orderId).then(() => {});
-  }
-
-  // delete record in indexedDb recordsOutbox
-  public deleteRecordInOutbox(recordId: string) {
-    return this.timeRecordsDb.recordsOutbox
-      .where('id')
-      .equals(recordId)
-      .delete()
-      .then(function(deleteCount) {
-        console.log('Deleted' + deleteCount + 'objects');
-      });
   }
 
   public addRecordToOrdersTable(record: ITimeRecord) {
@@ -353,30 +336,55 @@ export class IndexedDBService {
             this.timeRecordsDb.orders
               .where('id')
               .equals(+record.orderId)
-              .modify(orders[0]);
+              .modify(orders[0])
+              .catch(e => {
+                console.warn('indexedDB: can´t add record to order table');
+              });
           }
         }
       });
   }
 
   // adds record to ordersOutbox table
-  public addRecordToOrdersOutboxTable(record, orderId) {
+  public addRecordToOrdersOutboxTable(record: ITimeRecord) {
+    let records = [];
     return this.timeRecordsDb.ordersOutbox
       .where('id')
-      .equals(+orderId)
+      .equals(+record.orderId)
       .toArray(orders => {
         if (orders !== undefined) {
-          const records = orders[0].records;
-          // if order has no record
-          if (records === undefined) {
-            orders[0].records = [];
+          if (orders.length > 0) {
+            if (orders[0].records.length > 0) {
+              records = orders[0].records;
+            } else {
+              records = [];
+            }
+            orders[0].records.push(record);
+            this.timeRecordsDb.ordersOutbox
+              .where('id')
+              .equals(+record.orderId)
+              .modify(orders[0])
+              .catch(e => {
+                console.warn('indexedDB: can´t add record to orderOutbox  table');
+              });
           }
-          orders[0].records.push(record);
-          this.timeRecordsDb.orders
-            .where('id')
-            .equals(orderId)
-            .modify(orders[0]);
         }
+      });
+  }
+
+  // delete order in indexedDb ordersOutbox
+  public deleteOrderInOutbox(orderId) {
+    this.deleteOrderInOrdersOutbox(orderId).then(() => {});
+  }
+
+  // delete record in indexedDb recordsOutbox
+  public deleteRecordInOutbox(recordId: string) {
+    return this.timeRecordsDb.recordsOutbox
+      .where('id')
+      .equals(recordId)
+      .delete()
+      .then(function(deleteCount) {
+        console.log('Deleted' + deleteCount + 'objects');
       });
   }
 
@@ -385,27 +393,6 @@ export class IndexedDBService {
       console.log('Data', data);
       return data;
     });
-  }
-
-  public addRecordToOrderOutbox(record, orderId) {
-    return this.timeRecordsDb.ordersOutbox
-      .where('id')
-      .equals(+orderId)
-      .first()
-      .then(data => {
-        data.records.push(record);
-        console.log('Data', data);
-        this.timeRecordsDb.ordersOutbox
-          .where('id')
-          .equals(+orderId)
-          .modify(data)
-          .then(updated => {
-            console.log('Data', updated);
-          })
-          .catch(e => {
-            console.warn('indexedDB: can´t add record to order in outbox');
-          });
-      });
   }
 
   public getRecordsFromRecordsOutboxTable(): Promise<any> {
