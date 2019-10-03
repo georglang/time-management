@@ -106,32 +106,66 @@ export class IndexedDBService {
   }
 
   // check if record is in indexedDB orders table
-  public checkIfRecordIsInOrdersTable(record: ITimeRecord, orderId: string) {
+  public checkIfRecordIsInIndexedDbOrdersTable(record: ITimeRecord) {
     let isAlreadyInRecordsTable = true;
     return new Promise((resolve, reject) => {
-      this.getAllRecords(orderId).then(recordsInIdxDB => {
+      this.getAllRecords(+record.orderId).then(recordsInIdxDB => {
         if (recordsInIdxDB !== undefined) {
           if (recordsInIdxDB.length !== 0) {
             const _records = [];
+
             const newRecord = {
               date: record.date,
               description: record.description,
               workingHours: record.workingHours
             };
 
-            recordsInIdxDB.forEach(recordIdxDB => {
-              _records.push({
-                date: recordIdxDB.date,
-                description: recordIdxDB.description,
-                workingHours: recordIdxDB.workingHours
+            if (recordsInIdxDB !== undefined) {
+              recordsInIdxDB.forEach(recordIdxDB => {
+                _records.push({
+                  date: recordIdxDB.date,
+                  description: recordIdxDB.description,
+                  workingHours: recordIdxDB.workingHours
+                });
               });
-            });
 
-            isAlreadyInRecordsTable = _.findIndex(_records, o => _.isMatch(o, newRecord)) > -1;
-            resolve(isAlreadyInRecordsTable);
+              isAlreadyInRecordsTable = _.findIndex(_records, o => _.isMatch(o, newRecord)) > -1;
+              resolve(isAlreadyInRecordsTable);
+            }
           } else {
             isAlreadyInRecordsTable = false;
             resolve(isAlreadyInRecordsTable);
+          }
+        }
+      });
+    });
+  }
+
+  public checkIfRecordIsInOrdersOutboxTable(record: ITimeRecord) {
+    let isAlreadyInRecordsOutboxTable = true;
+    return new Promise((resolve, reject) => {
+      const records = [];
+
+      this.getRecordsFromRecordsOutboxTable().then(recordsInOutbox => {
+        if (recordsInOutbox !== undefined) {
+          if (recordsInOutbox.length !== 0) {
+            const newRecord = {
+              date: record.date,
+              description: record.description,
+              workingHours: record.workingHours
+            };
+
+            recordsInOutbox.forEach(recordInOutbox => {
+              records.push({
+                date: recordInOutbox.date,
+                description: recordInOutbox.description,
+                workingHours: recordInOutbox.workingHours
+              });
+            });
+            isAlreadyInRecordsOutboxTable = _.findIndex(records, o => _.isMatch(o, newRecord)) > -1;
+            resolve(isAlreadyInRecordsOutboxTable);
+          } else {
+            resolve(false);
           }
         }
       });
@@ -237,6 +271,14 @@ export class IndexedDBService {
     });
   }
 
+  public addOrderToOrdersTable(order: IOrder) {
+    debugger;
+
+    return this.timeRecordsDb.orders.add(order).then(data => {
+      return data;
+    });
+  }
+
   // check if orders are in orders table
   // if not: add order that is not in orders table yet
   public addOrdersWithRecordsToOrdersTable(orders: IOrder[]): Promise<boolean> {
@@ -261,13 +303,12 @@ export class IndexedDBService {
               } else {
                 if (order.records.length > 0) {
                   order.records.forEach(record => {
-                    this.checkIfRecordIsInOrdersTable(record, record.orderId).then(
-                      doesRecordExist => {
-                        if (!doesRecordExist) {
-                          this.addRecordToOrdersTable(record, record.orderId);
-                        }
+                    this.checkIfRecordIsInIndexedDbOrdersTable(record).then(doesRecordExist => {
+                      debugger;
+                      if (!doesRecordExist) {
+                        this.addRecordToOrdersTable(record);
                       }
-                    );
+                    });
                   });
                   resolve(true);
                 }
@@ -295,25 +336,23 @@ export class IndexedDBService {
       });
   }
 
-  // evtl. noch createdAt mit einbeziehen, damit keine doppelten eintraege vorhanden sind
-
-  // adds record to orders table
-  public addRecordToOrdersTable(record, orderId) {
+  public addRecordToOrdersTable(record: ITimeRecord) {
+    let records = [];
     return this.timeRecordsDb.orders
       .where('id')
-      .equals(orderId)
+      .equals(+record.orderId)
       .toArray(orders => {
         if (orders !== undefined) {
           if (orders.length > 0) {
-            const records = orders[0].records;
-            // if order has no record
-            if (records === undefined) {
-              orders[0].records = [];
+            if (orders[0].records.length > 0) {
+              records = orders[0].records;
+            } else {
+              records = [];
             }
-            orders[0].records.push(record[0]);
+            orders[0].records.push(record);
             this.timeRecordsDb.orders
               .where('id')
-              .equals(orderId)
+              .equals(+record.orderId)
               .modify(orders[0]);
           }
         }
@@ -430,11 +469,11 @@ export class IndexedDBService {
       });
   }
 
-  public getRecordById(orderId: string, recordId: string): Promise<any> {
+  public getRecordById(orderId: number): Promise<any> {
     return this.getAllRecords(orderId);
   }
 
-  public getOrderById(paramId: string) {
+  public getOrderById(paramId: number) {
     return this.timeRecordsDb.orders
       .where('id')
       .equals(paramId)
@@ -501,14 +540,13 @@ export class IndexedDBService {
       });
   }
 
-  public getAllRecords(orderId): Promise<ITimeRecord[]> {
+  public getAllRecords(orderId: number): Promise<ITimeRecord[]> {
     return this.timeRecordsDb.orders
       .where('id')
       .equals(orderId)
       .toArray(order => {
         if (order.length !== 0) {
-          const records: ITimeRecord[] = order[0].records;
-          return records;
+          return order[0].records;
         }
       });
   }
