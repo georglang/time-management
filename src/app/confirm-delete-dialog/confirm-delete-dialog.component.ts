@@ -1,5 +1,4 @@
 import { Component, OnInit, Inject } from '@angular/core';
-import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-confirm-delete-dialog',
@@ -8,9 +7,7 @@ import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 })
 export class ConfirmDeleteDialogComponent implements OnInit {
   public modalTitle: string;
-  constructor(@Inject(MAT_DIALOG_DATA) public data: any) {
-    this.modalTitle = data.title;
-  }
+  constructor() {}
 
   ngOnInit() {}
 }
