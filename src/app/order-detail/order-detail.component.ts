@@ -63,7 +63,7 @@ export class OrderDetailComponent implements OnInit {
 
   ngOnInit() {
     this.route.params.subscribe(params => {
-      this.paramOrderId = +params['id'];
+      this.paramOrderId = params['id'];
 
       // if (this.isOnline()) {
       //   this.getOrderByIdFromCloudDatabase(this.paramOrderId);
@@ -342,10 +342,6 @@ export class OrderDetailComponent implements OnInit {
     document.body.appendChild(iframe);
 
     iframe.src = pdf.output('datauristring');
-  }
-
-  public synchronizeWithOrdersTable() {
-    this.synchronizeIdxDBWithFirebase.synchronizeIndexedDbOrdersOutboxTableWithFirebase();
   }
 
   // Beim allgemeinen synchronisieren muss zuerst herausgefunden werden, was ueberhaut sychronisiert werden muss
