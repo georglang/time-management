@@ -11,7 +11,8 @@ import {
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import _ from 'lodash';
-import { resolve } from 'q';
+
+import { BehaviorSubject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -19,6 +20,7 @@ import { resolve } from 'q';
 export class FirestoreRecordService {
   private ordersCollection: AngularFirestoreCollection<IOrder>;
   private recordsCollection: AngularFirestoreCollection<ITimeRecord>;
+
   constructor(private afs: AngularFirestore) {
     this.ordersCollection = this.afs.collection<IOrder>('orders');
     this.recordsCollection = this.afs.collection<ITimeRecord>('records');
@@ -138,15 +140,29 @@ export class FirestoreRecordService {
     });
   }
 
+  public updateRecord(orderId: string, record: ITimeRecord) {
+    return this.ordersCollection
+      .doc(orderId)
+      .collection('records')
+      .doc(record.id)
+      .update(record)
+      .then(data => {
+        this.updateRecordInOrdersTable(+orderId, record);
+      });
+  }
+
+  private updateRecordInOrdersTable(orderId, record): void {
+    // this.indexedDBService.updateRecordInOrdersTable(orderId, record).then(() => {
+    //   this.messageService.recordUpdatedSuccessful();
+    // });
+  }
+
   public deleteRecord(orderId: string, recordId) {
     return this.ordersCollection
       .doc(orderId)
       .collection('records')
       .doc(recordId)
-      .delete()
-      .then(data => {
-        return data;
-      });
+      .delete();
   }
 
   private compareIfRecordIsOnline(newRecord: ITimeRecord, records): boolean {
