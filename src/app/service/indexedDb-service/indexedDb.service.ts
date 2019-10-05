@@ -109,35 +109,39 @@ export class IndexedDBService {
   public checkIfRecordIsInIndexedDbOrdersTable(record: ITimeRecord) {
     let isAlreadyInRecordsTable = true;
     return new Promise((resolve, reject) => {
-      this.getAllRecords(+record.orderId).then(recordsInIdxDB => {
-        if (recordsInIdxDB !== undefined) {
-          if (recordsInIdxDB.length !== 0) {
-            const _records = [];
+      if (typeof record.orderId !== 'string') {
+        this.getAllRecords(+record.orderId).then(recordsInIdxDB => {
+          if (recordsInIdxDB !== undefined) {
+            if (recordsInIdxDB.length !== 0) {
+              const _records = [];
 
-            const newRecord = {
-              date: record.date,
-              description: record.description,
-              workingHours: record.workingHours
-            };
+              const newRecord = {
+                date: record.date,
+                description: record.description,
+                workingHours: record.workingHours
+              };
 
-            if (recordsInIdxDB !== undefined) {
-              recordsInIdxDB.forEach(recordIdxDB => {
-                _records.push({
-                  date: recordIdxDB.date,
-                  description: recordIdxDB.description,
-                  workingHours: recordIdxDB.workingHours
+              if (recordsInIdxDB !== undefined) {
+                recordsInIdxDB.forEach(recordIdxDB => {
+                  _records.push({
+                    date: recordIdxDB.date,
+                    description: recordIdxDB.description,
+                    workingHours: recordIdxDB.workingHours
+                  });
                 });
-              });
 
-              isAlreadyInRecordsTable = _.findIndex(_records, o => _.isMatch(o, newRecord)) > -1;
+                isAlreadyInRecordsTable = _.findIndex(_records, o => _.isMatch(o, newRecord)) > -1;
+                resolve(isAlreadyInRecordsTable);
+              }
+            } else {
+              isAlreadyInRecordsTable = false;
               resolve(isAlreadyInRecordsTable);
             }
           } else {
             isAlreadyInRecordsTable = false;
-            resolve(isAlreadyInRecordsTable);
           }
-        }
-      });
+        });
+      }
     });
   }
 
@@ -266,14 +270,11 @@ export class IndexedDBService {
   // add order offline
   public addOrderToOutbox(order: IOrder) {
     return this.timeRecordsDb.ordersOutbox.add(order).then(data => {
-      console.log('Data', data);
       return data;
     });
   }
 
   public addOrderToOrdersTable(order: IOrder) {
-    debugger;
-
     return this.timeRecordsDb.orders.add(order).then(data => {
       return data;
     });
@@ -469,6 +470,15 @@ export class IndexedDBService {
       });
   }
 
+  public getOrderByFirebaseId(orderId: string) {
+    return this.timeRecordsDb.orders
+      .where('id')
+      .equals(orderId)
+      .toArray(order => {
+        return order;
+      });
+  }
+
   public deleteOrderInOrdersOutbox(orderId: string) {
     return this.timeRecordsDb.ordersOutbox
       .where('id')
@@ -583,5 +593,9 @@ export class IndexedDBService {
           console.error('Error: indexedDB recordsOutbox: can not update record: ', error);
         });
     });
+  }
+
+  public deleteAllOrders() {
+    return this.timeRecordsDb.orders.clear();
   }
 }
