@@ -322,9 +322,17 @@ export class IndexedDBService {
 
   public addRecordToOrdersTable(record: ITimeRecord) {
     let records = [];
+    let orderId;
+
+    if (typeof record.orderId === 'string') {
+      orderId = record.orderId;
+    } else {
+      orderId = +record.orderId;
+    }
+
     return this.timeRecordsDb.orders
       .where('id')
-      .equals(+record.orderId)
+      .equals(orderId)
       .toArray(orders => {
         if (orders !== undefined) {
           if (orders.length > 0) {
@@ -336,7 +344,7 @@ export class IndexedDBService {
             orders[0].records.push(record);
             this.timeRecordsDb.orders
               .where('id')
-              .equals(+record.orderId)
+              .equals(orderId)
               .modify(orders[0])
               .catch(e => {
                 console.warn('indexedDB: can´t add record to order table');

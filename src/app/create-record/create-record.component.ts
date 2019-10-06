@@ -5,6 +5,7 @@ import { IndexedDBService } from '../service/indexedDb-service/indexedDb.service
 import { ITimeRecord, TimeRecord } from '../data-classes/TimeRecords';
 import { FirestoreRecordService } from '../service/firestore-record-service/firestore-record.service';
 import { MessageService } from '../service/message-service/message.service';
+import { IOrder } from '../data-classes/Order';
 
 @Component({
   selector: 'app-create-record',
@@ -57,6 +58,8 @@ export class CreateRecordComponent implements OnInit {
     // } else {
     //   this.createRecordIfOffline(orderId, record);
     // }
+    // this.createRecordIfOffline(record);
+
     this.createRecordIfOffline(record);
   }
 
@@ -102,15 +105,37 @@ export class CreateRecordComponent implements OnInit {
     //       this.messageService.recordAlreadyExists();
     //     }
     //   });
+    debugger;
 
-    this.indexedDbService.checkIfRecordIsInIndexedDbOrdersTable(record).then(doesRecordExists => {
-      if (!doesRecordExists) {
-        this.indexedDbService.addRecordToOrdersTable(record);
-        this.indexedDbService.addRecordToOrdersOutboxTable(record);
-      } else {
-        this.messageService.recordAlreadyExists();
-      }
-    });
+    if (typeof record.orderId !== 'string') {
+      this.indexedDbService.checkIfRecordIsInIndexedDbOrdersTable(record).then(doesRecordExists => {
+        if (!doesRecordExists) {
+          this.indexedDbService.addRecordToOrdersTable(record);
+          this.indexedDbService.addRecordToOrdersOutboxTable(record);
+        } else {
+          this.messageService.recordAlreadyExists();
+        }
+      });
+    } else {
+      // if orderId is string than get the depending order and save it with the new record to ordersOutbox
+      this.indexedDbService.getOrderByFirebaseId(record.orderId).then((order: IOrder[]) => {
+        if (order.length > 0) {
+          this.indexedDbService
+            .checkIfOrderIsInIndexedDBOrdersOutboxTable(record.orderId)
+            .then(isAlreadyInTable => {
+              if (!isAlreadyInTable) {
+                this.indexedDbService.addOrderToOutbox(order[0]).then(() => {
+                  this.indexedDbService.addRecordToOrdersOutboxTable(record);
+                  this.indexedDbService.addRecordToOrdersTable(record);
+                });
+              } else {
+                this.indexedDbService.addRecordToOrdersOutboxTable(record);
+                this.indexedDbService.addRecordToOrdersTable(record);
+              }
+            });
+        }
+      });
+    }
   }
 
   public onSubmit() {
