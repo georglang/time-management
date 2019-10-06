@@ -173,13 +173,22 @@ export class OrderDetailComponent implements OnInit {
   // Offline
   //
 
-  public getOrderByIdFromIndexedDbOrders(orderId: number) {
-    this.indexedDbService.getOrderById(orderId).then((order: IOrder[]) => {
-      if (order.length > 0) {
-        this.order = order[0];
-        this.setRecordDataSource(this.order.records);
-      }
-    });
+  public getOrderByIdFromIndexedDbOrders(orderId: any) {
+    if (typeof orderId !== 'string') {
+      this.indexedDbService.getOrderById(orderId).then((order: IOrder[]) => {
+        if (order.length > 0) {
+          this.order = order[0];
+          this.setRecordDataSource(this.order.records);
+        }
+      });
+    } else {
+      this.indexedDbService.getOrderByFirebaseId(orderId).then((order: IOrder[]) => {
+        if (order.length > 0) {
+          this.order = order[0];
+          this.setRecordDataSource(this.order.records);
+        }
+      });
+    }
   }
 
   // records from firebase and indexedDB
