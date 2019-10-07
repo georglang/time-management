@@ -50,43 +50,32 @@ export class SynchronizeIdxDBWithFirebaseService {
 
   // read orders from indexedDB ordersOutbox table
   public synchronizeIndexedDbOrdersOutboxTableWithFirebase(): Promise<boolean> {
+    debugger;
+
     return new Promise((resolve, reject) => {
       this.indexedDBService.getOrdersFromOrdersOutbox().then(ordersInOutbox => {
         if (ordersInOutbox !== undefined) {
           if (ordersInOutbox.length > 0) {
             ordersInOutbox.forEach(order => {
+              debugger;
+
               return this.firestoreOrderService.checkIfOrderExists(order).then(doesOrderExist => {
                 if (!doesOrderExist) {
-                  const localId = order.id;
-                  delete order.id;
-                  this.firestoreOrderService.addOrder(order).then((idFromFirebase: string) => {
-                    order.id = idFromFirebase;
-                    // update depending records in recordsOutbox
-                    this.indexedDBService
-                      .doesRecordsOutboxContainRecords()
-                      .then(doesRecordsOutboxContainOrders => {
-                        if (doesRecordsOutboxContainOrders) {
-                          this.indexedDBService
-                            .updateLocalIdOfRecordsOutboxWithFirebaseId(localId, idFromFirebase)
-                            .then(hasBeenUpdated => {
-                              if (hasBeenUpdated) {
-                                this.indexedDBService.addToOrdersTable(order).then(() => {
-                                  this.indexedDBService.deleteOrderInOutbox(localId);
-                                  resolve(true);
-                                });
-                              }
-                            });
-                        } else {
-                          this.indexedDBService.addToOrdersTable(order).then(() => {
-                            this.indexedDBService.deleteOrderInOutbox(localId);
-                            resolve(true);
-                          });
-                        }
-                      });
-                  });
+                  this.firestoreOrderService.addOrder(order).then((idFromFirebase: string) => {});
                 } else {
-                  this.indexedDBService.deleteOrderInOutbox(order.id);
-                  resolve(true);
+                  debugger;
+                  if (order.records.length > 0) {
+                    order.records.forEach(record => {
+                      this.firestoreRecordService
+                        .checkIfRecordExistsInOrderInFirestore(record)
+                        .then(doesRecordExists => {
+                          if (!doesRecordExists) {
+                            this.firestoreRecordService.addTimeRecord(record);
+                          }
+                        });
+                    });
+                    resolve(true);
+                  }
                 }
               });
             });
@@ -95,6 +84,54 @@ export class SynchronizeIdxDBWithFirebaseService {
       });
     });
   }
+
+  // read orders from indexedDB ordersOutbox table
+  // public synchronizeIndexedDbOrdersOutboxTableWithFirebase(): Promise<boolean> {
+  //   return new Promise((resolve, reject) => {
+  //     this.indexedDBService.getOrdersFromOrdersOutbox().then(ordersInOutbox => {
+  //       if (ordersInOutbox !== undefined) {
+  //         if (ordersInOutbox.length > 0) {
+  //           ordersInOutbox.forEach(order => {
+  //             return this.firestoreOrderService.checkIfOrderExists(order).then(doesOrderExist => {
+  //               if (!doesOrderExist) {
+  //                 const localId = order.id;
+  //                 delete order.id;
+  //                 this.firestoreOrderService.addOrder(order).then((idFromFirebase: string) => {
+  //                   order.id = idFromFirebase;
+  //                   // update depending records in recordsOutbox
+  //                   this.indexedDBService
+  //                     .doesRecordsOutboxContainRecords()
+  //                     .then(doesRecordsOutboxContainOrders => {
+  //                       if (doesRecordsOutboxContainOrders) {
+  //                         this.indexedDBService
+  //                           .updateLocalIdOfRecordsOutboxWithFirebaseId(localId, idFromFirebase)
+  //                           .then(hasBeenUpdated => {
+  //                             if (hasBeenUpdated) {
+  //                               this.indexedDBService.addToOrdersTable(order).then(() => {
+  //                                 this.indexedDBService.deleteOrderInOutbox(localId);
+  //                                 resolve(true);
+  //                               });
+  //                             }
+  //                           });
+  //                       } else {
+  //                         this.indexedDBService.addToOrdersTable(order).then(() => {
+  //                           this.indexedDBService.deleteOrderInOutbox(localId);
+  //                           resolve(true);
+  //                         });
+  //                       }
+  //                     });
+  //                 });
+  //               } else {
+  //                 this.indexedDBService.deleteOrderInOutbox(order.id);
+  //                 resolve(true);
+  //               }
+  //             });
+  //           });
+  //         }
+  //       }
+  //     });
+  //   });
+  // }
 
   // records from indexedDB recordsOutbox table
   // update order with new records depending on orderId
@@ -106,21 +143,19 @@ export class SynchronizeIdxDBWithFirebaseService {
             records.forEach(record => {
               debugger;
               return this.firestoreRecordService
-                .checkIfRecordExistsInOrderInFirestore(record.orderId, record)
+                .checkIfRecordExistsInOrderInFirestore(record)
                 .then(doesRecordExist => {
                   if (!doesRecordExist) {
                     const localId = record.id;
                     delete record.id;
                     this.firestoreRecordService
-                      .addTimeRecord(record.orderId, record)
+                      .addTimeRecord(record)
                       .then((idFromFirebase: string) => {
                         record.id = idFromFirebase;
-                        this.indexedDBService
-                          .addRecordToOrdersTable(record, record.orderId)
-                          .then(() => {
-                            this.indexedDBService.deleteRecordInOutbox(localId);
-                            resolve(true);
-                          });
+                        this.indexedDBService.addRecordToOrdersTable(record).then(() => {
+                          this.indexedDBService.deleteRecordInOutbox(localId);
+                          resolve(true);
+                        });
                       });
                   } else {
                     this.indexedDBService.deleteRecordInOutbox(record.id);
