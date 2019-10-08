@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Database } from '../../database/Database';
 import { TimeRecord, ITimeRecord } from '../../data-classes/TimeRecords';
 import _ from 'lodash';
-import { IOrder } from '../../data-classes/Order';
+import { IOrder, Order } from '../../data-classes/Order';
 import { FirestoreOrderService } from '../firestore-order-service/firestore-order.service';
 
 @Injectable()
@@ -42,28 +42,16 @@ export class IndexedDBService {
 
   // check if order is in indexedDB ordersOutbox
   public checkIfOrderIsInIndexedDBOrdersOutboxTable(order): Promise<boolean> {
-    let isAlreadyInOrdersOutboxTable = true;
-    const orders = [];
-
+    let isOrdersAlreadyInOutboxTable = true;
     return new Promise((resolve, reject) => {
       this.getOrdersFromOrdersOutbox().then(ordersInOutbox => {
         if (ordersInOutbox !== undefined) {
           if (ordersInOutbox.length !== 0) {
-            const newOrder = {
-              companyName: order.companyName,
-              location: order.location,
-              contactPerson: order.contactPerson
-            };
-
-            ordersInOutbox.forEach(orderInOutbox => {
-              orders.push({
-                companyName: orderInOutbox.companyName,
-                location: orderInOutbox.location,
-                contactPerson: orderInOutbox.contactPerson
-              });
-            });
-            isAlreadyInOrdersOutboxTable = _.findIndex(orders, o => _.isMatch(o, newOrder)) > -1;
-            resolve(isAlreadyInOrdersOutboxTable);
+            isOrdersAlreadyInOutboxTable =
+              _.findIndex(ordersInOutbox, o => {
+                return _.isMatch(o, order);
+              }) > -1;
+            resolve(isOrdersAlreadyInOutboxTable);
           } else {
             resolve(false);
           }
