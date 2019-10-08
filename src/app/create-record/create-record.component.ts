@@ -7,6 +7,9 @@ import { FirestoreRecordService } from '../service/firestore-record-service/fire
 import { MessageService } from '../service/message-service/message.service';
 import { IOrder } from '../data-classes/Order';
 
+// ToDo:
+// Messages recordCreatedSuccessfully kontrollieren
+
 @Component({
   selector: 'app-create-record',
   templateUrl: './create-record.component.html',
@@ -73,7 +76,7 @@ export class CreateRecordComponent implements OnInit {
             this.firestoreRecordService
               .addTimeRecord(record)
               .then((id: string) => {
-                this.messageService.recordCreatedSuccessful();
+                this.messageService.recordCreatedSuccessfully();
                 this.router.navigate(['order-details', record.orderId]);
                 record.id = id;
                 this.addRecordToIndexedDbRecordsTable(record);
@@ -89,7 +92,9 @@ export class CreateRecordComponent implements OnInit {
   }
 
   public addRecordToIndexedDbRecordsTable(record: ITimeRecord): void {
-    this.indexedDbService.addRecordToOrdersTable(record);
+    this.indexedDbService.addRecordToOrdersTable(record).then(() => {
+      this.messageService.recordCreatedSuccessfully();
+    });
   }
 
   public createRecordIfOffline(record: ITimeRecord) {
@@ -105,34 +110,39 @@ export class CreateRecordComponent implements OnInit {
     //       this.messageService.recordAlreadyExists();
     //     }
     //   });
-    debugger;
-
-    if (typeof record.orderId !== 'string') {
-      this.indexedDbService.checkIfRecordIsInIndexedDbOrdersTable(record).then(doesRecordExists => {
-        if (!doesRecordExists) {
-          this.indexedDbService.addRecordToOrdersTable(record);
-          this.indexedDbService.addRecordToOrdersOutboxTable(record);
-        } else {
-          this.messageService.recordAlreadyExists();
-        }
-      });
-    } else {
+    if (record.orderId.match(/^[a-z]+$/)) {
       // if orderId is string than get the depending order and save it with the new record to ordersOutbox
       this.indexedDbService.getOrderByFirebaseId(record.orderId).then((order: IOrder[]) => {
         if (order.length > 0) {
           this.indexedDbService
-            .checkIfOrderIsInIndexedDBOrdersOutboxTable(record.orderId)
+            .checkIfOrderIsInIndexedDBOrdersOutboxTable(order[0])
             .then(isAlreadyInTable => {
               if (!isAlreadyInTable) {
                 this.indexedDbService.addOrderToOutbox(order[0]).then(() => {
                   this.indexedDbService.addRecordToOrdersOutboxTable(record);
-                  this.indexedDbService.addRecordToOrdersTable(record);
+                  this.indexedDbService.addRecordToOrdersTable(record).then(() => {
+                    this.messageService.recordCreatedSuccessfully();
+                  });
                 });
               } else {
+                // order is already in outbox just add the new record
                 this.indexedDbService.addRecordToOrdersOutboxTable(record);
                 this.indexedDbService.addRecordToOrdersTable(record);
+                // Weiter hier, schauen, obs so passt
+                // Probieren, ob es auch funktioniert, wenn order noch nicht existiert
               }
             });
+        }
+      });
+    } else {
+      this.indexedDbService.checkIfRecordIsInIndexedDbOrdersTable(record).then(doesRecordExists => {
+        if (!doesRecordExists) {
+          this.indexedDbService.addRecordToOrdersOutboxTable(record);
+          this.indexedDbService.addRecordToOrdersTable(record).then(() => {
+            this.messageService.recordCreatedSuccessfully();
+          });
+        } else {
+          this.messageService.recordAlreadyExists();
         }
       });
     }
