@@ -41,6 +41,9 @@ export class IndexedDBService {
   }
 
   // check if order is in indexedDB ordersOutbox
+
+  // Noch Probieren, ob es auch funktioniert, wenn order noch nicht existiert
+
   public checkIfOrderIsInIndexedDBOrdersOutboxTable(order): Promise<boolean> {
     let isOrdersAlreadyInOutboxTable = true;
     return new Promise((resolve, reject) => {
@@ -97,7 +100,7 @@ export class IndexedDBService {
   public checkIfRecordIsInIndexedDbOrdersTable(record: ITimeRecord) {
     let isAlreadyInRecordsTable = true;
     return new Promise((resolve, reject) => {
-      if (typeof record.orderId !== 'string') {
+      if (!record.orderId.match(/^[a-z]+$/)) {
         this.getAllRecords(+record.orderId).then(recordsInIdxDB => {
           if (recordsInIdxDB !== undefined) {
             if (recordsInIdxDB.length !== 0) {
@@ -312,10 +315,10 @@ export class IndexedDBService {
     let records = [];
     let orderId;
 
-    if (typeof record.orderId === 'string') {
-      orderId = record.orderId;
-    } else {
+    if (record.orderId.match(/^[a-z]+$/)) {
       orderId = +record.orderId;
+    } else {
+      orderId = record.orderId;
     }
 
     return this.timeRecordsDb.orders
@@ -347,7 +350,7 @@ export class IndexedDBService {
     let records = [];
     let orderId;
 
-    if (typeof record.orderId === 'string') {
+    if (record.orderId.match(/^[a-z]+$/)) {
       orderId = record.orderId;
     } else {
       orderId = +record.orderId;
