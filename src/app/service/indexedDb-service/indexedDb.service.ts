@@ -316,9 +316,9 @@ export class IndexedDBService {
     let orderId;
 
     if (record.orderId.match(/^[a-z]+$/)) {
-      orderId = +record.orderId;
-    } else {
       orderId = record.orderId;
+    } else {
+      orderId = +record.orderId;
     }
 
     return this.timeRecordsDb.orders
