@@ -39,7 +39,7 @@ export class MessageService {
     this.toastr.error('Nicht gefunden', 'Eintrag', errorConfig);
   }
 
-  public recordCreatedSuccessful() {
+  public recordCreatedSuccessfully() {
     const successConfig = {
       positionClass: 'toast-bottom-center',
       timeout: 2000
@@ -47,7 +47,7 @@ export class MessageService {
     this.toastr.success('Erfolgreich erstellt', 'Eintrag', successConfig);
   }
 
-  public recordUpdatedSuccessful() {
+  public recordUpdatedSuccessfully() {
     const successConfig = {
       positionClass: 'toast-bottom-center',
       timeout: 2000
