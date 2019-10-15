@@ -155,7 +155,7 @@ export class EditRecordComponent implements OnInit {
             if (!isAlreadyInRecordsOutboxTable) {
               if (doesRecordsOutboxContainRecords) {
                 if (this.indexedDBService.updateRecordInRecordsOutboxTable(record)) {
-                  this.messageService.recordUpdatedSuccessful();
+                  this.messageService.recordUpdatedSuccessfully();
                 } else {
                   this.messageService.recordCouldNotBeUpdated();
                 }
