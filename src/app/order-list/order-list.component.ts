@@ -31,12 +31,14 @@ export class OrderListComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    if (this.isOnline()) {
-      this.getOrdersFromCloudDatabase();
-    } else {
-      console.warn('No internet connection');
-      this.getOrdersFromIndexedDb();
-    }
+    // if (this.isOnline()) {
+    //   this.getOrdersFromCloudDatabase();
+    // } else {
+    //   console.warn('No internet connection');
+    //   this.getOrdersFromIndexedDb();
+    // }
+
+    this.getOrdersFromCloudDatabase();
 
     // ToDo: Connection turns from Offline to online
     if (this.connectionService !== undefined) {
@@ -53,14 +55,25 @@ export class OrderListComponent implements OnInit {
   //
 
   public getOrdersFromCloudDatabase(): void {
+    // if (this.firestoreOrderService !== undefined) {
+    //   this.firestoreOrderService.getOrdersFromOrdersCollection()
+    //     .then((orders: IOrder[]) => {
+    //     if (orders !== undefined) {
+    //       this.dataSource = new MatTableDataSource<IOrder>(orders);
+    //       // this.saveOrdersInIndexedDBOrdersTable(orders);
+    //     } else {
+    //       this.dataSource = new MatTableDataSource<IOrder>();
+    //     }
+    //   });
+    // }
+
     if (this.firestoreOrderService !== undefined) {
-      this.firestoreOrderService.getOrders().subscribe((orders: IOrder[]) => {
+      this.firestoreOrderService.getOrdersFromOrdersCollection2().subscribe((orders: IOrder[]) => {
         if (orders !== undefined) {
-          this.dataSource = new MatTableDataSource<IOrder>(orders);
-          this.saveOrdersInIndexedDBOrdersTable(orders);
+          this.dataSource.data = orders;
         } else {
-          this.dataSource = new MatTableDataSource<IOrder>();
-          // ToDo: Meldung in HTML kein Aufträge vorhanden
+          this.dataSource = new MatTableDataSource();
+          //       // ToDo: Meldung in HTML kein Aufträge vorhanden
         }
       });
     }

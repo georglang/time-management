@@ -78,12 +78,23 @@ export class FirestoreOrderService {
   public getOrdersFromOrdersCollection(): Promise<IOrder[]> {
     return this.ordersCollection.ref.get().then(querySnapshot => {
       querySnapshot.forEach(doc => {
-        this.ordersInFirestore = [];
         this.ordersInFirestore.push(doc.data());
         return doc.data();
       });
       return this.ordersInFirestore;
     });
+  }
+
+  public getOrdersFromOrdersCollection2() {
+    return this.ordersCollection.snapshotChanges().pipe(
+      map(actions =>
+        actions.map(a => {
+          const data = a.payload.doc.data() as IOrder;
+          const id = a.payload.doc.id;
+          return { id, ...data };
+        })
+      )
+    );
   }
 
   documentToDomainObject = dToDO => {
