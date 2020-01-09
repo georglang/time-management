@@ -54,9 +54,31 @@ export class FirestoreOrderService {
     return observable;
   }
 
+  public getOrderById(orderId: string): any {
+    return this.ordersCollection.doc(orderId).valueChanges();
+  }
+
+  // Weiter
+
+  // public getOrderById(orderId: string): Promise<any> {
+  //   return this.ordersCollection
+  //     .doc(orderId)
+  //     .ref.get()
+  //     .then(doc => {
+  //       if (doc.exists) {
+  //         const data: IOrder = Object.assign(doc.data());
+  //         return data;
+  //       }
+  //     })
+  //     .catch(function(error) {
+  //       console.log('getOrderById: no order found', error);
+  //     });
+  // }
+
   public getOrdersFromOrdersCollection(): Promise<IOrder[]> {
     return this.ordersCollection.ref.get().then(querySnapshot => {
       querySnapshot.forEach(doc => {
+        this.ordersInFirestore = [];
         this.ordersInFirestore.push(doc.data());
         return doc.data();
       });
@@ -81,21 +103,6 @@ export class FirestoreOrderService {
       })
       .catch(error => {
         console.error('Error adding order: ', error);
-      });
-  }
-
-  public getOrderById(orderId: string): Promise<any> {
-    return this.ordersCollection
-      .doc(orderId)
-      .ref.get()
-      .then(doc => {
-        if (doc.exists) {
-          const data: IOrder = Object.assign(doc.data());
-          return data;
-        }
-      })
-      .catch(function(error) {
-        console.log('getOrderById: no order found', error);
       });
   }
 
