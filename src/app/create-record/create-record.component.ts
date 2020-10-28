@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { IndexedDBService } from '../service/indexedDb-service/indexedDb.service';
+// import { IndexedDBService } from '../service/indexedDb-service/indexedDb.service';
 import { ITimeRecord, TimeRecord } from '../data-classes/TimeRecords';
 import { FirestoreRecordService } from '../service/firestore-record-service/firestore-record.service';
 import { MessageService } from '../service/message-service/message.service';
@@ -23,7 +23,7 @@ export class CreateRecordComponent implements OnInit {
     private router: Router,
     private route: ActivatedRoute,
     private formBuilder: FormBuilder,
-    private indexedDbService: IndexedDBService,
+    // private indexedDbService: IndexedDBService,
     private firestoreRecordService: FirestoreRecordService,
     private messageService: MessageService
   ) {}
@@ -56,6 +56,9 @@ export class CreateRecordComponent implements OnInit {
   public createRecord(formInput: any, orderId: string): void {
     const record = new TimeRecord(formInput.date, formInput.description, formInput.workingHours);
     record.orderId = orderId;
+    this.addRecordToFirebaseRecordsTable(record);
+
+
     // if (this.isOnline()) {
     //   this.addRecordToFirebaseRecordsTable(record);
     // } else {
@@ -92,9 +95,9 @@ export class CreateRecordComponent implements OnInit {
   }
 
   public addRecordToIndexedDbRecordsTable(record: ITimeRecord): void {
-    this.indexedDbService.addRecordToOrdersTable(record).then(() => {
-      this.messageService.recordCreatedSuccessfully();
-    });
+    // this.indexedDbService.addRecordToOrdersTable(record).then(() => {
+    //   this.messageService.recordCreatedSuccessfully();
+    // });
   }
 
   public createRecordIfOffline(record: ITimeRecord) {
@@ -112,39 +115,45 @@ export class CreateRecordComponent implements OnInit {
     //   });
     if (record.orderId.match(/^[a-z]+$/)) {
       // if orderId is string than get the depending order and save it with the new record to ordersOutbox
-      this.indexedDbService.getOrderByFirebaseId(record.orderId).then((order: IOrder[]) => {
-        if (order.length > 0) {
-          this.indexedDbService
-            .checkIfOrderIsInIndexedDBOrdersOutboxTable(order[0])
-            .then(isAlreadyInTable => {
-              if (!isAlreadyInTable) {
-                this.indexedDbService.addOrderToOutbox(order[0]).then(() => {
-                  this.indexedDbService.addRecordToOrdersOutboxTable(record);
-                  this.indexedDbService.addRecordToOrdersTable(record).then(() => {
-                    this.messageService.recordCreatedSuccessfully();
-                  });
-                });
-              } else {
-                // order is already in outbox just add the new record
-                this.indexedDbService.addRecordToOrdersOutboxTable(record);
-                this.indexedDbService.addRecordToOrdersTable(record);
-                // Weiter hier, schauen, obs so passt
-                // Probieren, ob es auch funktioniert, wenn order noch nicht existiert
-              }
-            });
-        }
-      });
+
+      // this.indexedDbService.getOrderByFirebaseId(record.orderId).then((order: IOrder[]) => {
+      //   if (order.length > 0) {
+      //     this.indexedDbService
+      //       .checkIfOrderIsInIndexedDBOrdersOutboxTable(order[0])
+      //       .then(isAlreadyInTable => {
+      //         if (!isAlreadyInTable) {
+      //           this.indexedDbService.addOrderToOutbox(order[0]).then(() => {
+      //             this.indexedDbService.addRecordToOrdersOutboxTable(record);
+      //             this.indexedDbService.addRecordToOrdersTable(record).then(() => {
+      //               this.messageService.recordCreatedSuccessfully();
+      //             });
+      //           });
+      //         } else {
+      //           // order is already in outbox just add the new record
+      //           this.indexedDbService.addRecordToOrdersOutboxTable(record);
+      //           this.indexedDbService.addRecordToOrdersTable(record);
+      //           // Weiter hier, schauen, obs so passt
+      //           // Probieren, ob es auch funktioniert, wenn order noch nicht existiert
+      //         }
+      //       });
+      //   }
+      // });
+
+
     } else {
-      this.indexedDbService.checkIfRecordIsInIndexedDbOrdersTable(record).then(doesRecordExists => {
-        if (!doesRecordExists) {
-          this.indexedDbService.addRecordToOrdersOutboxTable(record);
-          this.indexedDbService.addRecordToOrdersTable(record).then(() => {
-            this.messageService.recordCreatedSuccessfully();
-          });
-        } else {
-          this.messageService.recordAlreadyExists();
-        }
-      });
+
+      // this.indexedDbService.checkIfRecordIsInIndexedDbOrdersTable(record).then(doesRecordExists => {
+      //   if (!doesRecordExists) {
+      //     this.indexedDbService.addRecordToOrdersOutboxTable(record);
+      //     this.indexedDbService.addRecordToOrdersTable(record).then(() => {
+      //       this.messageService.recordCreatedSuccessfully();
+      //     });
+
+      //   } else {
+      //     this.messageService.recordAlreadyExists();
+      //   }
+      // });
+
     }
   }
 

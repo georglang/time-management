@@ -1,16 +1,16 @@
-import { Injectable } from '@angular/core';
-import { IndexedDBService } from '../indexedDb-service/indexedDb.service';
-import { FirestoreOrderService } from '../firestore-order-service/firestore-order.service';
-import { FirestoreRecordService } from '../firestore-record-service/firestore-record.service';
-import { MessageService } from '../message-service/message.service';
-import _ from 'lodash';
+import { Injectable } from "@angular/core";
+// import { IndexedDBService } from '../indexedDb-service/indexedDb.service';
+import { FirestoreOrderService } from "../firestore-order-service/firestore-order.service";
+import { FirestoreRecordService } from "../firestore-record-service/firestore-record.service";
+import { MessageService } from "../message-service/message.service";
+import _ from "lodash";
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: "root",
 })
 export class SynchronizeWithFirebaseService {
   constructor(
-    private indexedDBService: IndexedDBService,
+    // private indexedDBService: IndexedDBService,
     private firestoreOrderService: FirestoreOrderService,
     private firestoreRecordService: FirestoreRecordService,
     private messageService: MessageService
@@ -22,77 +22,77 @@ export class SynchronizeWithFirebaseService {
   // if indexedDB ordersOutbox do not contain orders, sychronize record from recordsOutbox
   public synchronize(): Promise<boolean> {
     return new Promise((resolve, reject) => {
-      this.indexedDBService.doesOrdersOutboxContainOrders().then(doesOrdersExist => {
-        if (doesOrdersExist) {
-          this.synchronizeIndexedDbOrdersOutboxTableWithFirebase().then(isSynchronized => {
-            if (isSynchronized) {
-              this.indexedDBService.doesRecordsOutboxContainRecords().then(doesRecordsExist => {
-                if (doesRecordsExist) {
-                  this.synchronizeIndexedDbRecordsTableWithFirebase().then(completed => {
-                    return resolve(completed);
-                  });
-                }
-              });
-            }
-          });
-        } else {
-          this.indexedDBService.doesRecordsOutboxContainRecords().then(doesRecordsExist => {
-            if (doesRecordsExist) {
-              this.synchronizeIndexedDbRecordsTableWithFirebase().then(completed => {
-                return resolve(completed);
-              });
-            }
-          });
-        }
-      });
+      // this.indexedDBService.doesOrdersOutboxContainOrders().then(doesOrdersExist => {
+      //   if (doesOrdersExist) {
+      //     this.synchronizeIndexedDbOrdersOutboxTableWithFirebase().then(isSynchronized => {
+      //       if (isSynchronized) {
+      //         this.indexedDBService.doesRecordsOutboxContainRecords().then(doesRecordsExist => {
+      //           if (doesRecordsExist) {
+      //             this.synchronizeIndexedDbRecordsTableWithFirebase().then(completed => {
+      //               return resolve(completed);
+      //             });
+      //           }
+      //         });
+      //       }
+      //     });
+      //   } else {
+      //     this.indexedDBService.doesRecordsOutboxContainRecords().then(doesRecordsExist => {
+      //       if (doesRecordsExist) {
+      //         this.synchronizeIndexedDbRecordsTableWithFirebase().then(completed => {
+      //           return resolve(completed);
+      //         });
+      //       }
+      //     });
+      //   }
+      // });
     });
   }
 
   // read orders from indexedDB ordersOutbox table
   public synchronizeIndexedDbOrdersOutboxTableWithFirebase(): Promise<boolean> {
     return new Promise((resolve, reject) => {
-      this.indexedDBService.getOrdersFromOrdersOutbox().then(ordersInOutbox => {
-        if (ordersInOutbox !== undefined) {
-          if (ordersInOutbox.length > 0) {
-            ordersInOutbox.forEach(order => {
-              return this.firestoreOrderService.checkIfOrderExists(order).then(doesOrderExist => {
-                if (!doesOrderExist) {
-                  const localId = order.id;
-                  delete order.id;
-                  this.firestoreOrderService.addOrder(order).then((idFromFirebase: string) => {
-                    order.id = idFromFirebase;
-                    // update depending records in recordsOutbox
-                    this.indexedDBService
-                      .doesRecordsOutboxContainRecords()
-                      .then(doesRecordsOutboxContainOrders => {
-                        if (doesRecordsOutboxContainOrders) {
-                          this.indexedDBService
-                            .updateLocalIdOfRecordsOutboxWithFirebaseId(localId, idFromFirebase)
-                            .then(hasBeenUpdated => {
-                              if (hasBeenUpdated) {
-                                this.indexedDBService.addToOrdersTable(order).then(() => {
-                                  this.indexedDBService.deleteOrderInOutbox(localId);
-                                  resolve(true);
-                                });
-                              }
-                            });
-                        } else {
-                          this.indexedDBService.addToOrdersTable(order).then(() => {
-                            this.indexedDBService.deleteOrderInOutbox(localId);
-                            resolve(true);
-                          });
-                        }
-                      });
-                  });
-                } else {
-                  this.indexedDBService.deleteOrderInOutbox(order.id);
-                  resolve(true);
-                }
-              });
-            });
-          }
-        }
-      });
+      // this.indexedDBService.getOrdersFromOrdersOutbox().then(ordersInOutbox => {
+      //   if (ordersInOutbox !== undefined) {
+      //     if (ordersInOutbox.length > 0) {
+      //       ordersInOutbox.forEach(order => {
+      //         return this.firestoreOrderService.checkIfOrderExists(order).then(doesOrderExist => {
+      //           if (!doesOrderExist) {
+      //             const localId = order.id;
+      //             delete order.id;
+      //             this.firestoreOrderService.addOrder(order).then((idFromFirebase: string) => {
+      //               order.id = idFromFirebase;
+      //               // update depending records in recordsOutbox
+      //               this.indexedDBService
+      //                 .doesRecordsOutboxContainRecords()
+      //                 .then(doesRecordsOutboxContainOrders => {
+      //                   if (doesRecordsOutboxContainOrders) {
+      //                     this.indexedDBService
+      //                       .updateLocalIdOfRecordsOutboxWithFirebaseId(localId, idFromFirebase)
+      //                       .then(hasBeenUpdated => {
+      //                         if (hasBeenUpdated) {
+      //                           this.indexedDBService.addToOrdersTable(order).then(() => {
+      //                             this.indexedDBService.deleteOrderInOutbox(localId);
+      //                             resolve(true);
+      //                           });
+      //                         }
+      //                       });
+      //                   } else {
+      //                     this.indexedDBService.addToOrdersTable(order).then(() => {
+      //                       this.indexedDBService.deleteOrderInOutbox(localId);
+      //                       resolve(true);
+      //                     });
+      //                   }
+      //                 });
+      //             });
+      //           } else {
+      //             this.indexedDBService.deleteOrderInOutbox(order.id);
+      //             resolve(true);
+      //           }
+      //         });
+      //       });
+      //     }
+      //   }
+      // });
     });
   }
 
@@ -100,36 +100,37 @@ export class SynchronizeWithFirebaseService {
   // update order with new records depending on orderId
   public synchronizeIndexedDbRecordsTableWithFirebase(): Promise<boolean> {
     return new Promise((resolve, reject) => {
-      this.indexedDBService.getRecordsFromRecordsOutboxTable().then(records => {
-        if (records !== undefined) {
-          if (records.length > 0) {
-            records.forEach(record => {
-              return this.firestoreRecordService
-                .checkIfRecordExistsInOrderInFirestore(record.orderId, record)
-                .then(doesRecordExist => {
-                  if (!doesRecordExist) {
-                    const localId = record.id;
-                    delete record.id;
-                    this.firestoreRecordService
-                      .addTimeRecord(record.orderId, record)
-                      .then((idFromFirebase: string) => {
-                        record.id = idFromFirebase;
-                        this.indexedDBService
-                          .addRecordToOrdersTable(record, record.orderId)
-                          .then(() => {
-                            this.indexedDBService.deleteRecordInOutbox(localId);
-                            resolve(true);
-                          });
-                      });
-                  } else {
-                    this.indexedDBService.deleteRecordInOutbox(record.id);
-                    resolve(true);
-                  }
-                });
-            });
-          }
-        }
-      });
+      //   this.indexedDBService.getRecordsFromRecordsOutboxTable().then(records => {
+      //     if (records !== undefined) {
+      //       if (records.length > 0) {
+      //         records.forEach(record => {
+      //           return this.firestoreRecordService
+      //             .checkIfRecordExistsInOrderInFirestore(record.orderId, record)
+      //             .then(doesRecordExist => {
+      //               if (!doesRecordExist) {
+      //                 const localId = record.id;
+      //                 delete record.id;
+      //                 this.firestoreRecordService
+      //                   .addTimeRecord(record.orderId, record)
+      //                   .then((idFromFirebase: string) => {
+      //                     record.id = idFromFirebase;
+      //                     this.indexedDBService
+      //                       .addRecordToOrdersTable(record, record.orderId)
+      //                       .then(() => {
+      //                         this.indexedDBService.deleteRecordInOutbox(localId);
+      //                         resolve(true);
+      //                       });
+      //                   });
+      //               } else {
+      //                 this.indexedDBService.deleteRecordInOutbox(record.id);
+      //                 resolve(true);
+      //               }
+      //             });
+      //         });
+      //       }
+      //     }
+      //   });
+      // });
     });
   }
 }

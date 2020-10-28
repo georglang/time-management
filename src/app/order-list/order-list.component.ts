@@ -83,11 +83,11 @@ export class OrderListComponent implements OnInit {
   // Offline Handling
   //
 
-  public saveOrdersInIndexedDBOrdersTable(orders: IOrder[]): void {
-    if (this.indexedDbService !== undefined) {
-      this.indexedDbService.addOrdersWithRecordsToOrdersTable(orders);
-    }
-  }
+  // public saveOrdersInIndexedDBOrdersTable(orders: IOrder[]): void {
+  //   if (this.indexedDbService !== undefined) {
+  //     this.indexedDbService.addOrdersWithRecordsToOrdersTable(orders);
+  //   }
+  // }
 
   public getOrdersFromIndexedDb(): void {
     if (this.indexedDbService !== undefined) {

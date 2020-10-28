@@ -6,7 +6,7 @@ import { DateAdapter } from '@angular/material/core';
 import { FirestoreOrderService } from '../service/firestore-order-service/firestore-order.service';
 import { FirestoreRecordService } from '../service/firestore-record-service/firestore-record.service';
 import { MessageService } from '../service/message-service/message.service';
-import { IndexedDBService } from '../service/indexedDb-service/indexedDb.service';
+// import { IndexedDBService } from '../service/indexedDb-service/indexedDb.service';
 import { ToastrService } from 'ngx-toastr';
 
 @Component({
@@ -29,7 +29,7 @@ export class EditRecordComponent implements OnInit {
     private firestoreOrderService: FirestoreOrderService,
     private firestoreRecordService: FirestoreRecordService,
     private messageService: MessageService,
-    private indexedDBService: IndexedDBService,
+    // private indexedDBService: IndexedDBService,
     private toastrService: ToastrService
   ) {
     this.dateAdapter.setLocale('de');
@@ -84,12 +84,12 @@ export class EditRecordComponent implements OnInit {
   }
 
   public getRecordsByIdFromRecordsOutbox(recordId: number): void {
-    this.indexedDBService.getRecordByIdFromRecordsOutbox(recordId).then(record => {
-      this.record = record;
-      if (this.record !== undefined) {
-        this.setControl(this.record);
-      }
-    });
+    // this.indexedDBService.getRecordByIdFromRecordsOutbox(recordId).then(record => {
+    //   this.record = record;
+    //   if (this.record !== undefined) {
+    //     this.setControl(this.record);
+    //   }
+    // });
   }
 
   public navigateToOrderList(): void {
@@ -146,24 +146,27 @@ export class EditRecordComponent implements OnInit {
   }
 
   private updateRecordInRecordsOutbox(record: ITimeRecord): void {
-    this.indexedDBService
-      .doesRecordsOutboxContainRecords()
-      .then(doesRecordsOutboxContainRecords => {
-        this.indexedDBService
-          .checkIfRecordIsInRecordsOutboxTable(record)
-          .then(isAlreadyInRecordsOutboxTable => {
-            if (!isAlreadyInRecordsOutboxTable) {
-              if (doesRecordsOutboxContainRecords) {
-                if (this.indexedDBService.updateRecordInRecordsOutboxTable(record)) {
-                  this.messageService.recordUpdatedSuccessfully();
-                } else {
-                  this.messageService.recordCouldNotBeUpdated();
-                }
-              }
-            } else {
-              this.messageService.recordAlreadyExists();
-            }
-          });
-      });
+
+
+    // this.indexedDBService
+    //   .doesRecordsOutboxContainRecords()
+    //   .then(doesRecordsOutboxContainRecords => {
+    //     this.indexedDBService
+    //       .checkIfRecordIsInRecordsOutboxTable(record)
+    //       .then(isAlreadyInRecordsOutboxTable => {
+    //         if (!isAlreadyInRecordsOutboxTable) {
+    //           if (doesRecordsOutboxContainRecords) {
+    //             if (this.indexedDBService.updateRecordInRecordsOutboxTable(record)) {
+    //               this.messageService.recordUpdatedSuccessfully();
+    //             } else {
+    //               this.messageService.recordCouldNotBeUpdated();
+    //             }
+    //           }
+    //         } else {
+    //           this.messageService.recordAlreadyExists();
+    //         }
+    //       });
+    //   });
+
   }
 }

@@ -273,43 +273,43 @@ export class IndexedDBService {
 
   // check if orders are in orders table
   // if not: add order that is not in orders table yet
-  public addOrdersWithRecordsToOrdersTable(orders: IOrder[]): Promise<boolean> {
-    let orderIds: number[] = [];
-    return new Promise((resolve, reject) => {
-      if (orders.length > 0) {
-        this.getOrdersFromOrdersTable().then((ordersInIndexedDB: IOrder[]) => {
-          orderIds = [];
-          if (ordersInIndexedDB !== undefined) {
-            ordersInIndexedDB.forEach(cachedOrder => {
-              orderIds.push(cachedOrder.id);
-            });
-          }
-          orders.forEach(order => {
-            if (ordersInIndexedDB !== undefined) {
-              ordersInIndexedDB.forEach(cachedOrder => {
-                orderIds.push(cachedOrder.id);
-              });
+  // public addOrdersWithRecordsToOrdersTable(orders: IOrder[]): Promise<boolean> {
+  //   let orderIds: number[] = [];
+  //   return new Promise((resolve, reject) => {
+  //     if (orders.length > 0) {
+  //       this.getOrdersFromOrdersTable().then((ordersInIndexedDB: IOrder[]) => {
+  //         orderIds = [];
+  //         if (ordersInIndexedDB !== undefined) {
+  //           ordersInIndexedDB.forEach(cachedOrder => {
+  //             orderIds.push(cachedOrder.id);
+  //           });
+  //         }
+  //         orders.forEach(order => {
+  //           if (ordersInIndexedDB !== undefined) {
+  //             ordersInIndexedDB.forEach(cachedOrder => {
+  //               orderIds.push(cachedOrder.id);
+  //             });
 
-              if (!orderIds.includes(order.id)) {
-                this.addToOrdersTable(order).then(data => {});
-              } else {
-                if (order.records.length > 0) {
-                  order.records.forEach(record => {
-                    this.checkIfRecordIsInIndexedDbOrdersTable(record).then(doesRecordExist => {
-                      if (!doesRecordExist) {
-                        this.addRecordToOrdersTable(record);
-                      }
-                    });
-                  });
-                  resolve(true);
-                }
-              }
-            }
-          });
-        });
-      }
-    });
-  }
+  //             if (!orderIds.includes(order.id)) {
+  //               this.addToOrdersTable(order).then(data => {});
+  //             } else {
+  //               if (order.records.length > 0) {
+  //                 order.records.forEach(record => {
+  //                   this.checkIfRecordIsInIndexedDbOrdersTable(record).then(doesRecordExist => {
+  //                     if (!doesRecordExist) {
+  //                       this.addRecordToOrdersTable(record);
+  //                     }
+  //                   });
+  //                 });
+  //                 resolve(true);
+  //               }
+  //             }
+  //           }
+  //         });
+  //       });
+  //     }
+  //   });
+  // }
 
   public addRecordToOrdersTable(record: ITimeRecord) {
     let records = [];
