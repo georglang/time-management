@@ -1,26 +1,61 @@
+<app-header titleInput="Regiestunden"></app-header>
+
 <div id="detail-component-wrapper">
   <div class="sub-nav">
     <div class="sub-nav-btn">
-      <mat-icon (click)="navigateToOrderList()" class="navigate-before-icon float-left"
+      <mat-icon
+        (click)="navigateToOrderList()"
+        class="navigate-before-icon float-left"
         >navigate_before</mat-icon
       >
     </div>
-
     <button type="button" class="sub-nav-btn" (click)="print()">
       <mat-icon class="print-icon float-right">print</mat-icon>
     </button>
   </div>
+
+  <div class="order-detail-title"></div>
+
   <div id="detail-component-content">
     <div id="customer-info">
-      <mat-form-field>
-        <input matInput placeholder="Kunde" [ngModel]="order?.companyName" disabled />
-      </mat-form-field>
-      <mat-form-field>
-        <input matInput placeholder="Ort" [ngModel]="order?.location" disabled />
-      </mat-form-field>
-      <mat-form-field>
-        <input matInput placeholder="Gesamtstunden" [ngModel]="sumOfWorkingHours" disabled />
-      </mat-form-field>
+      <table>
+        <td>
+          <tr>
+            <strong>Kunde</strong>
+          </tr>
+          <tr>
+            <strong>Ort</strong>
+          </tr>
+        </td>
+        <td>
+          <tr>
+            {{
+              order?.companyName
+            }}
+          </tr>
+          <tr>
+            {{
+              order?.location
+            }}
+          </tr>
+        </td>
+        <td>
+          <tr>
+            {{
+              order?.companyName
+            }}
+          </tr>
+          <tr>
+            {{
+              order?.location
+            }}
+          </tr>
+        </td>
+      </table>
+    </div>
+
+    <div>
+      <strong> </strong>
     </div>
 
     <div class="order-detail-table-wrapper">
@@ -30,6 +65,28 @@
         matSort
         *ngIf="hasRecordsFound; else noRecordsFoundTemplate"
       >
+        <!-- Checkbox Column -->
+        <ng-container matColumnDef="select">
+          <th mat-header-cell *matHeaderCellDef>
+            <mat-checkbox
+              (change)="$event ? masterToggle() : null"
+              [checked]="selection.hasValue() && isAllSelected()"
+              [indeterminate]="selection.hasValue() && !isAllSelected()"
+            >
+            </mat-checkbox>
+          </th>
+          <td mat-cell *matCellDef="let row">
+            <mat-checkbox
+              (click)="$event.stopPropagation()"
+              (change)="$event ? selection.toggle(row) : null"
+              [checked]="selection.isSelected(row)"
+              [disabled]="row.excluded"
+            >
+              <!-- *ngIf="!row.excluded" -->
+            </mat-checkbox>
+          </td>
+        </ng-container>
+
         <ng-container matColumnDef="id">
           <mat-header-cell *matHeaderCellDef> Id</mat-header-cell>
           <mat-cell *matCellDef="let element">
@@ -41,7 +98,9 @@
         <ng-container matColumnDef="date">
           <mat-header-cell *matHeaderCellDef> Datum</mat-header-cell>
           <mat-cell *matCellDef="let element">
-            <div class="disable-on-mobile">{{ element.date | date: 'dd.MM.yyyy' }}</div>
+            <div class="disable-on-mobile">
+              {{ element.date | date: "dd.MM.yyyy" }}
+            </div>
             <mat-form-field>
               <input
                 matInput
@@ -83,33 +142,84 @@
           </mat-cell>
         </ng-container>
 
+        <ng-container matColumnDef="employee">
+          <mat-header-cell *matHeaderCellDef> Arbeiter </mat-header-cell>
+          <mat-cell *matCellDef="let element">
+            <div class="disable-on-mobile">{{ element.employee }}</div>
+            <mat-form-field>
+              <input
+                matInput
+                placeholder="Arbeiter"
+                value="{{ element.employee }}"
+                readonly
+              />
+            </mat-form-field>
+          </mat-cell>
+        </ng-container>
+
         <ng-container matColumnDef="action">
-          <mat-header-cell *matHeaderCellDef> Bearbeiten / Löschen </mat-header-cell>
+          <mat-header-cell *matHeaderCellDef>
+            Bearbeiten / Löschen
+          </mat-header-cell>
           <div class="test">
             <mat-cell *matCellDef="let element">
               <div id="delete-and-edit-btn-wrapper">
-                <button mat-icon-button (click)="editRecord(element.id)">
+                <button
+                  mat-icon-button
+                  (click)="editRecord(element.id)"
+                  [disabled]="element.excluded"
+                >
                   <mat-icon>edit</mat-icon>
                 </button>
-                <button mat-icon-button (click)="deleteRecord(element.id)">
+                <button
+                  mat-icon-button
+                  (click)="deleteRecord(element.id)"
+                  [disabled]="element.excluded"
+                >
                   <mat-icon>delete</mat-icon>
+                </button>
+                <button
+                  mat-icon-button
+                  (click)="archiveRecord(element)"
+                  [disabled]="element.excluded"
+                >
+                  <mat-icon>check</mat-icon>
                 </button>
               </div>
             </mat-cell>
           </div>
         </ng-container>
-        <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>x
-        <mat-row *matRowDef="let row; columns: displayedColumns"></mat-row>
+
+        <!-- Exclude Column -->
+        <ng-container id="column-excluded" matColumnDef="excluded">
+          <th mat-header-cell *matHeaderCellDef>Excluded</th>
+          <td mat-cell *matCellDef="let element">{{ element.excluded }}</td>
+        </ng-container>
+
+        <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+        <!-- !row.excluded will prevent those rows from being clicked -->
+        <mat-row
+          *matRowDef="let row; columns: displayedColumns"
+          (click)="!row.excluded && selection.toggle(row)"
+          [ngStyle]="row.excluded && { 'background-color': 'lightgrey' }"
+        ></mat-row>
       </mat-table>
 
       <ng-template #noRecordsFoundTemplate>
         Keine Einträge gefunden
       </ng-template>
+
+      <!-- <mat-row *matRowDef="let row; columns: displayedColumns"></mat-row> -->
     </div>
   </div>
 </div>
 <div id="bottom-nav">
-  <button id="create-record-btn" type="button" mat-fab (click)="createNewRecord()">
+  <button
+    id="create-record-btn"
+    type="button"
+    mat-fab
+    (click)="createNewRecord()"
+  >
     <i class="material-icons">add</i>
   </button>
 </div>

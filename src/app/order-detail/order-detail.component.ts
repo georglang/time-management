@@ -2,6 +2,7 @@ import { Component, OnInit, Input } from "@angular/core";
 import { Router, ActivatedRoute } from "@angular/router";
 import { MatDialog, MatDialogConfig } from "@angular/material/dialog";
 import { MatTableDataSource } from "@angular/material/table";
+import { SelectionModel } from "@angular/cdk/collections";
 
 // import { IndexedDBService } from '../service/indexedDb-service/indexedDb.service';
 import { DateAdapter } from "@angular/material/core";
@@ -10,7 +11,7 @@ import { ConfirmDeleteDialogComponent } from "./../confirm-delete-dialog/confirm
 import { ToastrService } from "ngx-toastr";
 import { FirestoreOrderService } from "../service/firestore-order-service/firestore-order.service";
 import { FirestoreRecordService } from "../service/firestore-record-service/firestore-record.service";
-import { SynchronizeIdxDBWithFirebaseService } from "../service/synchronize-idxDb-with-firebase-service/synchronize-idxDb-with-firebase.service";
+// import { SynchronizeIdxDBWithFirebaseService } from "../service/synchronize-idxDb-with-firebase-service/synchronize-idxDb-with-firebase.service";
 import { MessageService } from "../service/message-service/message.service";
 
 declare var jsPDF: any;
@@ -34,10 +35,19 @@ export class OrderDetailComponent implements OnInit {
   public columns: string[];
   public totalTime = 0.0;
   public records: ITimeRecord[] = [];
-  public displayedColumns = ["date", "description", "workingHours", "action"];
+  public displayedColumns = [
+    "select",
+    "date",
+    "description",
+    "workingHours",
+    "employee",
+    "action",
+    "excluded",
+  ];
   public dataSource: MatTableDataSource<ITimeRecord>;
   public hasRecordsFound: boolean = false;
-  public testtest;
+  public dateFormated;
+  public selection = new SelectionModel<ITimeRecord>(true, []);
   private orderIds: number[] = [];
 
   constructor(
@@ -50,7 +60,7 @@ export class OrderDetailComponent implements OnInit {
     private readonly connectionService: ConnectionService,
     private firestoreOrderService: FirestoreOrderService,
     private firestoreRecordService: FirestoreRecordService,
-    private synchronizeIdxDBWithFirebase: SynchronizeIdxDBWithFirebaseService,
+    // private synchronizeIdxDBWithFirebase: SynchronizeIdxDBWithFirebaseService,
     private messageService: MessageService
   ) {
     this.dateAdapter.setLocale("de");
@@ -88,7 +98,6 @@ export class OrderDetailComponent implements OnInit {
       // });
 
       // this.records = this.getRecordsFromRecordsOutbox(this.paramId);
-
     });
 
     this.connectionService.monitor().subscribe((isOnline) => {
@@ -272,6 +281,10 @@ export class OrderDetailComponent implements OnInit {
     this.openDeleteRecordDialog(recordId);
   }
 
+  public archiveRecord(record: ITimeRecord) {
+    record.excluded = true;
+  }
+
   public showDeleteMessage() {
     const successConfig = {
       positionClass: "toast-bottom-center",
@@ -326,8 +339,26 @@ export class OrderDetailComponent implements OnInit {
     // this.indexedDbService.deleteRecordInOrdersTable(this.paramOrderId, recordId).then(data => {});
   }
 
+  /** Whether the number of selected elements matches the total number of rows. */
+  public isAllSelected() {
+    const numSelected = this.selection.selected.length;
+    const numRows = this.dataSource.data.length;
+    return numSelected === numRows;
+  }
+
+  /** Selects all rows if they are not all selected; otherwise clear selection. */ masterToggle() {
+    this.isAllSelected()
+      ? this.selection.clear()
+      : // this.dataSource.data.forEach(row => this.selection.select(row));
+
+        this.dataSource.data.forEach((row) => {
+          if (!row.excluded) {
+            this.selection.select(row);
+          }
+        });
+  }
+
   public print() {
-    debugger;
     const pdf = new jsPDF();
 
     pdf.setFontSize(18);
@@ -335,20 +366,20 @@ export class OrderDetailComponent implements OnInit {
       { title: "Datum", dataKey: "date" },
       { title: "Beschreibung", dataKey: "description" },
       { title: "Arbeitsstunden", dataKey: "workingHours" },
+      { title: "Arbeiter", dataKey: "employee" },
     ];
 
     const recordsToPrint = [];
-    this.order.records.forEach((record) => {
-      this.testtest = moment(record['date']).format('DD.MM.YYYY');
-      debugger;
 
+    this.selection.selected.forEach((selectedRecord) => {
+      this.dateFormated = moment(selectedRecord["date"]).format("DD.MM.YYYY");
 
-      // const formattedDate = moment(record['date']);
       recordsToPrint.push(
         new TimeRecord(
-          this.testtest,
-          record["description"],
-          record["workingHours"],
+          this.dateFormated,
+          selectedRecord["description"],
+          selectedRecord["workingHours"],
+          selectedRecord["employee"],
           "",
           ""
         )
@@ -356,21 +387,18 @@ export class OrderDetailComponent implements OnInit {
     });
 
     const customerInfo = document.getElementById("customer-info");
-
     const customerName = customerInfo.firstChild.childNodes[1].firstChild;
     const location = customerInfo.firstChild.childNodes[1].lastChild;
-    debugger;
 
-    pdf.fromHTML('Kunde: ', 12, 12);
+    pdf.fromHTML("Kunde: ", 12, 12);
     pdf.fromHTML(customerName, 32, 12);
 
-    pdf.fromHTML('Ort: ', 12, 19);
+    pdf.fromHTML("Ort: ", 12, 19);
     pdf.fromHTML(location, 32, 19);
-
 
     pdf.autoTable(columns, recordsToPrint, {
       bodyStyles: { valign: "top" },
-      margin: { left: 10, top: 40 },
+      margin: { left: 10, top: 40, right: 10 },
       styles: { overflow: "linebreak", columnWidth: "wrap" },
       columnStyles: {
         description: { columnWidth: "auto" },
@@ -393,7 +421,7 @@ export class OrderDetailComponent implements OnInit {
   // Beim allgemeinen synchronisieren muss zuerst herausgefunden werden, was ueberhaut sychronisiert werden muss
   // Erstellen Order und Record Offline: schauen in ordersOutbox
   public synchronizeOrdersAndRecords() {
-    this.synchronizeIdxDBWithFirebase.synchronizeWithFirebase();
+    // this.synchronizeIdxDBWithFirebase.synchronizeWithFirebase();
   }
 
   public updateRecords() {
