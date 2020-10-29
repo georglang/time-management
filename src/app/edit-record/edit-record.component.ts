@@ -125,7 +125,7 @@ export class EditRecordComponent implements OnInit {
           }
         });
     } else {
-      this.updateRecordInRecordsOutbox(record);
+      // this.updateRecordInRecordsOutbox(record);
     }
   }
 

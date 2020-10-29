@@ -8,9 +8,12 @@
 
     <!-- <button type="button" class="sub-nav-btn" (click)="documentEditForm.ngSubmit.emit()" [disabled]="!documentEditForm.form.valid"> -->
     <button type="button" class="sub-nav-btn" (click)="documentEditForm.ngSubmit.emit()">
-      <mat-icon class="order-complete-icon float-right">check</mat-icon>
+      <mat-icon class="order-complete-icon float-right">save</mat-icon>
     </button>
   </div>
+
+  <div class="edit-record-title">Bearbeiten</div>
+
 
   <div id="edit-record-content">
     <form [formGroup]="editRecordForm" #documentEditForm="ngForm" (ngSubmit)="onSubmit()">
