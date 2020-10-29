@@ -36,9 +36,10 @@ export class CreateOrderComponent implements OnInit {
     private connectionService: ConnectionService,
     private messageService: MessageService
   ) {
-    this.columns = ['Firma', 'Einsatzleiter', 'Ort'];
+    this.columns = ['Datum', 'Firma', 'Einsatzleiter', 'Ort'];
 
     this.createOrderForm = this.formBuilder.group({
+      date: ['', Validators.required],
       companyName: ['', Validators.required],
       location: ['', Validators.required],
       contactPerson: ['']
@@ -94,7 +95,12 @@ export class CreateOrderComponent implements OnInit {
   // }
 
   public createOrder(formInput: any): void {
-    const order = new Order(formInput.companyName, formInput.location, formInput.contactPerson);
+    const order = new Order(
+      formInput.date,
+      formInput.companyName,
+      formInput.location,
+      formInput.contactPerson,
+    );
     order.records = [];
     if (this.isOnline()) {
       this.addOrderToFirebaseOrdersTable(order);
