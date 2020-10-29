@@ -1,23 +1,23 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
-import { Router } from '@angular/router';
-import { MatSort } from '@angular/material/sort';
-import { MatTableDataSource } from '@angular/material/table';
+import { Component, OnInit, ViewChild } from "@angular/core";
+import { Router } from "@angular/router";
+import { MatSort } from "@angular/material/sort";
+import { MatTableDataSource } from "@angular/material/table";
 
-import { ConnectionService } from 'ng-connection-service';
+import { ConnectionService } from "ng-connection-service";
 
-import { FirestoreOrderService } from '../service/firestore-order-service/firestore-order.service';
-import { IndexedDBService } from '../service/indexedDb-service/indexedDb.service';
-import { IOrder } from '../data-classes/Order';
+import { FirestoreOrderService } from "../service/firestore-order-service/firestore-order.service";
+import { IndexedDBService } from "../service/indexedDb-service/indexedDb.service";
+import { IOrder } from "../data-classes/Order";
 
 @Component({
-  selector: 'app-order-list',
-  templateUrl: './order-list.component.html',
-  styleUrls: ['./order-list.component.sass']
+  selector: "app-order-list",
+  templateUrl: "./order-list.component.html",
+  styleUrls: ["./order-list.component.sass"],
 })
 export class OrderListComponent implements OnInit {
   public orders: any[] = []; // IOrder coudn´t be used because of firebase auto generated id,
   public dataSource = new MatTableDataSource();
-  public displayedColumns = ['customer', 'contactPerson', 'location', 'detail'];
+  public displayedColumns = ["date", "customer", "location", "detail"];
   public isOnlineService: boolean;
 
   @ViewChild(MatSort, { static: false })
@@ -42,7 +42,7 @@ export class OrderListComponent implements OnInit {
 
     // ToDo: Connection turns from Offline to online
     if (this.connectionService !== undefined) {
-      this.connectionService.monitor().subscribe(isOnline => {});
+      this.connectionService.monitor().subscribe((isOnline) => {});
     }
   }
 
@@ -68,14 +68,16 @@ export class OrderListComponent implements OnInit {
     // }
 
     if (this.firestoreOrderService !== undefined) {
-      this.firestoreOrderService.getOrdersFromOrdersCollection2().subscribe((orders: IOrder[]) => {
-        if (orders !== undefined) {
-          this.dataSource.data = orders;
-        } else {
-          this.dataSource = new MatTableDataSource();
-          //       // ToDo: Meldung in HTML kein Aufträge vorhanden
-        }
-      });
+      this.firestoreOrderService
+        .getOrdersFromOrdersCollection2()
+        .subscribe((orders: IOrder[]) => {
+          if (orders !== undefined) {
+            this.dataSource.data = orders;
+          } else {
+            this.dataSource = new MatTableDataSource();
+            //       // ToDo: Meldung in HTML kein Aufträge vorhanden
+          }
+        });
     }
   }
 
@@ -91,14 +93,16 @@ export class OrderListComponent implements OnInit {
 
   public getOrdersFromIndexedDb(): void {
     if (this.indexedDbService !== undefined) {
-      this.indexedDbService.getOrdersFromOrdersTable().then((orders: IOrder[]) => {
-        if (orders.length > 0) {
-          this.dataSource = new MatTableDataSource<IOrder>(orders);
-        } else {
-          // ToDo: Meldung in HTML kein Aufträge vorhanden
-          this.dataSource = new MatTableDataSource<IOrder>();
-        }
-      });
+      this.indexedDbService
+        .getOrdersFromOrdersTable()
+        .then((orders: IOrder[]) => {
+          if (orders.length > 0) {
+            this.dataSource = new MatTableDataSource<IOrder>(orders);
+          } else {
+            // ToDo: Meldung in HTML kein Aufträge vorhanden
+            this.dataSource = new MatTableDataSource<IOrder>();
+          }
+        });
     }
   }
 
@@ -109,10 +113,10 @@ export class OrderListComponent implements OnInit {
   }
 
   public navigateToOrder(orderId: string): void {
-    this.router.navigate(['/order-details/' + orderId]);
+    this.router.navigate(["/order-details/" + orderId]);
   }
 
   public navigateToCreateOrder(): void {
-    this.router.navigate(['/create-order']);
+    this.router.navigate(["/create-order"]);
   }
 }

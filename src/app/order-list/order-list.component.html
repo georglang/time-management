@@ -1,3 +1,4 @@
+<app-header titleInput="Aufträge"></app-header>
 <div id="order-list-wrapper">
   <div class="sub-nav">
     <input
@@ -11,16 +12,24 @@
   </div>
 
   <div id="order-list-content">
-    <p *ngIf="searchvalue.value != 'search here...' && searchvalue.value != ''"></p>
+    <p
+      *ngIf="searchvalue.value != 'search here...' && searchvalue.value != ''"
+    ></p>
     <table matSort mat-table [dataSource]="dataSource" class="mat-elevation-z8">
+
+      <ng-container matColumnDef="date">
+        <mat-header-cell *matHeaderCellDef>
+          Datum
+        </mat-header-cell>
+        <th mat-sort-header mat-header-cell *matHeaderCellDef>Datum</th>
+        <td mat-cell *matCellDef="let order">
+          {{ order.date | date: "dd.MM.yyyy" }}
+        </td>
+      </ng-container>
+
       <ng-container matColumnDef="customer">
         <th mat-sort-header mat-header-cell *matHeaderCellDef>Kunde</th>
         <td mat-cell *matCellDef="let order">{{ order.companyName }}</td>
-      </ng-container>
-
-      <ng-container matColumnDef="contactPerson">
-        <th mat-sort-header mat-header-cell *matHeaderCellDef>Ansprechpartner</th>
-        <td mat-cell *matCellDef="let order">{{ order.contactPerson }}</td>
       </ng-container>
 
       <ng-container matColumnDef="location">
@@ -41,7 +50,9 @@
       ></tr>
     </table>
 
-    <h5 id="no-orders-found" *ngIf="dataSource.data.length === 0">Keine Aufträge gefunden</h5>
+    <h5 id="no-orders-found" *ngIf="dataSource.data.length === 0">
+      Keine Aufträge gefunden
+    </h5>
   </div>
 </div>
 <div id="bottom-nav">
