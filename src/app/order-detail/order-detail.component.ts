@@ -14,12 +14,21 @@ import { FirestoreRecordService } from "../service/firestore-record-service/fire
 // import { SynchronizeIdxDBWithFirebaseService } from "../service/synchronize-idxDb-with-firebase-service/synchronize-idxDb-with-firebase.service";
 import { MessageService } from "../service/message-service/message.service";
 
-declare var jsPDF: any;
-import "jspdf-autotable";
 import * as moment from "moment";
 import { ConnectionService } from "ng-connection-service";
 import { IOrder } from "../data-classes/Order";
 moment.locale("de");
+
+// import * as jsPDF from 'jspdf';
+// import "jspdf-autotable";
+
+import { jsPDF } from "jspdf";
+import autoTable from "jspdf-autotable";
+import { UserOptions } from "jspdf-autotable";
+
+interface jsPDFWithPlugin extends jsPDF {
+  autoTable: (options: UserOptions) => jsPDF;
+}
 
 @Component({
   selector: "app-order-detail",
@@ -49,6 +58,7 @@ export class OrderDetailComponent implements OnInit {
   public dateFormated;
   public selection = new SelectionModel<ITimeRecord>(true, []);
   private orderIds: number[] = [];
+  public pdf = new jsPDF() as jsPDFWithPlugin;
 
   constructor(
     private route: ActivatedRoute,
@@ -359,9 +369,9 @@ export class OrderDetailComponent implements OnInit {
   }
 
   public print() {
-    const pdf = new jsPDF();
+    this.pdf.setFont("gnuolane", "normal");
+    this.pdf.setFontSize(12);
 
-    pdf.setFontSize(18);
     const columns = [
       { title: "Datum", dataKey: "date" },
       { title: "Beschreibung", dataKey: "description" },
@@ -386,53 +396,87 @@ export class OrderDetailComponent implements OnInit {
       );
     });
 
+    console.log("Time Record", recordsToPrint);
+
     const customerInfo = document.getElementById("customer-info");
-    const customerName = customerInfo.firstChild.childNodes[1].firstChild;
-    const location = customerInfo.firstChild.childNodes[1].lastChild;
 
-    pdf.fromHTML("Kunde: ", 12, 12);
-    pdf.fromHTML(customerName, 32, 12);
+    const date = customerInfo.children[0].children[1].childNodes[0].textContent.trim();
+    const customerName = customerInfo.children[0].children[1].childNodes[1].textContent.trim();
+    const location = customerInfo.children[0].children[1].childNodes[2].textContent.trim();
+    const contactPerson = customerInfo.children[0].children[1].childNodes[3].textContent.trim();
 
-    pdf.fromHTML("Ort: ", 12, 19);
-    pdf.fromHTML(location, 32, 19);
+    this.pdf.text(
+      "FORSTBETRIEB Tschabi | Hochkreuthweg 3 | 87642 Trauchgau",
+      12,
+      10
+    );
 
-    pdf.autoTable(columns, recordsToPrint, {
-      bodyStyles: { valign: "top" },
-      margin: { left: 10, top: 40, right: 10 },
-      styles: { overflow: "linebreak", columnWidth: "wrap" },
-      columnStyles: {
-        description: { columnWidth: "auto" },
-      },
+    this.pdf.fromHTML("Datum: ", 12, 29);
+    this.pdf.fromHTML(date, 42, 29);
+
+    this.pdf.fromHTML("Kunde: ", 12, 36);
+    this.pdf.text(customerName, 42, 36);
+
+    this.pdf.fromHTML("Ort: ", 12, 43);
+    this.pdf.text(location, 42, 43);
+
+    this.pdf.fromHTML("Einsatzleiter: ", 12, 50);
+    this.pdf.text(contactPerson, 42, 50);
+
+    autoTable(this.pdf, { html: "#my-table" });
+
+
+
+    // this.pdf.autoTable(columns, recordsToPrint, {
+    //   bodyStyles: { valign: "top" },
+    //   margin: { left: 10, top: 65, right: 10 },
+    //   styles: {
+    //     overflow: "linebreak",
+    //     columnWidth: "wrap",
+    //     fillColor: [67, 120, 61],
+    //   },
+    //   columnStyles: {
+    //     description: { columnWidth: "auto" },
+    //   },
+    // });
+
+    this.loadLogo();
+  }
+
+  private loadLogo() {
+    // this.loadImage("assets/img/logo100px.png").then((logo) => {
+    //   this.pdf.addImage(logo, "PNG", 173, 10);
+    //   this.saveAsPdf();
+    //   this.loadFooterImage();
+    // });
+  }
+
+  private loadFooterImage() {
+    this.loadImage("assets/img/letter_footer.png").then((logo) => {
+      // this.pdf.addImage(logo, "PNG", 4, 200);
+      // this.pdf.addSVG("assets/letter_footer.svg")
+      // this.pdf.addSVG("assets/letter_footer.svg", 4, 200);
+      // this.saveAsPdf();
     });
+  }
 
+  private saveAsPdf() {
     const dateNow = moment().format("DD.MM.YYYY HH.MM");
     const filename = "Regienstunden " + dateNow + ".pdf";
-    pdf.save(filename);
-    const iframe = document.createElement("iframe");
-    iframe.setAttribute(
-      "style",
-      "position:absolute;right:0; top:0; bottom:0; height:100%; width:650px; padding:20px;"
-    );
-    document.body.appendChild(iframe);
+    this.pdf.save(filename);
+  }
 
-    iframe.src = pdf.output("datauristring");
+  private loadImage(url) {
+    return new Promise((resolve) => {
+      let img = new Image();
+      img.onload = () => resolve(img);
+      img.src = url;
+    });
   }
 
   // Beim allgemeinen synchronisieren muss zuerst herausgefunden werden, was ueberhaut sychronisiert werden muss
   // Erstellen Order und Record Offline: schauen in ordersOutbox
   public synchronizeOrdersAndRecords() {
     // this.synchronizeIdxDBWithFirebase.synchronizeWithFirebase();
-  }
-
-  public updateRecords() {
-    const newRecord = {
-      date: new Date(),
-      description: "Servus Servus",
-      workingHours: 2222,
-      id: 1,
-      orderId: "TyclJFilyldgrBb7GR3J",
-    };
-
-    // this.indexedDbService.updateRecordInRecordsOutboxTable(newRecord);
   }
 }
