@@ -23,7 +23,7 @@ moment.locale("de");
 // import "jspdf-autotable";
 
 import { jsPDF } from "jspdf";
-import autoTable from "jspdf-autotable";
+import "jspdf-autotable";
 import { UserOptions } from "jspdf-autotable";
 
 interface jsPDFWithPlugin extends jsPDF {
@@ -411,21 +411,25 @@ export class OrderDetailComponent implements OnInit {
       10
     );
 
-    this.pdf.fromHTML("Datum: ", 12, 29);
-    this.pdf.fromHTML(date, 42, 29);
+    this.pdf.text("Datum: ", 12, 29);
+    this.pdf.text(date, 42, 29);
 
-    this.pdf.fromHTML("Kunde: ", 12, 36);
+    this.pdf.text("Kunde: ", 12, 36);
     this.pdf.text(customerName, 42, 36);
 
-    this.pdf.fromHTML("Ort: ", 12, 43);
+    this.pdf.text("Ort: ", 12, 43);
     this.pdf.text(location, 42, 43);
 
-    this.pdf.fromHTML("Einsatzleiter: ", 12, 50);
+    this.pdf.text("Einsatzleiter: ", 12, 50);
     this.pdf.text(contactPerson, 42, 50);
 
-    autoTable(this.pdf, { html: "#my-table" });
-
-
+    this.pdf.autoTable({
+      head: [["Name", "Email", "Country"]],
+      body: [
+        ["David", "david@example.com", "Sweden"],
+        ["Castille", "castille@example.com", "Spain"],
+      ],
+    });
 
     // this.pdf.autoTable(columns, recordsToPrint, {
     //   bodyStyles: { valign: "top" },
@@ -441,6 +445,7 @@ export class OrderDetailComponent implements OnInit {
     // });
 
     this.loadLogo();
+    this.saveAsPdf();
   }
 
   private loadLogo() {
