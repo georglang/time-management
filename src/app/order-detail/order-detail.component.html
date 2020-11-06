@@ -201,11 +201,11 @@
         <!-- !row.excluded will prevent those rows from being clicked -->
         <mat-row
           *matRowDef="let row; columns: displayedColumns"
-
-          (click)="highlighted.toggle(row); buttonsFor(row)"
-          [ngClass]="{hovered: row.hovered, highlighted: highlighted.isSelected(row)}"
-
-
+          (click)="highlighted.toggle(row); showEditAndDeleteButton(row)"
+          [ngClass]="{
+            hovered: row.hovered,
+            highlighted: highlighted.isSelected(row)
+          }"
           (click)="!row.excluded && selection.toggle(row)"
           [ngStyle]="row.excluded && { 'background-color': 'lightgrey' }"
         ></mat-row>
@@ -221,28 +221,30 @@
 </div>
 
 <div id="bottom-nav">
-  <button
-    type="button"
-    id="create-record-edit-btn"
-    type="button"
-    mat-fab
-    (click)="createNewRecord()"
-  >
-    <i class="material-icons">edit</i>
-  </button>
+  <div *ngIf="showButtonsIfRecordIsSelected">
+    <button
+      type="button"
+      id="create-record-edit-btn"
+      type="button"
+      mat-fab
+      (click)="editRecord(this.selectedRecord)"
+    >
+      <i class="material-icons">edit</i>
+    </button>
+  </div>
 
-  <button
-    type="button"
-    id="create-record-delete-btn"
-    type="button"
-    mat-fab
-    (click)="createNewRecord()"
-  >
-    <i class="material-icons">delete</i>
-  </button>
-
-
-<div id="bottom-nav">
+  <div *ngIf="showButtonsIfRecordIsSelected">
+    <button
+      *ngIf="showButtonsIfRecordIsSelected"
+      type="button"
+      id="create-record-delete-btn"
+      type="button"
+      mat-fab
+      (click)="deleteRecord(this.selectedRecord)"
+    >
+      <i class="material-icons">delete</i>
+    </button>
+  </div>
   <button
     type="button"
     id="create-record-btn"

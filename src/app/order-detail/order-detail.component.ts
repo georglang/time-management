@@ -57,8 +57,9 @@ export class OrderDetailComponent implements OnInit {
   public dateFormated;
   public selection = new SelectionModel<ITimeRecord>(true, []);
 
-  highlighted = new SelectionModel<ITimeRecord>(false, []);
-
+  public highlighted = new SelectionModel<ITimeRecord>(false, []);
+  public selectedRecord: ITimeRecord;
+  public showButtonsIfRecordIsSelected: boolean = false;
 
   private orderIds: number[] = [];
   public pdf = new jsPDF() as jsPDFWithPlugin;
@@ -141,9 +142,6 @@ export class OrderDetailComponent implements OnInit {
         // });
       }
     });
-
-    debugger;
-    console.log('Is Selected: ', this.highlighted.isSelected)
   }
 
   public isOnline() {
@@ -289,9 +287,9 @@ export class OrderDetailComponent implements OnInit {
     ]);
   }
 
-  public editRecord(id: any) {
+  public editRecord(record: ITimeRecord) {
     this.router.navigate([
-      "/order-details/" + this.paramOrderId + /edit-record/ + id,
+      "/order-details/" + this.paramOrderId + /edit-record/ + record.id,
     ]);
   }
 
@@ -486,9 +484,12 @@ export class OrderDetailComponent implements OnInit {
     // this.synchronizeIdxDBWithFirebase.synchronizeWithFirebase();
   }
 
-  buttonsFor(row) {
-    debugger;
-    console.log('Row: ', row);
-
+  showEditAndDeleteButton(selectedRecord: ITimeRecord) {
+    this.selectedRecord = selectedRecord;
+    if (this.highlighted.selected.length == 0) {
+      this.showButtonsIfRecordIsSelected = false;
+    } else {
+      this.showButtonsIfRecordIsSelected = true;
+    }
   }
 }
