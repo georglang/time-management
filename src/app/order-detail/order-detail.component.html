@@ -19,15 +19,30 @@
   <div id="detail-component-content">
     <div id="customer-info">
       <table>
-        <td>
+        <td class="td-margin">
           <tr>
-            <strong>Kunde</strong>
+            <mat-icon aria-hidden="false" aria-label="Example home icon">
+              date_range
+            </mat-icon>
           </tr>
           <tr>
-            <strong>Ort</strong>
+            <strong>Kunde:</strong>
+          </tr>
+          <tr>
+            <mat-icon aria-hidden="false" aria-label="Example home icon">
+              location_on
+            </mat-icon>
+          </tr>
+          <tr>
+            <strong>Einsatzleiter:</strong>
           </tr>
         </td>
         <td>
+          <tr>
+            {{
+              order?.date | date: "dd.MM.yyyy"
+            }}
+          </tr>
           <tr>
             {{
               order?.companyName
@@ -38,16 +53,9 @@
               order?.location
             }}
           </tr>
-        </td>
-        <td>
           <tr>
             {{
-              order?.companyName
-            }}
-          </tr>
-          <tr>
-            {{
-              order?.location
+              order?.contactPerson
             }}
           </tr>
         </td>
@@ -157,11 +165,11 @@
           </mat-cell>
         </ng-container>
 
-        <ng-container matColumnDef="action">
+        <!-- <ng-container matColumnDef="action">
           <mat-header-cell *matHeaderCellDef>
             Bearbeiten / Löschen
           </mat-header-cell>
-          <div class="test">
+          <div>
             <mat-cell *matCellDef="let element">
               <div id="delete-and-edit-btn-wrapper">
                 <button
@@ -178,17 +186,10 @@
                 >
                   <mat-icon>delete</mat-icon>
                 </button>
-                <button
-                  mat-icon-button
-                  (click)="archiveRecord(element)"
-                  [disabled]="element.excluded"
-                >
-                  <mat-icon>check</mat-icon>
-                </button>
               </div>
             </mat-cell>
           </div>
-        </ng-container>
+        </ng-container> -->
 
         <!-- Exclude Column -->
         <ng-container id="column-excluded" matColumnDef="excluded">
@@ -200,6 +201,11 @@
         <!-- !row.excluded will prevent those rows from being clicked -->
         <mat-row
           *matRowDef="let row; columns: displayedColumns"
+
+          (click)="highlighted.toggle(row); buttonsFor(row)"
+          [ngClass]="{hovered: row.hovered, highlighted: highlighted.isSelected(row)}"
+
+
           (click)="!row.excluded && selection.toggle(row)"
           [ngStyle]="row.excluded && { 'background-color': 'lightgrey' }"
         ></mat-row>
@@ -213,8 +219,32 @@
     </div>
   </div>
 </div>
+
 <div id="bottom-nav">
   <button
+    type="button"
+    id="create-record-edit-btn"
+    type="button"
+    mat-fab
+    (click)="createNewRecord()"
+  >
+    <i class="material-icons">edit</i>
+  </button>
+
+  <button
+    type="button"
+    id="create-record-delete-btn"
+    type="button"
+    mat-fab
+    (click)="createNewRecord()"
+  >
+    <i class="material-icons">delete</i>
+  </button>
+
+
+<div id="bottom-nav">
+  <button
+    type="button"
     id="create-record-btn"
     type="button"
     mat-fab

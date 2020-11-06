@@ -50,15 +50,20 @@ export class OrderDetailComponent implements OnInit {
     "description",
     "workingHours",
     "employee",
-    "action",
     "excluded",
   ];
   public dataSource: MatTableDataSource<ITimeRecord>;
   public hasRecordsFound: boolean = false;
   public dateFormated;
   public selection = new SelectionModel<ITimeRecord>(true, []);
+
+  highlighted = new SelectionModel<ITimeRecord>(false, []);
+
+
   private orderIds: number[] = [];
   public pdf = new jsPDF() as jsPDFWithPlugin;
+
+  public selected = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -136,6 +141,9 @@ export class OrderDetailComponent implements OnInit {
         // });
       }
     });
+
+    debugger;
+    console.log('Is Selected: ', this.highlighted.isSelected)
   }
 
   public isOnline() {
@@ -369,7 +377,7 @@ export class OrderDetailComponent implements OnInit {
   }
 
   public print() {
-    this.pdf.setFont("gnuolane", "normal");
+    this.pdf.setFont("Helvetica");
     this.pdf.setFontSize(12);
 
     const columns = [
@@ -384,16 +392,23 @@ export class OrderDetailComponent implements OnInit {
     this.selection.selected.forEach((selectedRecord) => {
       this.dateFormated = moment(selectedRecord["date"]).format("DD.MM.YYYY");
 
-      recordsToPrint.push(
-        new TimeRecord(
-          this.dateFormated,
-          selectedRecord["description"],
-          selectedRecord["workingHours"],
-          selectedRecord["employee"],
-          "",
-          ""
-        )
-      );
+      // recordsToPrint.push(
+      //   new TimeRecord(
+      //     this.dateFormated,
+      //     selectedRecord["description"],
+      //     selectedRecord["workingHours"],
+      //     selectedRecord["employee"],
+      //     "",
+      //     ""
+      //   )
+      // );
+
+      recordsToPrint.push([
+        this.dateFormated,
+        selectedRecord["description"],
+        selectedRecord["workingHours"],
+        selectedRecord["employee"],
+      ]);
     });
 
     console.log("Time Record", recordsToPrint);
@@ -406,62 +421,48 @@ export class OrderDetailComponent implements OnInit {
     const contactPerson = customerInfo.children[0].children[1].childNodes[3].textContent.trim();
 
     this.pdf.text(
-      "FORSTBETRIEB Tschabi | Hochkreuthweg 3 | 87642 Trauchgau",
+      "Forstbetrieb Tschabi | Hochkreuthweg 3 | 87642 Trauchgau",
       12,
-      10
+      20
     );
 
-    this.pdf.text("Datum: ", 12, 29);
-    this.pdf.text(date, 42, 29);
+    this.pdf.text("Datum: ", 12, 39);
+    this.pdf.text(date, 42, 359);
 
-    this.pdf.text("Kunde: ", 12, 36);
-    this.pdf.text(customerName, 42, 36);
+    this.pdf.text("Kunde: ", 12, 46);
+    this.pdf.text(customerName, 42, 46);
 
-    this.pdf.text("Ort: ", 12, 43);
-    this.pdf.text(location, 42, 43);
+    this.pdf.text("Ort: ", 12, 53);
+    this.pdf.text(location, 42, 53);
 
-    this.pdf.text("Einsatzleiter: ", 12, 50);
-    this.pdf.text(contactPerson, 42, 50);
+    this.pdf.text("Einsatzleiter: ", 12, 60);
+    this.pdf.text(contactPerson, 42, 60);
 
     this.pdf.autoTable({
-      head: [["Name", "Email", "Country"]],
-      body: [
-        ["David", "david@example.com", "Sweden"],
-        ["Castille", "castille@example.com", "Spain"],
-      ],
+      head: [["Datum", "Beschreibung", "Arbeitsstunden", "Arbeiter"]],
+      body: recordsToPrint,
+      margin: { top: 78 },
+      pageBreak: "auto",
+      showHead: "everyPage",
+      showFoot: "everyPage",
     });
 
-    // this.pdf.autoTable(columns, recordsToPrint, {
-    //   bodyStyles: { valign: "top" },
-    //   margin: { left: 10, top: 65, right: 10 },
-    //   styles: {
-    //     overflow: "linebreak",
-    //     columnWidth: "wrap",
-    //     fillColor: [67, 120, 61],
-    //   },
-    //   columnStyles: {
-    //     description: { columnWidth: "auto" },
-    //   },
-    // });
-
     this.loadLogo();
-    this.saveAsPdf();
   }
 
   private loadLogo() {
-    // this.loadImage("assets/img/logo100px.png").then((logo) => {
-    //   this.pdf.addImage(logo, "PNG", 173, 10);
-    //   this.saveAsPdf();
-    //   this.loadFooterImage();
-    // });
+    this.loadImage("assets/img/logo100px.png").then(
+      (logo: HTMLImageElement) => {
+        this.pdf.addImage(logo, "PNG", 170, 17, 24, 24);
+        this.loadFooterImage();
+      }
+    );
   }
 
   private loadFooterImage() {
     this.loadImage("assets/img/letter_footer.png").then((logo) => {
-      // this.pdf.addImage(logo, "PNG", 4, 200);
-      // this.pdf.addSVG("assets/letter_footer.svg")
-      // this.pdf.addSVG("assets/letter_footer.svg", 4, 200);
-      // this.saveAsPdf();
+      this.pdf.addSvgAsImage("assets/letter_footer.svg", 200, 12, 200, 100);
+      this.saveAsPdf();
     });
   }
 
@@ -483,5 +484,11 @@ export class OrderDetailComponent implements OnInit {
   // Erstellen Order und Record Offline: schauen in ordersOutbox
   public synchronizeOrdersAndRecords() {
     // this.synchronizeIdxDBWithFirebase.synchronizeWithFirebase();
+  }
+
+  buttonsFor(row) {
+    debugger;
+    console.log('Row: ', row);
+
   }
 }

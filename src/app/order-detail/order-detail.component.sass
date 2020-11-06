@@ -13,7 +13,6 @@
   top: 50px
   z-index: 1030
 
-
 .sub-nav-btn
   height: 50px
   width: 50px
@@ -22,9 +21,6 @@
   &:hover
     cursor: pointer
     color: grey
-
-#detail-component-content
-  margin-top: 180px
 
 #customer-data
   margin-bottom: 40px
@@ -49,6 +45,10 @@ th
 td
   border-top: 0px
 
+.td-margin
+  padding-left: 15px
+  padding-right: 30px
+
 #record-form
   margin-top: 40px
 
@@ -61,7 +61,9 @@ td
 #customer-info
   margin-top: 12px
   margin-bottom: 30px
-  padding-left: 24px
+  border-bottom: solid grey 1px
+  padding-bottom: 36px
+
   tr
     td
       padding-left: 10px
@@ -98,6 +100,18 @@ td
   right: 16px
   bottom: 16px
 
+#create-record-edit-btn
+  background-color: #5fb345
+  position: absolute
+  right: 16px
+  bottom: 120px
+
+#create-record-delete-btn
+  background-color: #5fb345
+  position: absolute
+  right: 16px
+  bottom: 82px
+
 #order-details-header
   margin: auto
   height: 60px
@@ -133,25 +147,47 @@ td
 .disable-on-mobile
     display: none
 
-.mat-form-field-wrapper
-  padding-top: 16px
-  padding-bottom: 0px !important
+#bottom-nav
+  background-color: #fff
+  height: 50px
+  position: fixed
+  bottom: 0
+  width: 100%
+  box-shadow: 0px 2px 15px 0px rgba(0, 0, 0, 0.12)
+  z-index: 1030
 
-::ng-deep .mat-form-field-underline
-  display: none
 
-.mat-form-field-appearance-legacy
-  padding-bottom: 0px important
+.selected
+  background-color: red!important
 
-.mat-form-field-wrapper
-  padding-bottom: 0em important
+.mat-row.highlighted
+  background: #999
+
+
+// ::ng-deep .mat-form-field-underline
+//   display: none
 
 .mat-column-excluded
   display: none
 
-td.mat-cell
+.mat-cell
   border-bottom-style: none
 
+::ng-deep .mat-checkbox-checked.mat-accent .mat-checkbox-ripple .mat-ripple-element
+  opacity: 0.03 !important
+  background-color: #43783d!important
+
+::ng-deep .mat-checkbox-checked.mat-accent .mat-checkbox-background,.mat-checkbox-indeterminate.mat-accent .mat-checkbox-background
+  background-color: #43783d
+
+// material text input underline
+// ::ng-deep .mat-form-field-underline
+//   display: block
+
+// Extra small devices (portrait phones, less than 576px)
+// No media query for `xs` since this is the default in Bootstrap
+
+// Small devices (landscape phones, 576px and up)
 @media screen and (max-width: 576px)
   .table-responsive-stack
     tr
@@ -177,7 +213,6 @@ td.mat-cell
   .disable-on-mobile
     display: none
 
-
   .mat-form-field
     display: block
     font-size: 16px
@@ -189,3 +224,18 @@ td.mat-cell
     min-height: 28px
     margin-top: 16px
 
+  // material text input underline
+  // ::ng-deep .mat-form-field-underline
+  //   display: none
+
+
+// Medium devices (tablets, 768px and up)
+@media (min-width: 768px)
+
+// Large devices (desktops, 992px and up)
+@media (min-width: 992px)
+  .test
+
+// Extra large devices (large desktops, 1200px and up)
+@media (min-width: 1200px)
+  .test
