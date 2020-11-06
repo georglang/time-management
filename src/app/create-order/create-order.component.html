@@ -14,8 +14,8 @@
 </div>
 
 <div class="container-fluid">
-  <div id="create-order-form">
-    <form [formGroup]="createOrderForm" #documentEditForm="ngForm" (ngSubmit)="onSubmit()">
+  <div id="create-order-form-wrapper">
+    <form id="create-order-form" [formGroup]="createOrderForm" #documentEditForm="ngForm" (ngSubmit)="onSubmit()">
       <fieldset class="form-group">
         <mat-form-field>
           <input
