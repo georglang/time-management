@@ -48,11 +48,13 @@ import { OrderDetailComponent } from "./order-detail/order-detail.component";
 import { EditRecordComponent } from "./edit-record/edit-record.component";
 import { CreateRecordComponent } from "./create-record/create-record.component";
 import { ConfirmDeleteDialogComponent } from "./confirm-delete-dialog/confirm-delete-dialog.component";
+import { ConfirmPrintDialogComponent } from "./confirm-print-dialog/confirm-print-dialog.component";
+
 import { MatSelectModule } from "@angular/material/select";
-import { FooterComponent } from './footer/footer.component';
+import { FooterComponent } from "./footer/footer.component";
 
 @NgModule({
-  declarations: [	
+  declarations: [
     AppComponent,
     OrderListComponent,
     HeaderComponent,
@@ -62,8 +64,10 @@ import { FooterComponent } from './footer/footer.component';
     EditRecordComponent,
     CreateRecordComponent,
     ConfirmDeleteDialogComponent,
-      FooterComponent
-   ],
+    ConfirmPrintDialogComponent,
+    FooterComponent,
+    ConfirmPrintDialogComponent,
+  ],
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
