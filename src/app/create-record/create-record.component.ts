@@ -41,7 +41,7 @@ export class CreateRecordComponent implements OnInit {
       viewValue: "Greisl Martin",
     },
     {
-      value: "schabi Matthias",
+      value: "Tschabi Matthias",
       viewValue: "Tschabi Matthias",
     },
   ];
@@ -82,6 +82,7 @@ export class CreateRecordComponent implements OnInit {
   // ToDo: TimeRecord, Reihenfolge von id und orderId in constructor wechseln
   // dann kann newRecord in new TimeRecord mit angegeben werden
   public createRecord(formInput: any, orderId: string): void {
+    debugger;
     const record = new TimeRecord(
       formInput.date,
       formInput.description,
