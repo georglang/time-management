@@ -2,9 +2,11 @@ import { Component, OnInit, ViewChild } from "@angular/core";
 import { Router } from "@angular/router";
 import { MatSort } from "@angular/material/sort";
 import { MatTableDataSource } from "@angular/material/table";
-
+import { MatDialog, MatDialogConfig } from "@angular/material/dialog";
+import { SelectionModel } from "@angular/cdk/collections";
 import { FirestoreOrderService } from "../service/firestore-order-service/firestore-order.service";
 import { IOrder } from "../data-classes/Order";
+import { ConfirmDeleteDialogComponent } from "../confirm-delete-dialog/confirm-delete-dialog.component";
 
 @Component({
   selector: "app-order-list",
@@ -14,15 +16,19 @@ import { IOrder } from "../data-classes/Order";
 export class OrderListComponent implements OnInit {
   public orders: any[] = []; // IOrder coudn´t be used because of firebase auto generated id,
   public dataSource = new MatTableDataSource();
-  public displayedColumns = ["date", "customer", "location", "detail"];
+  public displayedColumns = ["date", "customer", "location"];
   public isOnlineService: boolean;
+  public highlighted = new SelectionModel<IOrder>(false, []);
+  public selectedOrder: IOrder;
+  public showButtonsIfOrderIsSelected: boolean = false;
 
   @ViewChild(MatSort, { static: false })
   sort: MatSort;
 
   constructor(
     private router: Router,
-    private firestoreOrderService: FirestoreOrderService
+    private firestoreOrderService: FirestoreOrderService,
+    public dialog: MatDialog
   ) {}
 
   ngOnInit() {
@@ -44,14 +50,52 @@ export class OrderListComponent implements OnInit {
     }
   }
 
+  public showActionButtons(selectedOrder: IOrder) {
+    this.selectedOrder = selectedOrder;
+    if (this.highlighted.selected.length == 0) {
+      this.showButtonsIfOrderIsSelected = false;
+    } else {
+      this.showButtonsIfOrderIsSelected = true;
+    }
+  }
+
+  public editOrder(order: IOrder) {
+    debugger;
+    this.router.navigate(["/edit-order/" + order.id]);
+  }
+
+  public deleteOrder(order: IOrder) {
+    this.openDeleteOrderDialog(order.id);
+  }
+
+  public openDeleteOrderDialog(orderId: string): void {
+    const dialogConfig = new MatDialogConfig();
+    dialogConfig.disableClose = true;
+    dialogConfig.autoFocus = true;
+
+    const dialogRef = this.dialog.open(
+      ConfirmDeleteDialogComponent,
+      dialogConfig
+    );
+    dialogRef.afterClosed().subscribe((shouldDelete) => {
+      if (shouldDelete) {
+        this.deleteOrderInFirebase(orderId);
+      }
+    });
+  }
+
+  private deleteOrderInFirebase(orderId: string) {
+    this.firestoreOrderService.deleteOrder(orderId);
+  }
+
   public applyFilter(filterValue: string): void {
     filterValue = filterValue.trim();
     filterValue = filterValue.toLocaleLowerCase();
     this.dataSource.filter = filterValue;
   }
 
-  public navigateToOrder(orderId: string): void {
-    this.router.navigate(["/order-details/" + orderId]);
+  public navigateToOrder(order: IOrder): void {
+    this.router.navigate(["/order-details/" + order.id]);
   }
 
   public navigateToCreateOrder(): void {

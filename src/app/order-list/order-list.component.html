@@ -15,13 +15,10 @@
     <p
       *ngIf="searchvalue.value != 'search here...' && searchvalue.value != ''"
     ></p>
-    <table matSort mat-table [dataSource]="dataSource" class="mat-elevation-z8">
 
+    <table matSort mat-table [dataSource]="dataSource">
       <ng-container matColumnDef="date">
-        <mat-header-cell *matHeaderCellDef>
-          Datum
-        </mat-header-cell>
-        <th mat-sort-header mat-header-cell *matHeaderCellDef>Datum</th>
+        <mat-header-cell *matHeaderCellDef> Datum </mat-header-cell>
         <td mat-cell *matCellDef="let order">
           {{ order.date | date: "dd.MM.yyyy" }}
         </td>
@@ -46,7 +43,11 @@
       <tr
         mat-row
         *matRowDef="let row; columns: displayedColumns"
-        (click)="navigateToOrder(row.id)"
+        (click)="highlighted.toggle(row); showActionButtons(row)"
+        [ngClass]="{
+          hovered: row.hovered,
+          highlighted: highlighted.isSelected(row)
+        }"
       ></tr>
     </table>
 
@@ -56,6 +57,42 @@
   </div>
 </div>
 <div id="bottom-nav">
+  <div *ngIf="showButtonsIfOrderIsSelected">
+    <button
+      type="button"
+      id="create-order-watch-btn"
+      type="button"
+      mat-fab
+      (click)="navigateToOrder(this.selectedOrder)"
+    >
+      <i class="material-icons">visibility</i>
+    </button>
+  </div>
+  <div *ngIf="showButtonsIfOrderIsSelected">
+    <button
+      type="button"
+      id="create-order-edit-btn"
+      type="button"
+      mat-fab
+      (click)="editOrder(this.selectedOrder)"
+    >
+      <i class="material-icons">edit</i>
+    </button>
+  </div>
+
+  <div *ngIf="showButtonsIfOrderIsSelected">
+    <button
+      *ngIf="showButtonsIfOrderIsSelected"
+      type="button"
+      id="create-order-delete-btn"
+      type="button"
+      mat-fab
+      (click)="deleteOrder(this.selectedOrder)"
+    >
+      <i class="material-icons">delete</i>
+    </button>
+  </div>
+
   <button
     type="button"
     id="create-order-btn"
