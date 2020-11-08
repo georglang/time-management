@@ -29,7 +29,7 @@
               date_range
             </mat-icon>
             <div class="float-left icon-margin">
-              {{ order?.date | date: "dd.MM.yyyy" }}
+              {{ order?.date.toDate() | date: "dd.MM.yyyy" }}
             </div>
           </div>
 
@@ -120,13 +120,13 @@
           <mat-header-cell *matHeaderCellDef> Datum</mat-header-cell>
           <mat-cell *matCellDef="let element">
             <div class="disable-on-mobile">
-              {{ element.date | date: "dd.MM.yyyy" }}
+              {{ element?.date | date: "dd.MM.yyyy" }}
             </div>
             <mat-form-field>
               <input
                 matInput
                 placeholder="Datum"
-                value="{{ element.date | date: 'dd.MM.yyyy' }}"
+                value="{{ element?.date | date: 'dd.MM.yyyy' }}"
                 readonly
               />
             </mat-form-field>
