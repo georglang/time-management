@@ -52,6 +52,7 @@ import { ConfirmPrintDialogComponent } from "./confirm-print-dialog/confirm-prin
 
 import { MatSelectModule } from "@angular/material/select";
 import { FooterComponent } from "./footer/footer.component";
+import { EditOrderComponent } from "./edit-order/edit-order.component";
 
 @NgModule({
   declarations: [
@@ -67,6 +68,7 @@ import { FooterComponent } from "./footer/footer.component";
     ConfirmPrintDialogComponent,
     FooterComponent,
     ConfirmPrintDialogComponent,
+    EditOrderComponent
   ],
   imports: [
     BrowserModule,
