@@ -12,18 +12,18 @@ export class ConfirmDeleteDialogComponent implements OnInit {
   public hide = true;
   public isPasswortCorrect = false;
 
-  public signin: FormGroup = new FormGroup({
+  public passwordForm: FormGroup = new FormGroup({
     password: new FormControl("", [Validators.required, Validators.min(3)]),
   });
 
   get passwordInput() {
-    return this.signin.get("password");
+    return this.passwordForm.get("password");
   }
 
   constructor() {}
 
   ngOnInit() {
-    this.signin.controls["password"].valueChanges.subscribe((input) => {
+    this.passwordForm.controls["password"].valueChanges.subscribe((input) => {
       if (input === "Löwenbräu") {
         this.isPasswortCorrect = true;
       }

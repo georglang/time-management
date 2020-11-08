@@ -1,6 +1,6 @@
 <h2 mat-dialog-title>Löschen</h2>
 <mat-dialog-content>Soll der Eintrag wirklich gelöscht werden?</mat-dialog-content>
-<form [formGroup]="signin">
+<form [formGroup]="passwordForm">
   <mat-form-field id="passwort-field">
        <input matInput placeholder="Passwort" [type]="hide ? 'password' : 'text'" formControlName="password" required>
        <mat-icon matSuffix (click)="hide = !hide">{{hide ? 'visibility_off' : 'visibility'}}</mat-icon>
