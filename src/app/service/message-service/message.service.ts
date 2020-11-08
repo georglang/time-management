@@ -47,7 +47,7 @@ export class MessageService {
     this.toastr.success('Erfolgreich erstellt', 'Eintrag', successConfig);
   }
 
-  public recordUpdatedSuccessfully() {
+  public updatedSuccessfully() {
     const successConfig = {
       positionClass: 'toast-bottom-center',
       timeout: 2000
