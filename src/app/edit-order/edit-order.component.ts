@@ -70,7 +70,7 @@ export class EditOrderComponent implements OnInit {
 
   private setControl(order: IOrder): void {
     this.editOrderForm.setValue({
-      date: order.date,
+      date: order.date.toDate(),
       companyName: order.companyName,
       location: order.location,
       contactPerson: order.contactPerson,
