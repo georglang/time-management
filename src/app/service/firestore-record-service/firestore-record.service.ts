@@ -141,13 +141,16 @@ export class FirestoreRecordService {
   }
 
   public updateRecord(orderId: string, record: ITimeRecord) {
+
+    const _record = { ...record}
+
     return this.ordersCollection
       .doc(orderId)
       .collection('records')
-      .doc(record.id)
-      .update(record)
+      .doc(_record.id)
+      .update(_record)
       .then(data => {
-        this.updateRecordInOrdersTable(+orderId, record);
+        this.updateRecordInOrdersTable(+orderId, _record);
       });
   }
 
