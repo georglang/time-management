@@ -20,7 +20,7 @@
       <ng-container matColumnDef="date">
         <mat-header-cell *matHeaderCellDef> Datum </mat-header-cell>
         <td mat-cell *matCellDef="let order">
-          {{ order.date | date: "dd.MM.yyyy" }}
+          {{ order.date?.toDate() | date: "dd.MM.yyyy" }}
         </td>
       </ng-container>
 
