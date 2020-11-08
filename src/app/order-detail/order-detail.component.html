@@ -9,7 +9,7 @@
         >navigate_before</mat-icon
       >
     </div>
-    <button type="button" class="sub-nav-btn" (click)="print()">
+    <button type="button" class="sub-nav-btn" (click)="openPrintDialog()">
       <mat-icon class="print-icon float-right">print</mat-icon>
     </button>
   </div>
@@ -17,49 +17,62 @@
   <div class="order-detail-title"></div>
 
   <div id="detail-component-content">
-    <div id="customer-info">
-      <table>
-        <td class="td-margin">
-          <tr>
-            <mat-icon aria-hidden="false" aria-label="Example home icon">
+    <div id="customer-info" class="clearfix">
+      <div id="customer-info-wrapper" class="clearfix">
+        <div id="customer-info-wrapper-left" class="float-left">
+          <div id="order-date" class="clearfix">
+            <mat-icon
+              class="float-left"
+              aria-hidden="false"
+              aria-label="date icon"
+            >
               date_range
             </mat-icon>
-          </tr>
-          <tr>
-            <strong>Kunde:</strong>
-          </tr>
-          <tr>
-            <mat-icon aria-hidden="false" aria-label="Example home icon">
+            <div class="float-left icon-margin">
+              {{ order?.date | date: "dd.MM.yyyy" }}
+            </div>
+          </div>
+
+          <div id="order-customer" class="clearfix">
+            <mat-icon
+              class="float-left"
+              aria-hidden="false"
+              aria-label="company name icon"
+            >
+              perm_identity
+            </mat-icon>
+            <div class="float-left icon-margin">
+              {{ order?.companyName }}
+            </div>
+          </div>
+        </div>
+        <div id="customer-info-wrapper-right" class="float-left">
+          <div id="order-location" class="clearfix">
+            <mat-icon
+              class="float-left"
+              aria-hidden="false"
+              aria-label="location icon"
+            >
               location_on
             </mat-icon>
-          </tr>
-          <tr>
-            <strong>Einsatzleiter:</strong>
-          </tr>
-        </td>
-        <td>
-          <tr>
-            {{
-              order?.date | date: "dd.MM.yyyy"
-            }}
-          </tr>
-          <tr>
-            {{
-              order?.companyName
-            }}
-          </tr>
-          <tr>
-            {{
-              order?.location
-            }}
-          </tr>
-          <tr>
-            {{
-              order?.contactPerson
-            }}
-          </tr>
-        </td>
-      </table>
+
+            <div class="float-left icon-margin">
+              {{ order?.location }}
+            </div>
+          </div>
+          <div id="order-contact-person" class="clearfix">
+            <img
+              id="helmet-icon"
+              class="float-left"
+              src="./assets/img/helmet.svg"
+              alt="contact person icon"
+            />
+            <div class="float-left icon-margin">
+              {{ order?.contactPerson }}
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <div>
@@ -75,14 +88,14 @@
       >
         <!-- Checkbox Column -->
         <ng-container matColumnDef="select">
-          <th mat-header-cell *matHeaderCellDef>
-            <mat-checkbox
-              (change)="$event ? masterToggle() : null"
-              [checked]="selection.hasValue() && isAllSelected()"
-              [indeterminate]="selection.hasValue() && !isAllSelected()"
-            >
-            </mat-checkbox>
-          </th>
+          <mat-header-cell *matHeaderCellDef>Drucken</mat-header-cell>
+          Drucken
+          <mat-checkbox
+            (change)="$event ? masterToggle() : null"
+            [checked]="selection.hasValue() && isAllSelected()"
+            [indeterminate]="selection.hasValue() && !isAllSelected()"
+          >
+          </mat-checkbox>
           <td mat-cell *matCellDef="let row">
             <mat-checkbox
               (click)="$event.stopPropagation()"
@@ -164,32 +177,6 @@
             </mat-form-field>
           </mat-cell>
         </ng-container>
-
-        <!-- <ng-container matColumnDef="action">
-          <mat-header-cell *matHeaderCellDef>
-            Bearbeiten / Löschen
-          </mat-header-cell>
-          <div>
-            <mat-cell *matCellDef="let element">
-              <div id="delete-and-edit-btn-wrapper">
-                <button
-                  mat-icon-button
-                  (click)="editRecord(element.id)"
-                  [disabled]="element.excluded"
-                >
-                  <mat-icon>edit</mat-icon>
-                </button>
-                <button
-                  mat-icon-button
-                  (click)="deleteRecord(element.id)"
-                  [disabled]="element.excluded"
-                >
-                  <mat-icon>delete</mat-icon>
-                </button>
-              </div>
-            </mat-cell>
-          </div>
-        </ng-container> -->
 
         <!-- Exclude Column -->
         <ng-container id="column-excluded" matColumnDef="excluded">

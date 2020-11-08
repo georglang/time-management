@@ -10,7 +10,6 @@ import { ConfirmDeleteDialogComponent } from "./../confirm-delete-dialog/confirm
 import { ToastrService } from "ngx-toastr";
 import { FirestoreOrderService } from "../service/firestore-order-service/firestore-order.service";
 import { FirestoreRecordService } from "../service/firestore-record-service/firestore-record.service";
-import { MessageService } from "../service/message-service/message.service";
 
 import * as moment from "moment";
 import { ConnectionService } from "ng-connection-service";
@@ -23,6 +22,7 @@ moment.locale("de");
 import { jsPDF } from "jspdf";
 import "jspdf-autotable";
 import { UserOptions } from "jspdf-autotable";
+import { ConfirmPrintDialogComponent } from "../confirm-print-dialog/confirm-print-dialog.component";
 
 interface jsPDFWithPlugin extends jsPDF {
   autoTable: (options: UserOptions) => jsPDF;
@@ -93,14 +93,12 @@ export class OrderDetailComponent implements OnInit {
   }
 
   public getOrderByIdFromCloudDatabase(orderId: string) {
-    this.firestoreOrderService
-      .getOrderById(orderId)
-      .subscribe((order: IOrder) => {
-        if (order !== undefined) {
-          this.order = order;
-          this.getRecordsFromCloudDatabase(orderId);
-        }
-      });
+    this.firestoreOrderService.getOrderById(orderId).then((order: IOrder) => {
+      if (order !== undefined) {
+        this.order = order;
+        this.getRecordsFromCloudDatabase(orderId);
+      }
+    });
   }
 
   public getRecordsFromCloudDatabase(orderId: string): any {
@@ -152,8 +150,8 @@ export class OrderDetailComponent implements OnInit {
     ]);
   }
 
-  public deleteRecord(recordId) {
-    this.openDeleteRecordDialog(recordId);
+  public deleteRecord(record: ITimeRecord) {
+    this.openDeleteRecordDialog(record.id);
   }
 
   public archiveRecord(record: ITimeRecord) {
@@ -178,6 +176,22 @@ export class OrderDetailComponent implements OnInit {
       "Eintrag",
       successConfig
     );
+  }
+
+  public openPrintDialog(): void {
+    const dialogConfig = new MatDialogConfig();
+    dialogConfig.disableClose = true;
+    dialogConfig.autoFocus = true;
+
+    const dialogRef = this.dialog.open(
+      ConfirmPrintDialogComponent,
+      dialogConfig
+    );
+    dialogRef.afterClosed().subscribe((shouldPrint) => {
+      if (shouldPrint) {
+        this.print();
+      }
+    });
   }
 
   public openDeleteRecordDialog(recordId: string): void {
@@ -228,13 +242,6 @@ export class OrderDetailComponent implements OnInit {
     this.pdf.setFont("Helvetica");
     this.pdf.setFontSize(12);
 
-    const columns = [
-      { title: "Datum", dataKey: "date" },
-      { title: "Beschreibung", dataKey: "description" },
-      { title: "Arbeitsstunden", dataKey: "workingHours" },
-      { title: "Arbeiter", dataKey: "employee" },
-    ];
-
     const recordsToPrint = [];
 
     this.selection.selected.forEach((selectedRecord) => {
@@ -252,10 +259,12 @@ export class OrderDetailComponent implements OnInit {
 
     const customerInfo = document.getElementById("customer-info");
 
-    const date = customerInfo.children[0].children[1].childNodes[0].textContent.trim();
-    const customerName = customerInfo.children[0].children[1].childNodes[1].textContent.trim();
-    const location = customerInfo.children[0].children[1].childNodes[2].textContent.trim();
-    const contactPerson = customerInfo.children[0].children[1].childNodes[3].textContent.trim();
+
+    const date = customerInfo.children[0].children[0].childNodes[0].childNodes[1].textContent.trim();
+    const customerName = customerInfo.children[0].children[0].childNodes[1].childNodes[1].textContent.trim();
+
+    const location = customerInfo.children[0].children[1].childNodes[0].childNodes[1].textContent.trim();
+    const contactPerson = customerInfo.children[0].children[1].childNodes[1].childNodes[1].textContent.trim();
 
     this.pdf.text(
       "Forstbetrieb Tschabi | Hochkreuthweg 3 | 87642 Trauchgau",
