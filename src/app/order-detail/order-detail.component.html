@@ -92,6 +92,7 @@
               (change)="$event ? masterToggle() : null"
               [checked]="selection.hasValue() && isAllSelected()"
               [indeterminate]="selection.hasValue() && !isAllSelected()"
+              *ngIf="showPrintButton"
             >
             </mat-checkbox>
           </mat-header-cell>
@@ -100,6 +101,7 @@
               (click)="$event.stopPropagation()"
               (change)="$event ? selection.toggle(row) : null"
               [checked]="selection.isSelected(row)"
+              *ngIf="showPrintButton"
             >
             </mat-checkbox>
           </mat-cell>
