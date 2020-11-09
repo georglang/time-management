@@ -225,15 +225,24 @@ export class OrderDetailComponent implements OnInit {
   /** Whether the number of selected elements matches the total number of rows. */
   public isAllSelected() {
     const numSelected = this.selection.selected.length;
-    const numRows = this.dataSource.data.length;
-    return numSelected === numRows;
+    const numRowsMinusExcluded = this.dataSource.data.filter(
+      (row) => !row.excluded
+    ).length;
+
+    return numSelected === numRowsMinusExcluded;
   }
 
   /** Selects all rows if they are not all selected; otherwise clear selection. */
-  public masterToggle() {
+  masterToggle() {
     this.isAllSelected()
       ? this.selection.clear()
-      : this.dataSource.data.forEach((row) => this.selection.select(row));
+      : // this.dataSource.data.forEach(row => this.selection.select(row));
+
+        this.dataSource.data.forEach((row) => {
+          if (!row.excluded) {
+            this.selection.select(row);
+          }
+        });
   }
 
   private getFormattedDate(date) {
@@ -335,7 +344,7 @@ export class OrderDetailComponent implements OnInit {
 
   public showEditAndDeleteButton(selectedRecord: ITimeRecord) {
     this.selectedRecord = selectedRecord;
-    if (this.highlighted.selected.length == 0) {
+    if (this.highlighted.selected.length == 0 || selectedRecord.excluded) {
       this.showButtonsIfRecordIsSelected = false;
     } else {
       this.showButtonsIfRecordIsSelected = true;

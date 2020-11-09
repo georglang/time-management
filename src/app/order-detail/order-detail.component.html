@@ -29,7 +29,7 @@
               date_range
             </mat-icon>
             <div class="float-left icon-margin">
-              {{ order?.date.seconds * 1000 | date: 'dd.MM.yyyy' }}
+              {{ order?.date?.seconds * 1000 | date: 'dd.MM.yyyy' }}
             </div>
           </div>
 
@@ -119,14 +119,15 @@
           <mat-header-cell *matHeaderCellDef> Datum</mat-header-cell>
           <mat-cell *matCellDef="let order">
             <div class="disable-on-small-device">
-              {{ order?.date.seconds * 1000 | date: 'dd.MM.yyyy' }}
+              {{ order?.date?.seconds * 1000 | date: 'dd.MM.yyyy' }}
             </div>
             <mat-form-field class="">
               <input
                 matInput
                 placeholder="Datum"
-                value="{{ order?.date.seconds * 1000 | date: 'dd.MM.yyyy' }}"
+                value="{{ order?.date?.seconds * 1000 | date: 'dd.MM.yyyy' }}"
                 readonly
+                [disabled]="order.excluded"
               />
             </mat-form-field>
           </mat-cell>
@@ -142,6 +143,7 @@
                 placeholder="Beschreibung"
                 value="{{ order.description }}"
                 readonly
+                [disabled]="order.excluded"
               />
             </mat-form-field>
           </mat-cell>
@@ -157,6 +159,7 @@
                 placeholder="Arbeitsstunden"
                 value="{{ order.workingHours }}"
                 readonly
+                [disabled]="order.excluded"
               />
             </mat-form-field>
           </mat-cell>
@@ -172,6 +175,7 @@
                 placeholder="Arbeiter"
                 value="{{ order.employee }}"
                 readonly
+                [disabled]="order.excluded"
               />
             </mat-form-field>
           </mat-cell>
@@ -193,7 +197,13 @@
             highlighted: highlighted.isSelected(row)
           }"
           (click)="!row.excluded && selection.toggle(row)"
-          [ngStyle]="row.excluded && { 'background-color': 'lightgrey' }"
+          [ngStyle]="
+            row.excluded && {
+              'background-color': '#cccccc',
+              border: '1px solid #999999',
+              color: '#666666'
+            }
+          "
         ></mat-row>
       </mat-table>
 
