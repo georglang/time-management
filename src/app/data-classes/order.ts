@@ -1,8 +1,10 @@
+import { Timestamp } from '@firebase/firestore-types';
 import { ITimeRecord } from './TimeRecords';
 
 export interface IOrder {
   companyName: string;
   contactPerson?: string;
+  date: Timestamp;
   location: string;
   records?: ITimeRecord[];
   id?: any;
@@ -17,17 +19,20 @@ export interface IFlattenOrder {
 export class Order implements IOrder {
   public companyName: string;
   public contactPerson: string;
+  public date: Timestamp;
   public location: string;
   public records: ITimeRecord[];
   public id: any;
 
   constructor(
+    date: Timestamp,
     companyName: string,
     location: string,
     contactPerson?: string,
     records?: ITimeRecord[],
     id?: any
   ) {
+    this.date = date;
     this.companyName = companyName;
     this.location = location;
     if (records === undefined) {
