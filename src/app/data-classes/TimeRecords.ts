@@ -1,33 +1,35 @@
-// ToDo: Evt. createdAt entfernen, da nicht benoetigt
 import { Timestamp } from "@firebase/firestore-types";
-("@firebase/firestore-types");
 
 export interface ITimeRecord {
-  date: any;
+  date: Timestamp;
   description: string;
   workingHours: number;
   employee: string;
   id?: string; // is necessary when deleting local record after synchronization
   orderId?: string;
   excluded?: boolean;
+  highlighted?: boolean;
+  hasBeenPrinted?: boolean;
 }
 
 export class TimeRecord implements ITimeRecord {
-  public date: any;
+  public date: Timestamp;
   public description: string;
   public workingHours: number;
   public employee: string;
   public location: string;
   public id: string;
   public orderId: any;
+  public hasBeenPrinted: boolean;
 
   constructor(
-    date: any,
+    date: Timestamp,
     description: string,
     workingHours: number,
     employee: string,
     id?: string,
-    orderId?: string
+    orderId?: string,
+    hasBeenPrinted?: boolean
   ) {
     this.date = date;
     this.description = description;
@@ -35,5 +37,6 @@ export class TimeRecord implements ITimeRecord {
     this.employee = employee;
     this.id = id;
     this.orderId = orderId;
+    this.hasBeenPrinted = hasBeenPrinted;
   }
 }
