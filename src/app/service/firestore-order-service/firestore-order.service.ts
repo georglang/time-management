@@ -102,14 +102,12 @@ export class FirestoreOrderService {
   documentToDomainObject = (dToDO) => {
     const object = dToDO.payload.doc.data();
     object.id = dToDO.payload.doc.id;
-    debugger;
     return object;
   };
 
   // add order and return new created firebase id
   public addOrder(order: IOrder): Promise<any> {
-    const _order = JSON.parse(JSON.stringify(order));
-    delete _order.id;
+    const _order = { ...order };
     return this.ordersCollection
       .add(_order)
       .then((docReference) => {
