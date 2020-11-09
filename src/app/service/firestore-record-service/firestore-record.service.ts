@@ -5,17 +5,15 @@ import { IOrder } from '../../data-classes/Order';
 import {
   AngularFirestore,
   AngularFirestoreCollection,
-  DocumentData
+  DocumentData,
 } from '@angular/fire/firestore';
 
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import _ from 'lodash';
 
-import { BehaviorSubject } from 'rxjs';
-
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class FirestoreRecordService {
   private ordersCollection: AngularFirestoreCollection<IOrder>;
@@ -26,7 +24,7 @@ export class FirestoreRecordService {
     this.recordsCollection = this.afs.collection<ITimeRecord>('records');
   }
 
-  documentToDomainObject = dToDO => {
+  documentToDomainObject = (dToDO) => {
     const object = dToDO.payload.doc.data();
     object.id = dToDO.payload.doc.id;
     return object;
@@ -37,15 +35,16 @@ export class FirestoreRecordService {
   //
 
   public addTimeRecord(record: ITimeRecord) {
-    const _record = JSON.parse(JSON.stringify(record));
+    const _record = { ...record };
+    delete _record.id;
     return this.ordersCollection
       .doc(_record.orderId)
       .collection('records')
       .add(_record)
-      .then(docReference => {
+      .then((docReference) => {
         return docReference.id;
       })
-      .catch(error => {
+      .catch((error) => {
         console.error('Error adding record: ', error);
       });
   }
@@ -55,7 +54,7 @@ export class FirestoreRecordService {
       .doc(orderId)
       .collection('records')
       .snapshotChanges()
-      .pipe(map(actions => actions.map(this.documentToDomainObject)));
+      .pipe(map((actions) => actions.map(this.documentToDomainObject)));
   }
 
   public getRecordById(orderId): any {
@@ -64,8 +63,8 @@ export class FirestoreRecordService {
       .collection('records')
       .snapshotChanges()
       .pipe(
-        map(actions =>
-          actions.map(a => {
+        map((actions) =>
+          actions.map((a) => {
             const data = a.payload.doc.data() as any;
             const id = a.payload.doc.id;
             return { id, ...data };
@@ -77,22 +76,26 @@ export class FirestoreRecordService {
   // last method
 
   // check if record is in firebase
-  public checkIfRecordExistsInOrderInFirestore(record: ITimeRecord): Promise<boolean> {
+  public checkIfRecordExistsInOrderInFirestore(
+    record: ITimeRecord
+  ): Promise<boolean> {
     let doesRecordExist = true;
     return new Promise((resolve, reject) => {
       // Funktioniert nicht wegen
-      this.getRecordsFromRecordsCollectionTest(record.orderId).then((records: any) => {
-        if (records.length > 0) {
-          if (this.compareIfRecordIsOnline(record, records)) {
-            doesRecordExist = true;
+      this.getRecordsFromRecordsCollectionTest(record.orderId).then(
+        (records: any) => {
+          if (records.length > 0) {
+            if (this.compareIfRecordIsOnline(record, records)) {
+              doesRecordExist = true;
+            } else {
+              doesRecordExist = false;
+            }
           } else {
             doesRecordExist = false;
           }
-        } else {
-          doesRecordExist = false;
+          resolve(doesRecordExist);
         }
-        resolve(doesRecordExist);
-      });
+      );
       resolve(false);
     });
   }
@@ -111,8 +114,8 @@ export class FirestoreRecordService {
 
   public getRecordsFromRecordsCollection() {
     const records: DocumentData[] = [];
-    return this.recordsCollection.ref.get().then(querySnapshot => {
-      querySnapshot.forEach(doc => {
+    return this.recordsCollection.ref.get().then((querySnapshot) => {
+      querySnapshot.forEach((doc) => {
         const data = doc.data() as TimeRecord;
         const timestamp: any = data.date;
         data.date = (timestamp as Timestamp).toDate();
@@ -125,8 +128,8 @@ export class FirestoreRecordService {
   public getRecordsFromRecordsCollectionTest(orderId): Promise<any> {
     const records: ITimeRecord[] = [];
     return new Promise((resolve, reject) => {
-      this.recordsCollection.ref.get().then(querySnapshot => {
-        querySnapshot.forEach(doc => {
+      this.recordsCollection.ref.get().then((querySnapshot) => {
+        querySnapshot.forEach((doc) => {
           const data = doc.data() as TimeRecord;
           const timestamp: any = data.date;
           data.date = (timestamp as Timestamp).toDate();
@@ -141,15 +144,14 @@ export class FirestoreRecordService {
   }
 
   public updateRecord(orderId: string, record: ITimeRecord) {
-
-    const _record = { ...record}
+    const _record = { ...record };
 
     return this.ordersCollection
       .doc(orderId)
       .collection('records')
       .doc(_record.id)
       .update(_record)
-      .then(data => {
+      .then(() => {
         this.updateRecordInOrdersTable(+orderId, _record);
       });
   }
@@ -173,7 +175,7 @@ export class FirestoreRecordService {
     const recordToCompare: ITimeRecord = Object();
     Object.assign(recordToCompare, newRecord);
     delete recordToCompare.id;
-    records.forEach(recordOnline => {
+    records.forEach((recordOnline) => {
       delete recordOnline.id;
       if (_.isEqual(recordOnline, recordToCompare)) {
         isRecordAlreadyOnline = true;
