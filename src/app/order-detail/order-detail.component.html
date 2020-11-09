@@ -10,7 +10,7 @@
       >
     </div>
     <button type="button" class="sub-nav-btn" (click)="openPrintDialog()">
-      <mat-icon class="print-icon float-right">print</mat-icon>
+      <mat-icon class="print-icon float-right">settings</mat-icon>
     </button>
   </div>
 
@@ -86,26 +86,23 @@
         matSort
         *ngIf="hasRecordsFound; else noRecordsFoundTemplate"
       >
-        <!-- Checkbox Column -->
         <ng-container matColumnDef="select">
-          <mat-header-cell *matHeaderCellDef>Drucken</mat-header-cell>
-          Drucken
-          <mat-checkbox
-            (change)="$event ? masterToggle() : null"
-            [checked]="selection.hasValue() && isAllSelected()"
-            [indeterminate]="selection.hasValue() && !isAllSelected()"
-          >
-          </mat-checkbox>
-          <td mat-cell *matCellDef="let row">
+          <mat-header-cell *matHeaderCellDef>
+            <mat-checkbox
+              (change)="$event ? masterToggle() : null"
+              [checked]="selection.hasValue() && isAllSelected()"
+              [indeterminate]="selection.hasValue() && !isAllSelected()"
+            >
+            </mat-checkbox>
+          </mat-header-cell>
+          <mat-cell *matCellDef="let row">
             <mat-checkbox
               (click)="$event.stopPropagation()"
               (change)="$event ? selection.toggle(row) : null"
               [checked]="selection.isSelected(row)"
-              [disabled]="row.excluded"
             >
-              <!-- *ngIf="!row.excluded" -->
             </mat-checkbox>
-          </td>
+          </mat-cell>
         </ng-container>
 
         <ng-container matColumnDef="id">
@@ -211,8 +208,11 @@
   <div *ngIf="showButtonsIfRecordIsSelected">
     <button
       type="button"
-      id="create-record-edit-btn"
-      type="button"
+      [ngClass]="{
+        'create-record-edit-btn-if-print-is-not-active': !showPrintButton,
+        'create-record-edit-btn': showPrintButton,
+        'create-record-edit-btn-if-delete-is-not-active': !showDeleteButton
+      }"
       mat-fab
       (click)="editRecord(this.selectedRecord)"
     >
@@ -220,9 +220,24 @@
     </button>
   </div>
 
-  <div *ngIf="showButtonsIfRecordIsSelected">
+  <div *ngIf="showButtonsIfRecordIsSelected && showPrintButton">
     <button
-      *ngIf="showButtonsIfRecordIsSelected"
+      type="button"
+      [ngClass]="{
+        'create-record-edit-btn-if-print-is-not-active': !showPrintButton,
+        'create-record-edit-btn': showPrintButton
+      }"
+      id="create-record-print-btn"
+      type="button"
+      mat-fab
+      (click)="print()"
+    >
+      <i class="material-icons">print</i>
+    </button>
+  </div>
+
+  <div *ngIf="showButtonsIfRecordIsSelected && showDeleteButton">
+    <button
       type="button"
       id="create-record-delete-btn"
       type="button"
