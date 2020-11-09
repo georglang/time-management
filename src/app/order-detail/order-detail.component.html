@@ -29,7 +29,7 @@
               date_range
             </mat-icon>
             <div class="float-left icon-margin">
-              {{ order?.date.toDate() | date: "dd.MM.yyyy" }}
+              {{ order?.date.seconds * 1000 | date: 'dd.MM.yyyy' }}
             </div>
           </div>
 
@@ -119,14 +119,14 @@
         <ng-container matColumnDef="date">
           <mat-header-cell *matHeaderCellDef> Datum</mat-header-cell>
           <mat-cell *matCellDef="let order">
-            <div class="disable-on-mobile">
-              {{ order.date?.toDate() | date: "dd.MM.yyyy" }}
+            <div class="disable-on-small-device">
+              {{ order?.date.seconds * 1000 | date: 'dd.MM.yyyy' }}
             </div>
-            <mat-form-field>
+            <mat-form-field class="">
               <input
                 matInput
                 placeholder="Datum"
-                value="{{ order?.date.toDate() | date: 'dd.MM.yyyy' }}"
+                value="{{ order?.date.seconds * 1000 | date: 'dd.MM.yyyy' }}"
                 readonly
               />
             </mat-form-field>
@@ -136,7 +136,7 @@
         <ng-container matColumnDef="description">
           <mat-header-cell *matHeaderCellDef>Beschreibung </mat-header-cell>
           <mat-cell *matCellDef="let order">
-            <div class="disable-on-mobile">{{ order.description }}</div>
+            <div class="disable-on-small-device">{{ order.description }}</div>
             <mat-form-field>
               <input
                 matInput
@@ -151,7 +151,7 @@
         <ng-container matColumnDef="workingHours">
           <mat-header-cell *matHeaderCellDef> Arbeitsstunden </mat-header-cell>
           <mat-cell *matCellDef="let order">
-            <div class="disable-on-mobile">{{ order.workingHours }}</div>
+            <div class="disable-on-small-device">{{ order.workingHours }}</div>
             <mat-form-field>
               <input
                 matInput
@@ -166,7 +166,7 @@
         <ng-container matColumnDef="employee">
           <mat-header-cell *matHeaderCellDef> Arbeiter </mat-header-cell>
           <mat-cell *matCellDef="let order">
-            <div class="disable-on-mobile">{{ order.employee }}</div>
+            <div class="disable-on-small-device">{{ order.employee }}</div>
             <mat-form-field>
               <input
                 matInput
