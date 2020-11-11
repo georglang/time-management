@@ -1,22 +1,22 @@
-import { Component, OnInit, ViewChild } from "@angular/core";
-import { Router } from "@angular/router";
-import { MatSort } from "@angular/material/sort";
-import { MatTableDataSource } from "@angular/material/table";
-import { MatDialog, MatDialogConfig } from "@angular/material/dialog";
-import { SelectionModel } from "@angular/cdk/collections";
-import { FirestoreOrderService } from "../service/firestore-order-service/firestore-order.service";
-import { IOrder } from "../data-classes/Order";
-import { ConfirmDeleteDialogComponent } from "../confirm-delete-dialog/confirm-delete-dialog.component";
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { Router } from '@angular/router';
+import { MatSort } from '@angular/material/sort';
+import { MatTableDataSource } from '@angular/material/table';
+import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
+import { SelectionModel } from '@angular/cdk/collections';
+import { FirestoreOrderService } from '../service/firestore-order-service/firestore-order.service';
+import { IOrder } from '../data-classes/Order';
+import { ConfirmDeleteDialogComponent } from '../confirm-delete-dialog/confirm-delete-dialog.component';
 
 @Component({
-  selector: "app-order-list",
-  templateUrl: "./order-list.component.html",
-  styleUrls: ["./order-list.component.sass"],
+  selector: 'app-order-list',
+  templateUrl: './order-list.component.html',
+  styleUrls: ['./order-list.component.sass'],
 })
 export class OrderListComponent implements OnInit {
   public orders: any[] = []; // IOrder coudn´t be used because of firebase auto generated id,
   public dataSource = new MatTableDataSource();
-  public displayedColumns = ["date", "customer", "location"];
+  public displayedColumns = ['date', 'customer', 'location'];
   public isOnlineService: boolean;
   public highlighted = new SelectionModel<IOrder>(false, []);
   public selectedOrder: IOrder;
@@ -41,10 +41,12 @@ export class OrderListComponent implements OnInit {
         .getOrdersFromOrdersCollection2()
         .subscribe((orders: IOrder[]) => {
           if (orders !== undefined) {
-            this.dataSource.data = orders;
+            const ordersSortedByDate = orders.sort(
+              (a, b) => b.date.toMillis() - a.date.toMillis()
+            );
+            this.dataSource = new MatTableDataSource(ordersSortedByDate);
           } else {
             this.dataSource = new MatTableDataSource();
-            //       // ToDo: Meldung in HTML kein Aufträge vorhanden
           }
         });
     }
@@ -60,8 +62,7 @@ export class OrderListComponent implements OnInit {
   }
 
   public editOrder(order: IOrder) {
-    debugger;
-    this.router.navigate(["/edit-order/" + order.id]);
+    this.router.navigate(['/edit-order/' + order.id]);
   }
 
   public deleteOrder(order: IOrder) {
@@ -95,10 +96,10 @@ export class OrderListComponent implements OnInit {
   }
 
   public navigateToOrder(order: IOrder): void {
-    this.router.navigate(["/order-details/" + order.id]);
+    this.router.navigate(['/order-details/' + order.id]);
   }
 
   public navigateToCreateOrder(): void {
-    this.router.navigate(["/create-order"]);
+    this.router.navigate(['/create-order']);
   }
 }

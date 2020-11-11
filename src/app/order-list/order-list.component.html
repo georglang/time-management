@@ -1,5 +1,5 @@
 <app-header titleInput="Aufträge"></app-header>
-<div id="order-list-wrapper">
+<div id="order-list-content-wrapper">
   <div class="sub-nav">
     <input
       id="search"
@@ -20,7 +20,7 @@
       <ng-container matColumnDef="date">
         <mat-header-cell *matHeaderCellDef> Datum </mat-header-cell>
         <td mat-cell *matCellDef="let order">
-          {{ order.date?.toDate() | date: "dd.MM.yyyy" }}
+          {{ order?.date.seconds * 1000 | date: 'dd.MM.yyyy' }}
         </td>
       </ng-container>
 
