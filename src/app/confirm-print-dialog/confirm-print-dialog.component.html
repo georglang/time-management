@@ -1,14 +1,24 @@
-<h2 mat-dialog-title>Drucken</h2>
-<mat-dialog-content>Soll gedruckt werden?</mat-dialog-content>
+<h2 mat-dialog-title>Erweiterte Einstellungen</h2>
+<mat-dialog-content>Einstellungen freischalten</mat-dialog-content>
 <form [formGroup]="passwordForm">
   <mat-form-field id="passwort-field">
-       <input matInput placeholder="Passwort" [type]="hide ? 'password' : 'text'" formControlName="password" required>
-       <mat-icon matSuffix (click)="hide = !hide">{{hide ? 'visibility_off' : 'visibility'}}</mat-icon>
-       <mat-hint *ngIf="!passwordInput.value">Passwort eingeben</mat-hint>
-   </mat-form-field>
- </form>
+    <input
+      matInput
+      placeholder="Passwort"
+      [type]="hide ? 'password' : 'text'"
+      formControlName="password"
+      required
+    />
+    <mat-icon matSuffix (click)="hide = !hide">{{
+      hide ? 'visibility_off' : 'visibility'
+    }}</mat-icon>
+    <mat-hint *ngIf="!passwordInput.value">Passwort eingeben</mat-hint>
+  </mat-form-field>
+</form>
 
 <mat-dialog-actions>
   <button mat-button [mat-dialog-close]="false">Nein</button>
-  <button mat-button [mat-dialog-close]="true" [disabled]="!isPasswortCorrect">Ja</button>
+  <button mat-button [mat-dialog-close]="true" [disabled]="!isPasswortCorrect">
+    Ja
+  </button>
 </mat-dialog-actions>
