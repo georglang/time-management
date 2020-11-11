@@ -1,100 +1,108 @@
 <app-header titleInput="Regiestunden anlegen"></app-header>
 
-<div id="create-record-wrapper">
-  <div class="sub-nav">
-    <div class="sub-nav-btn">
-      <mat-icon
-        (click)="navigateToOrderList()"
-        class="navigate-before-icon float-left"
-        >navigate_before</mat-icon
-      >
-    </div>
-
-    <!-- <button type="button" class="sub-nav-btn" (click)="documentEditForm.ngSubmit.emit()" [disabled]="!documentEditForm.form.valid">
-      <mat-icon class="order-complete-icon float-right">check</mat-icon>
-    </button> -->
-    <button
-      type="button"
-      (click)="documentCreateRecordForm.ngSubmit.emit()"
-      class="sub-nav-btn"
+<div class="sub-nav">
+  <div class="sub-nav-btn">
+    <mat-icon
+      (click)="navigateToOrderList()"
+      class="navigate-before-icon float-left"
+      >navigate_before</mat-icon
     >
-      <mat-icon class="order-complete-icon float-right">save</mat-icon>
-    </button>
   </div>
 
-  <div id="create-record-wrapper">
-    <form
-      id="create-record-form"
-      [formGroup]="createRecordForm"
-      #documentCreateRecordForm="ngForm"
-      (ngSubmit)="onSubmit()"
-    >
-      <fieldset class="form-group">
-        <mat-form-field>
-          <input
-            matInput
-            [matDatepicker]="picker"
-            placeholder="Datum wählen"
-            id="date"
-            name="date"
-            formControlName="date"
-            (click)="picker.open()"
-            autocomplete="off"
-            required
-          />
-          <mat-datepicker-toggle
-            matSuffix
-            [for]="picker"
-          ></mat-datepicker-toggle>
-          <mat-datepicker #picker></mat-datepicker>
-        </mat-form-field>
-      </fieldset>
+  <!-- <button type="button" class="sub-nav-btn" (click)="documentEditForm.ngSubmit.emit()" [disabled]="!documentEditForm.form.valid">
+    <mat-icon class="order-complete-icon float-right">check</mat-icon>
+  </button> -->
+  <button
+    type="button"
+    (click)="documentCreateRecordForm.ngSubmit.emit()"
+    class="sub-nav-btn"
+  >
+    <mat-icon class="order-complete-icon float-right">save</mat-icon>
+  </button>
+</div>
 
-      <fieldset class="form-group">
-        <mat-form-field>
-          <input
-            matInput
-            formControlName="description"
-            placeholder="Art der Arbeit"
-            autocomplete="off"
-            required
-          />
-          <!-- <mat-error *ngFor="let validation of form_validation_messages.description">
-            <mat-error class="error-message" *ngIf="item.controls.description.hasError(validation.type) && (item.controls.description.dirty || item.controls.description.touched)">{{validation.message}}</mat-error>
-          </mat-error> -->
-        </mat-form-field>
-      </fieldset>
+<div class="container-fluid">
+  <div id="create-record-content-wrapper" class="row">
+    <div class="col">
+      <div id="create-record-form-wrapper">
+        <form
+          id="create-record-form"
+          [formGroup]="createRecordForm"
+          #documentCreateRecordForm="ngForm"
+          (ngSubmit)="onSubmit()"
+        >
+          <fieldset class="form-group">
+            <mat-form-field>
+              <input
+                matInput
+                [matDatepicker]="picker"
+                placeholder="Datum wählen"
+                id="date"
+                name="date"
+                formControlName="date"
+                (click)="picker.open()"
+                autocomplete="off"
+                required
+              />
+              <mat-datepicker-toggle
+                matSuffix
+                [for]="picker"
+              ></mat-datepicker-toggle>
+              <mat-datepicker #picker></mat-datepicker>
+            </mat-form-field>
+          </fieldset>
 
-      <fieldset class="form-group">
-        <mat-form-field>
-          <input
-            matInput
-            type="number"
-            step="0.25"
-            formControlName="workingHours"
-            placeholder="Arbeitsstunden"
-            autocomplete="off"
-            required
-          />
-          <!-- <mat-error *ngFor="let validation of form_validation_messages.time">
-            <mat-error class="error-message" *ngIf="item.controls.time.hasError(validation.type) && (item.controls.time.dirty || item.controls.time.touched)">{{validation.message}}</mat-error>
-          </mat-error> -->
-        </mat-form-field>
-      </fieldset>
+          <fieldset class="form-group">
+            <mat-form-field>
+              <input
+                matInput
+                formControlName="description"
+                placeholder="Art der Arbeit"
+                autocomplete="off"
+                required
+              />
+              <!-- <mat-error *ngFor="let validation of form_validation_messages.description">
+                <mat-error class="error-message" *ngIf="item.controls.description.hasError(validation.type) && (item.controls.description.dirty || item.controls.description.touched)">{{validation.message}}</mat-error>
+              </mat-error> -->
+            </mat-form-field>
+          </fieldset>
 
-      <fieldset class="form-group">
-        <mat-form-field appearance="fill">
-          <mat-label>Arbeiter auswählen</mat-label>
-          <mat-select [(ngModel)]="selectedEmployee" formControlName="employee">
-            <mat-option
-              *ngFor="let employee of employees"
-              [value]="employee.value"
-            >
-              {{ employee.viewValue }}
-            </mat-option>
-          </mat-select>
-        </mat-form-field>
-      </fieldset>
-    </form>
+          <fieldset class="form-group">
+            <mat-form-field>
+              <input
+                matInput
+                type="number"
+                step="0.25"
+                formControlName="workingHours"
+                placeholder="Arbeitsstunden"
+                autocomplete="off"
+                required
+              />
+              <!-- <mat-error *ngFor="let validation of form_validation_messages.time">
+                <mat-error class="error-message" *ngIf="item.controls.time.hasError(validation.type) && (item.controls.time.dirty || item.controls.time.touched)">{{validation.message}}</mat-error>
+              </mat-error> -->
+            </mat-form-field>
+          </fieldset>
+
+          <fieldset class="form-group">
+            <mat-form-field appearance="fill">
+              <mat-label>Arbeiter auswählen</mat-label>
+              <mat-select
+                [(ngModel)]="selectedEmployee"
+                formControlName="employee"
+                multiple
+              >
+                <mat-option
+                  *ngFor="let employee of employees"
+                  [value]="employee.value"
+                >
+                  {{ employee.viewValue }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </fieldset>
+        </form>
+      </div>
+    </div>
   </div>
 </div>

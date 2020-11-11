@@ -1,19 +1,19 @@
-import { Component, OnInit } from "@angular/core";
-import { Router, ActivatedRoute } from "@angular/router";
-import { FormBuilder, FormGroup, Validators } from "@angular/forms";
+import { Component, OnInit } from '@angular/core';
+import { Router, ActivatedRoute } from '@angular/router';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 // import { IndexedDBService } from '../service/indexedDb-service/indexedDb.service';
-import { ITimeRecord, TimeRecord } from "../data-classes/TimeRecords";
-import { FirestoreRecordService } from "../service/firestore-record-service/firestore-record.service";
-import { MessageService } from "../service/message-service/message.service";
-import { IOrder } from "../data-classes/Order";
+import { ITimeRecord, TimeRecord } from '../data-classes/TimeRecords';
+import { FirestoreRecordService } from '../service/firestore-record-service/firestore-record.service';
+import { MessageService } from '../service/message-service/message.service';
+import { IOrder } from '../data-classes/Order';
 
 // ToDo:
 // Messages recordCreatedSuccessfully kontrollieren
 
 @Component({
-  selector: "app-create-record",
-  templateUrl: "./create-record.component.html",
-  styleUrls: ["./create-record.component.sass"],
+  selector: 'app-create-record',
+  templateUrl: './create-record.component.html',
+  styleUrls: ['./create-record.component.sass'],
 })
 export class CreateRecordComponent implements OnInit {
   public createRecordForm: FormGroup;
@@ -21,28 +21,28 @@ export class CreateRecordComponent implements OnInit {
   public selectedEmployee;
   public employees = [
     {
-      value: "Speer Leonhard",
-      viewValue: "Speer Leonhard",
+      value: 'Erle Wastl',
+      viewValue: 'Erle Wastl',
     },
     {
-      value: "Strobel Martin",
-      viewValue: "Strobel Martin",
+      value: 'Greisl Martin',
+      viewValue: 'Greisl Martin',
     },
     {
-      value: "Erle Wastl",
-      viewValue: "Erle Wastl",
+      value: 'Martin Johann',
+      viewValue: 'Martin Johann',
     },
     {
-      value: "Martin Johann",
-      viewValue: "Martin Johann",
+      value: 'Speer Leonhard',
+      viewValue: 'Speer Leonhard',
     },
     {
-      value: "Greisl Martin",
-      viewValue: "Greisl Martin",
+      value: 'Strobel Martin',
+      viewValue: 'Strobel Martin',
     },
     {
-      value: "Tschabi Matthias",
-      viewValue: "Tschabi Matthias",
+      value: 'Tschabi Matthias',
+      viewValue: 'Tschabi Matthias',
     },
   ];
 
@@ -57,10 +57,10 @@ export class CreateRecordComponent implements OnInit {
 
   ngOnInit() {
     this.createRecordForm = this.formBuilder.group({
-      date: ["", Validators.required],
-      description: ["", Validators.required],
-      workingHours: ["", Validators.required],
-      employee: ["", Validators.required],
+      date: ['', Validators.required],
+      description: ['', Validators.required],
+      workingHours: ['', Validators.required],
+      employee: ['', Validators.required],
     });
 
     this.route.params.subscribe((params) => {
@@ -76,20 +76,21 @@ export class CreateRecordComponent implements OnInit {
   }
 
   public navigateToOrderList() {
-    this.router.navigate(["/order-details", this.routeParamOrderId]);
+    this.router.navigate(['/order-details', this.routeParamOrderId]);
   }
 
   // ToDo: TimeRecord, Reihenfolge von id und orderId in constructor wechseln
   // dann kann newRecord in new TimeRecord mit angegeben werden
   public createRecord(formInput: any, orderId: string): void {
-    debugger;
     const record = new TimeRecord(
       formInput.date,
       formInput.description,
       formInput.workingHours,
-      formInput.employee
+      formInput.employee,
+      '',
+      '',
+      false
     );
-    debugger;
     record.orderId = orderId;
     this.addRecordToFirebaseRecordsTable(record);
 
@@ -103,7 +104,7 @@ export class CreateRecordComponent implements OnInit {
     this.createRecordIfOffline(record);
   }
 
-  addRecordToFirebaseRecordsTable(record: any): void {
+  public addRecordToFirebaseRecordsTable(record: any): void {
     if (this.firestoreRecordService !== undefined) {
       // check if record is already in firestore
       this.firestoreRecordService
@@ -114,12 +115,12 @@ export class CreateRecordComponent implements OnInit {
               .addTimeRecord(record)
               .then((id: string) => {
                 this.messageService.recordCreatedSuccessfully();
-                this.router.navigate(["order-details", record.orderId]);
+                this.router.navigate(['order-details', record.orderId]);
                 record.id = id;
                 this.addRecordToIndexedDbRecordsTable(record);
               })
               .catch((e) => {
-                console.error("can´t create record to firebase", e);
+                console.error('can´t create record to firebase', e);
               });
           } else {
             this.messageService.recordAlreadyExists();
@@ -186,8 +187,6 @@ export class CreateRecordComponent implements OnInit {
   }
 
   public onSubmit() {
-    const test = this.createRecordForm.get("employee");
-    debugger;
     this.createRecord(this.createRecordForm.value, this.routeParamOrderId);
     // if (this.isConnected()) {
     //   this.createRecordIfOnline(this.createRecordForm.value, this.paramId);
