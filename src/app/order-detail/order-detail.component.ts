@@ -31,10 +31,11 @@ interface jsPDFWithPlugin extends jsPDF {
 @Component({
   selector: 'app-order-detail',
   templateUrl: './order-detail.component.html',
-  styleUrls: ['./order-detail.component.sass'],
+  styleUrls: ['./order-detail.component.sass']
 })
 export class OrderDetailComponent implements OnInit {
   @Input() customer;
+
   private paramOrderId;
   public _isOnline;
   public sumOfWorkingHours;
@@ -48,7 +49,7 @@ export class OrderDetailComponent implements OnInit {
     'description',
     'workingHours',
     'employee',
-    'excluded',
+    'hasBeenPrinted',
   ];
   public dataSource: MatTableDataSource<ITimeRecord>;
   public hasRecordsFound: boolean = false;
@@ -109,7 +110,10 @@ export class OrderDetailComponent implements OnInit {
         .getRecordsByOrderId(orderId)
         .subscribe((records: ITimeRecord[]) => {
           this.order.records = records;
-          this.setRecordDataSource(records);
+          const recordsSortedByDate = this.order.records.sort(
+            (a, b) => b.date.toMillis() - a.date.toMillis()
+          );
+          this.setRecordDataSource(recordsSortedByDate);
         });
     }
   }
@@ -157,7 +161,7 @@ export class OrderDetailComponent implements OnInit {
   }
 
   public archiveRecord(record: ITimeRecord) {
-    record.excluded = true;
+    record.hasBeenPrinted = true;
   }
 
   public showDeleteMessage() {
@@ -225,11 +229,11 @@ export class OrderDetailComponent implements OnInit {
   /** Whether the number of selected elements matches the total number of rows. */
   public isAllSelected() {
     const numSelected = this.selection.selected.length;
-    const numRowsMinusExcluded = this.dataSource.data.filter(
-      (row) => !row.excluded
+    const numRowsMinushasBeenPrinted = this.dataSource.data.filter(
+      (row) => !row.hasBeenPrinted
     ).length;
 
-    return numSelected === numRowsMinusExcluded;
+    return numSelected === numRowsMinushasBeenPrinted;
   }
 
   /** Selects all rows if they are not all selected; otherwise clear selection. */
@@ -239,7 +243,7 @@ export class OrderDetailComponent implements OnInit {
       : // this.dataSource.data.forEach(row => this.selection.select(row));
 
         this.dataSource.data.forEach((row) => {
-          if (!row.excluded) {
+          if (!row.hasBeenPrinted) {
             this.selection.select(row);
           }
         });
@@ -261,18 +265,18 @@ export class OrderDetailComponent implements OnInit {
     this.pdf.setFont('Helvetica');
     this.pdf.setFontSize(12);
 
-    const recordsToPrint = [];
+    const records = [];
+    const recordsToSave = [];
 
     this.selection.selected.forEach((selectedRecord) => {
-      recordsToPrint.push([
+      recordsToSave.push(selectedRecord);
+      records.push([
         this.getFormattedDate(selectedRecord.date.toDate()),
         selectedRecord['description'],
         selectedRecord['workingHours'],
         selectedRecord['employee'],
       ]);
     });
-
-    console.log('Time Record', recordsToPrint);
 
     const customerInfo = document.getElementById('customer-info');
 
@@ -302,14 +306,16 @@ export class OrderDetailComponent implements OnInit {
 
     this.pdf.autoTable({
       head: [['Datum', 'Beschreibung', 'Arbeitsstunden', 'Arbeiter']],
-      body: recordsToPrint,
+      body: records,
       margin: { top: 78 },
       pageBreak: 'auto',
       showHead: 'everyPage',
       showFoot: 'everyPage',
     });
 
+    this.updateRecordsInFirestore(recordsToSave);
     this.loadLogo();
+    this.saveAsPdf();
   }
 
   private loadLogo() {
@@ -324,7 +330,6 @@ export class OrderDetailComponent implements OnInit {
   private loadFooterImage() {
     this.loadImage('assets/img/letter_footer.png').then((logo) => {
       this.pdf.addSvgAsImage('assets/letter_footer.svg', 200, 12, 200, 100);
-      this.saveAsPdf();
     });
   }
 
@@ -332,6 +337,13 @@ export class OrderDetailComponent implements OnInit {
     const dateNow = moment().format('DD.MM.YYYY HH.MM');
     const filename = 'Regienstunden ' + dateNow + '.pdf';
     this.pdf.save(filename);
+  }
+
+  private updateRecordsInFirestore(records: ITimeRecord[]) {
+    records.forEach((record) => {
+      record.hasBeenPrinted = true;
+      this.firestoreRecordService.updateRecord(record.orderId, record);
+    });
   }
 
   private loadImage(url) {
@@ -344,7 +356,10 @@ export class OrderDetailComponent implements OnInit {
 
   public showEditAndDeleteButton(selectedRecord: ITimeRecord) {
     this.selectedRecord = selectedRecord;
-    if (this.highlighted.selected.length == 0 || selectedRecord.excluded) {
+    if (
+      this.highlighted.selected.length == 0 ||
+      selectedRecord.hasBeenPrinted
+    ) {
       this.showButtonsIfRecordIsSelected = false;
     } else {
       this.showButtonsIfRecordIsSelected = true;

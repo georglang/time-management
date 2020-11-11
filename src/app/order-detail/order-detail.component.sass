@@ -41,9 +41,6 @@
   width: 270px
   margin: auto
 
-#customer-info-wrapper-right
-  margin-left: 45px
-
 .icon-margin
   margin-left: 14px
 
@@ -95,35 +92,36 @@ td
   right: 16px
   bottom: 16px
 
-#create-record-delete-btn
-  background-color: #5fb345
+#create-record-print-btn
   position: absolute
+  background-color: #5fb345
   right: 16px
   bottom: 78px
 
-#create-record-print-btn
+#create-record-delete-btn
   background-color: #5fb345
   position: absolute
   right: 16px
   bottom: 141px
 
+
 .create-record-edit-btn-if-print-is-not-active
-  background-color: #5fb345
   position: absolute
   right: 16px
   bottom: 141px
 
 .create-record-edit-btn-if-delete-is-not-active
-  background-color: #5fb345
   position: absolute
   right: 16px
   bottom: 78px
 
 .create-record-edit-btn
-  background-color: #5fb345
   position: absolute
   right: 16px
   bottom: 204px
+
+#edit-record-btn
+   background-color: #5fb345
 
 #order-details-header
   margin: auto
@@ -173,13 +171,13 @@ td
   background-color: red!important
 
 .mat-row.highlighted
-  background: #999
+  background: #59804d
 
 
 // ::ng-deep .mat-form-field-underline
 //   display: none
 
-.mat-column-excluded
+.mat-column-hasBeenPrinted
   display: none
 
 .mat-cell
@@ -212,10 +210,13 @@ mat-cell:first-of-type, mat-header-cell:first-of-type
 
 .mat-row
   min-height: 28px
-  margin-top: 16px
 
 #checkbox-print
   display: none
+
+::ng-deep .mat-form-field-wrapper
+  padding-bottom: 22px !important
+
 
 // Small devices (landscape phones, 576px and up)
 @media screen and (min-width: 576px)
@@ -244,17 +245,10 @@ mat-cell:first-of-type, mat-header-cell:first-of-type
 
   .mat-row
     min-height: 28px
-    margin-top: 16px
 
   // angular material: text input underline
   ::ng-deep .mat-form-field-underline
     display: none
-
-  .mat-form-field-wrapper
-    padding-bottom: 0px !important
-
-  .mat-form-field-appearance-legacy .mat-form-field-wrapper
-    padding-bottom: 0.25em !important
 
   #checkbox-print
     display: block
