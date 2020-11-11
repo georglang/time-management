@@ -69,8 +69,9 @@ export class EditOrderComponent implements OnInit {
   }
 
   private setControl(order: IOrder): void {
+    const date = order.date.toDate();
     this.editOrderForm.setValue({
-      date: order.date.toDate(),
+      date: date,
       companyName: order.companyName,
       location: order.location,
       contactPerson: order.contactPerson,
