@@ -19,7 +19,7 @@
             "polyfills": "src/polyfills.ts",
             "tsConfig": "src/tsconfig.app.json",
             "assets": ["src/favicon.ico", "src/assets", "src/manifest.json"],
-            "styles": ["src/styles.sass", "node_modules/ngx-toastr/toastr.css"]
+            "styles": ["src/styles.sass", "node_modules/ngx-toastr/toastr.css"],
             "scripts": [
               "./node_modules/jquery/dist/jquery.min.js",
               "./node_modules/jspdf/dist/jspdf.es.min.js",
