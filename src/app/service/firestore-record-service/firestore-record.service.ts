@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core';
-import { Timestamp } from '@firebase/firestore-types';
 import { TimeRecord, ITimeRecord } from '../../data-classes/TimeRecords';
 import { IOrder } from '../../data-classes/Order';
 import {
@@ -100,25 +99,11 @@ export class FirestoreRecordService {
     });
   }
 
-  // public getRecordsFromRecordsCollection() {
-  //   const records: DocumentData[] = [];
-  //   return this.recordsCollection.ref.get().then(querySnapshot => {
-  //     querySnapshot.forEach(doc => {
-  //       console.log(doc.data());
-  //       records.push(doc.data());
-  //       return doc.data();
-  //     });
-  //     return records;
-  //   });
-  // }
-
   public getRecordsFromRecordsCollection() {
     const records: DocumentData[] = [];
     return this.recordsCollection.ref.get().then((querySnapshot) => {
       querySnapshot.forEach((doc) => {
         const data = doc.data() as TimeRecord;
-        const timestamp: any = data.date;
-        data.date = (timestamp as Timestamp).toDate();
         records.push(data);
       });
       return records;
@@ -131,8 +116,6 @@ export class FirestoreRecordService {
       this.recordsCollection.ref.get().then((querySnapshot) => {
         querySnapshot.forEach((doc) => {
           const data = doc.data() as TimeRecord;
-          const timestamp: any = data.date;
-          data.date = (timestamp as Timestamp).toDate();
           if (data.orderId === orderId) {
             records.push(data);
           }
