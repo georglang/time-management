@@ -2,84 +2,98 @@
 
 <div class="sub-nav">
   <div class="sub-nav-btn">
-    <mat-icon (click)="navigateToOrderList()" class="navigate-before-icon float-left"
+    <mat-icon
+      (click)="navigateToOrderList()"
+      class="navigate-before-icon float-left"
       >navigate_before</mat-icon
     >
   </div>
 
-  <button type="button" class="sub-nav-btn" (click)="documentEditForm.ngSubmit.emit()">
+  <button
+    type="button"
+    class="sub-nav-btn"
+    (click)="documentEditForm.ngSubmit.emit()"
+  >
     <!-- [disabled]="!documentEditForm.form.valid" -->
     <mat-icon class="order-complete-icon float-right">save</mat-icon>
   </button>
 </div>
 
 <div class="container-fluid">
-  <div id="create-order-form-wrapper">
-    <form id="create-order-form" [formGroup]="createOrderForm" #documentEditForm="ngForm" (ngSubmit)="onSubmit()">
-      <fieldset class="form-group">
-        <mat-form-field>
-          <input
-            matInput
-            [matDatepicker]="picker"
-            placeholder="Datum wählen"
-            id="date"
-            name="date"
-            formControlName="date"
-            (click)="picker.open()"
-            autocomplete="off"
-            required
-          />
-          <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-          <mat-datepicker #picker></mat-datepicker>
-        </mat-form-field>
-      </fieldset>
+  <div id="create-order-content-wrapper" class="row">
+    <div class="col">
+      <div id="create-order-form-wrapper">
+        <form
+          id="create-order-form"
+          [formGroup]="createOrderForm"
+          #documentEditForm="ngForm"
+          (ngSubmit)="onSubmit()"
+        >
+          <fieldset class="form-group">
+            <mat-form-field>
+              <input
+                matInput
+                [matDatepicker]="picker"
+                placeholder="Datum wählen"
+                id="date"
+                name="date"
+                formControlName="date"
+                (click)="picker.open()"
+                autocomplete="off"
+                required
+              />
+              <mat-datepicker-toggle matSuffix [for]="picker">
+              </mat-datepicker-toggle>
+              <mat-datepicker #picker></mat-datepicker>
+            </mat-form-field>
+          </fieldset>
 
+          <fieldset class="form-group">
+            <mat-form-field>
+              <input
+                matInput
+                set
+                control
+                name
+                formControlName="companyName"
+                placeholder="Firmenname"
+                class="form-control form-control-sm"
+                type="text"
+              />
+            </mat-form-field>
+          </fieldset>
 
+          <fieldset class="form-group">
+            <mat-form-field>
+              <input
+                matInput
+                set
+                control
+                name
+                formControlName="contactPerson"
+                placeholder="Einsatzleiter"
+                class="form-control form-control-sm"
+                type="text"
+              />
+            </mat-form-field>
+          </fieldset>
 
-      <fieldset class="form-group">
-        <mat-form-field>
-          <input
-            matInput
-            set
-            control
-            name
-            formControlName="companyName"
-            placeholder="Firmenname"
-            class="form-control form-control-sm"
-            type="text"
-          />
-        </mat-form-field>
-      </fieldset>
-
-      <fieldset class="form-group">
-        <mat-form-field>
-          <input
-            matInput
-            set
-            control
-            name
-            formControlName="contactPerson"
-            placeholder="Einsatzleiter"
-            class="form-control form-control-sm"
-            type="text"
-          />
-        </mat-form-field>
-      </fieldset>
-
-      <fieldset class="form-group">
-        <mat-form-field>
-          <input
-            matInput
-            set
-            control
-            name
-            formControlName="location"
-            placeholder="Ort"
-            class="form-control form-control-sm"
-            type="text"
-          />
-        </mat-form-field>
-      </fieldset>
-    </form>
+          <fieldset class="form-group">
+            <mat-form-field>
+              <input
+                matInput
+                set
+                control
+                name
+                formControlName="location"
+                placeholder="Ort"
+                class="form-control form-control-sm"
+                type="text"
+              />
+            </mat-form-field>
+          </fieldset>
+        </form>
+      </div>
+    </div>
   </div>
 </div>
