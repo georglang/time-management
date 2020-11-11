@@ -1,4 +1,4 @@
-import { Timestamp } from "@firebase/firestore-types";
+import { Timestamp } from '@firebase/firestore-types';
 
 export interface ITimeRecord {
   date: Timestamp;
@@ -7,8 +7,6 @@ export interface ITimeRecord {
   employee: string;
   id?: string; // is necessary when deleting local record after synchronization
   orderId?: string;
-  excluded?: boolean;
-  highlighted?: boolean;
   hasBeenPrinted?: boolean;
 }
 
