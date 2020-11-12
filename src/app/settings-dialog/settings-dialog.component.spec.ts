@@ -3,21 +3,21 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { DebugElement } from '@angular/core';
 
-import { ConfirmPrintDialogComponent } from './confirm-print-dialog.component';
+import { SettingsDialogComponent } from './settings-dialog.component';
 
 describe('ConfirmPrintDialogComponent', () => {
-  let component: ConfirmPrintDialogComponent;
-  let fixture: ComponentFixture<ConfirmPrintDialogComponent>;
+  let component: SettingsDialogComponent;
+  let fixture: ComponentFixture<SettingsDialogComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ ConfirmPrintDialogComponent ]
+      declarations: [ SettingsDialogComponent ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(ConfirmPrintDialogComponent);
+    fixture = TestBed.createComponent(SettingsDialogComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
