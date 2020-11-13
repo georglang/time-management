@@ -36,8 +36,6 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 // services
 import { FirestoreOrderService } from './service/firestore-order-service/firestore-order.service';
 import { FirestoreRecordService } from './service/firestore-record-service/firestore-record.service';
-import { IndexedDBService } from './service/indexedDb-service/indexedDb.service';
-import { SynchronizeIdxDBWithFirebaseService } from './service/synchronize-idxDb-with-firebase-service/synchronize-idxDb-with-firebase.service';
 
 // components
 import { OrderListComponent } from './order-list/order-list.component';
@@ -96,8 +94,6 @@ import { EditOrderComponent } from './edit-order/edit-order.component';
     AngularFirestoreModule,
   ],
   providers: [
-    IndexedDBService,
-    SynchronizeIdxDBWithFirebaseService,
     FirestoreOrderService,
     FirestoreRecordService,
     Database,
