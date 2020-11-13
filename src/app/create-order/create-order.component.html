@@ -1,28 +1,26 @@
 <app-header titleInput="Auftrag anlegen"></app-header>
 
-<div class="sub-nav">
-  <div class="sub-nav-btn">
-    <mat-icon
-      (click)="navigateToOrderList()"
-      class="navigate-before-icon float-left"
-      >navigate_before</mat-icon
-    >
+<div class="sub-nav row">
+  <div class="col-10">
+    <div type="button" class="nav-before-btn" (click)="navigateToOrderList()">
+      <mat-icon>navigate_before</mat-icon>
+    </div>
   </div>
-
-  <button
-    type="button"
-    class="sub-nav-btn"
-    (click)="documentEditForm.ngSubmit.emit()"
-  >
-    <!-- [disabled]="!documentEditForm.form.valid" -->
-    <mat-icon class="order-complete-icon float-right">save</mat-icon>
-  </button>
+  <div class="col-2">
+    <div
+      type="button"
+      class="settings-btn"
+      (click)="documentEditForm.ngSubmit.emit()"
+    >
+      <mat-icon>save</mat-icon>
+    </div>
+  </div>
 </div>
 
-<div class="container-fluid">
-  <div id="create-order-content-wrapper" class="row">
-    <div class="col">
-      <div id="create-order-form-wrapper">
+<div id="create-order-component-wrapper" class="row">
+  <div class="col-12">
+    <div id="create-order-form-wrapper" class="row no-gutters">
+      <div class="col-12">
         <form
           id="create-order-form"
           [formGroup]="createOrderForm"
