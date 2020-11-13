@@ -1,26 +1,26 @@
 <app-header titleInput="Bearbeiten"></app-header>
-<div class="sub-nav">
-  <div class="sub-nav-btn">
-    <mat-icon
-      (click)="navigateToOrderList()"
-      class="navigate-before-icon float-left"
-      >navigate_before</mat-icon
-    >
-  </div>
 
-  <button
-    type="button"
-    class="sub-nav-btn"
-    (click)="documentEditForm.ngSubmit.emit()"
-  >
-    <mat-icon class="order-complete-icon float-right">save</mat-icon>
-  </button>
+<div class="sub-nav row">
+  <div class="col-10">
+    <div type="button" class="nav-before-btn" (click)="navigateToOrderList()">
+      <mat-icon>navigate_before</mat-icon>
+    </div>
+  </div>
+  <div class="col-2">
+    <div
+      type="button"
+      class="save-btn"
+      (click)="documentEditForm.ngSubmit.emit()"
+    >
+      <mat-icon>save</mat-icon>
+    </div>
+  </div>
 </div>
 
-<div class="container-fluid">
-  <div id="edit-record-content-wrapper" class="row">
-    <div class="col">
-      <div id="edit-record-form-wrapper">
+<div id="edit-record-component-wrapper" class="row no-gutter">
+  <div class="col-12">
+    <div id="edit-record-form-wrapper" class="row no-gutter">
+      <div class="col-12">
         <form
           id="edit-record-form"
           [formGroup]="editRecordForm"
@@ -57,9 +57,6 @@
                 autocomplete="off"
                 required
               />
-              <!-- <mat-error *ngFor="let validation of form_validation_messages.description">
-                  <mat-error class="error-message" *ngIf="item.controls.description.hasError(validation.type) && (item.controls.description.dirty || item.controls.description.touched)">{{validation.message}}</mat-error>
-                </mat-error> -->
             </mat-form-field>
           </fieldset>
 
@@ -74,19 +71,13 @@
                 autocomplete="off"
                 required
               />
-              <!-- <mat-error *ngFor="let validation of form_validation_messages.time">
-                  <mat-error class="error-message" *ngIf="item.controls.time.hasError(validation.type) && (item.controls.time.dirty || item.controls.time.touched)">{{validation.message}}</mat-error>
-                </mat-error> -->
             </mat-form-field>
           </fieldset>
 
           <fieldset class="form-group">
             <mat-form-field appearance="fill">
               <mat-label>Arbeiter auswählen</mat-label>
-              <mat-select
-                formControlName="employee"
-                multiple
-              >
+              <mat-select formControlName="employee" multiple>
                 <mat-option
                   *ngFor="let employee of employees"
                   [value]="employee.value"
@@ -96,9 +87,6 @@
               </mat-select>
             </mat-form-field>
           </fieldset>
-          <!-- <button type="button" class="btn btn-sm" type="submit">
-                  Submit
-                </button> -->
         </form>
       </div>
     </div>
