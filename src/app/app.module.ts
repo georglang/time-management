@@ -40,7 +40,6 @@ import { FirestoreRecordService } from './service/firestore-record-service/fires
 // components
 import { OrderListComponent } from './order-list/order-list.component';
 import { HeaderComponent } from './header/header.component';
-import { Database } from './database/Database';
 import { CreateOrderComponent } from './create-order/create-order.component';
 import { OrderDetailComponent } from './order-detail/order-detail.component';
 import { EditRecordComponent } from './edit-record/edit-record.component';
@@ -96,7 +95,6 @@ import { EditOrderComponent } from './edit-order/edit-order.component';
   providers: [
     FirestoreOrderService,
     FirestoreRecordService,
-    Database,
     SortFormArrayByDate,
     {
       provide: FirebaseOptionsToken,
