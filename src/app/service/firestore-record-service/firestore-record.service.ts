@@ -29,10 +29,6 @@ export class FirestoreRecordService {
     return object;
   };
 
-  //
-  // Online
-  //
-
   public addTimeRecord(record: ITimeRecord) {
     const _record = { ...record };
     delete _record.id;
@@ -72,15 +68,11 @@ export class FirestoreRecordService {
       );
   }
 
-  // last method
-
-  // check if record is in firebase
   public checkIfRecordExistsInOrderInFirestore(
     record: ITimeRecord
   ): Promise<boolean> {
     let doesRecordExist = true;
     return new Promise((resolve, reject) => {
-      // Funktioniert nicht wegen
       this.getRecordsFromRecordsCollectionTest(record.orderId).then(
         (records: any) => {
           if (records.length > 0) {
@@ -134,15 +126,7 @@ export class FirestoreRecordService {
       .collection('records')
       .doc(_record.id)
       .update(_record)
-      .then(() => {
-        this.updateRecordInOrdersTable(+orderId, _record);
-      });
-  }
-
-  private updateRecordInOrdersTable(orderId, record): void {
-    // this.indexedDBService.updateRecordInOrdersTable(orderId, record).then(() => {
-    //   this.messageService.recordUpdatedSuccessful();
-    // });
+      .then(() => {});
   }
 
   public deleteRecord(orderId: string, recordId) {
