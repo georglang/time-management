@@ -8,7 +8,6 @@ import { ToastrService } from "ngx-toastr";
 import { FirestoreOrderService } from "../service/firestore-order-service/firestore-order.service";
 import { ConnectionService } from "ng-connection-service";
 import { MessageService } from "../service/message-service/message.service";
-import _ from "lodash";
 
 @Component({
   selector: "app-create-order",

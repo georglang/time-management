@@ -7,7 +7,7 @@ import { ServiceWorkerModule } from '@angular/service-worker';
 import { environment } from '../environments/environment';
 
 // firebase modulese
-import { FirebaseOptionsToken } from '@angular/fire';
+import { FIREBASE_OPTIONS } from '@angular/fire';
 import { AngularFirestoreModule } from '@angular/fire/firestore';
 
 // own modules
@@ -97,7 +97,7 @@ import { EditOrderComponent } from './edit-order/edit-order.component';
     FirestoreRecordService,
     SortFormArrayByDate,
     {
-      provide: FirebaseOptionsToken,
+      provide: FIREBASE_OPTIONS,
       useValue: environment.firebase,
     },
     {
