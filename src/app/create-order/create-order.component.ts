@@ -2,7 +2,6 @@ import { Component, OnInit } from "@angular/core";
 import { Router } from "@angular/router";
 import { FormBuilder, FormGroup, FormArray, Validators } from "@angular/forms";
 
-import { SynchronizeIdxDBWithFirebaseService } from "./../service/synchronize-idxDb-with-firebase-service/synchronize-idxDb-with-firebase.service";
 import { Order, IOrder } from "../data-classes/Order";
 
 import { ToastrService } from "ngx-toastr";
