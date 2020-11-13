@@ -1,45 +1,25 @@
+.col-12
+  padding-left: 0px
+  padding-right: 0px
+
 .sub-nav
-  height: 50px
+  height: 55px
   background: #fff
-  display: -ms-flexbox
-  display: flex
-  -ms-flex-pack: justify
-  justify-content: space-between
-  -ms-flex-align: center
-  align-items: center
   box-shadow: 0px 2px 15px 0px rgba(0, 0, 0, 0.12)
-  width: 100%
   position: fixed
+  width: 100%
   top: 50px
   z-index: 1030
 
-.sub-nav-btn
-  height: 50px
-  width: 50px
-  background-color: #fff
-  border: none
-  margin-right: 10px
-  &:hover
-    cursor: pointer
-    color: grey
+.nav-before-btn
+  text-align: left
+  margin-top: 8px
+  mat-icon
+    font-size: 40px
 
-#customer-data
-  margin-bottom: 40px
-  margin-left: 16px
-
-.navigate-before-icon
-  margin-top: 6px
-  margin-left: 6px
-  font-size: 38px
-
-.order-complete-icon
-  margin-top: -1px
-  margin-right: 10px
-  font-size: 27px
-
-#customer-info-wrapper
-  width: 270px
-  margin: auto
+.settings-btn
+  text-align: right
+  margin-top: 15px
 
 .icon-margin
   margin-left: 14px
@@ -54,37 +34,28 @@
 #order-contact-person
   margin-top: 4px
 
-.order-completed
-  color: #1c9021
-
 th
   display: none
 
 td
   border-top: 0px
 
-.td-margin
-  padding-left: 15px
-  padding-right: 30px
-
-#record-form
-  margin-top: 40px
-
-#add-record-btn
-  position: absolute
-  bottom: 16px
-  right: 16px
-  background-color: #5fb345
-
-#customer-info
-  margin-top: 12px
-  margin-bottom: 30px
+#customer-info-wrapper
   border-bottom: solid grey 1px
   padding-top: 38px
   padding-bottom: 36px
 
-.mat-table
-  padding-bottom: 40px
+#customer-info-wrapper-right
+  margin-left: 20px
+
+#customer-info
+  width: 80%
+  margin: auto
+  display: flex
+  justify-content: center
+
+#order-detail-table-wrapper
+  margin-top: 20px
 
 #create-record-btn
   background-color: #5fb345
@@ -104,7 +75,6 @@ td
   right: 16px
   bottom: 141px
 
-
 .create-record-edit-btn-if-print-is-not-active
   position: absolute
   right: 16px
@@ -123,13 +93,6 @@ td
 #edit-record-btn
    background-color: #5fb345
 
-#order-details-header
-  margin: auto
-  height: 60px
-  width: 90%
-  box-shadow: 1px 7px 24px -4px rgba(0, 0, 0, 0.61)
-  margin-top: 20px
-
 #contact-person
   margin-left: 20px
 
@@ -138,22 +101,6 @@ td
 
 #location
   margin-left: 34px
-
-#sum-of-working-hours
-  margin-top: 10px
-  span:nth-child(2)
-    margin-left: 10px
-
-#record-list-wrapper
-  box-shadow: 0px 2px 15px 0px rgba(0, 0, 0, 0.12)
-
-#no-records-found
-  margin-left: 30px
-
-#delete-and-edit-btn-wrapper
-  width: 170px
-  right: 0px
-  position: absolute
 
 .disable-on-small-device
   display: none
@@ -172,10 +119,6 @@ td
 
 .mat-row.highlighted
   background: #59804d
-
-
-// ::ng-deep .mat-form-field-underline
-//   display: none
 
 .mat-column-hasBeenPrinted
   display: none
@@ -198,9 +141,6 @@ td
 mat-cell:first-of-type, mat-header-cell:first-of-type
   padding-left: 0px
 
-.disable-on-mobile
-  display: none
-
 .mat-form-field
   display: block
   font-size: 16px
@@ -211,20 +151,12 @@ mat-cell:first-of-type, mat-header-cell:first-of-type
 .mat-row
   min-height: 28px
 
-#checkbox-print
-  display: none
-
 ::ng-deep .mat-form-field-wrapper
   padding-bottom: 22px !important
 
 
 // Small devices (landscape phones, 576px and up)
 @media screen and (min-width: 576px)
-  // Nicht loeschen
-  // .mat-header-row
-  //   display: flex
-  //   justify-content: flex-start
-
   .mat-row
     flex-direction: row
     align-items: start
@@ -232,9 +164,6 @@ mat-cell:first-of-type, mat-header-cell:first-of-type
 
   mat-cell:first-of-type, mat-header-cell:first-of-type
     padding-left: 0px
-
-  .disable-on-mobile
-    display: none
 
   .mat-form-field
     display: block
@@ -249,9 +178,6 @@ mat-cell:first-of-type, mat-header-cell:first-of-type
   // angular material: text input underline
   ::ng-deep .mat-form-field-underline
     display: none
-
-  #checkbox-print
-    display: block
 
 // Medium devices (tablets, 768px and up)
 @media (min-width: 768px)
