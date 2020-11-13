@@ -4,6 +4,34 @@
 @import '~bootstrap/scss/bootstrap-grid'
 @import '~bootstrap/scss/bootstrap'
 
+$main-color: #43783d
+
 // global styles and libraries
 .btn:focus,.btn:active, input, button
   outline: none !important
+
+
+
+// bootstrap - start
+
+.row
+  margin-right: 0px
+  margin-left: 0px
+
+.row.no-gutters
+  margin-right: 0
+  margin-left: 0
+
+  & > [class^="col-"],
+  & > [class*=" col-"]
+    padding-right: 0
+    padding-left: 0
+
+// bootstrap - end
+
+.mat-select-content, .mat-select-panel-done-animating
+  background: green !important
+  .mat-option
+    color : green !important
+
+// angular material data table - end
