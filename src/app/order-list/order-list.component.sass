@@ -2,27 +2,20 @@
   margin-top: 4%
 
 .sub-nav
-  height: 50px
+  height: 55px
   background: #fff
-  display: -ms-flexbox
-  display: flex
-  -ms-flex-pack: justify
-  justify-content: space-between
-  -ms-flex-align: center
-  align-items: center
   box-shadow: 0px 2px 15px 0px rgba(0, 0, 0, 0.12)
   position: fixed
   width: 100%
-  position: fixed
   top: 50px
   z-index: 1030
-  mat-icon
-    margin-top: 6px
-    margin-right: 8px
+
+.settings-btn
+  text-align: right
+  margin-top: 15px
 
 #order-list-content-wrapper
-  margin-top: 140px
-
+  margin-top: 120px
 
 .order-list-title
   width: 100%
@@ -36,13 +29,16 @@
   top: 50px
 
 #search
-  height: 100%
-  width: 100%
+  height: 50px
+  width: 60%
   border: 0
-  display: block
-  padding: 24px
   font-size: 16px
   color: #696969
+  margin-left: 12px
+  padding-top: 3px
+
+.search-icon
+  margin-top: 15px
 
 table
   width: 100%
@@ -112,11 +108,42 @@ table
   right: 16px
   bottom: 141px
 
-#create-order-watch-btn
+.create-order-edit-btn-if-delete-btn-is-active
+  background-color: #5fb345
+  position: absolute
+  right: 16px
+  bottom: 141px
+
+.create-order-edit-btn
+  background-color: #5fb345
+  position: absolute
+  right: 16px
+  bottom: 78px
+
+.create-watch-btn-if-delete-btn-is-active
   background-color: #5fb345
   position: absolute
   right: 16px
   bottom: 204px
 
+.create-order-watch-btn
+  background-color: #5fb345
+  position: absolute
+  right: 16px
+  bottom: 141px
+
 .mat-row.highlighted
   background: #999
+
+@media (min-width: 576px)
+  #search
+    width: 90%
+
+// Medium devices (tablets, 768px and up)
+@media (min-width: 768px)
+
+// Large devices (desktops, 992px and up)
+@media (min-width: 992px)
+
+// Extra large devices (large desktops, 1200px and up)
+@media (min-width: 1200px)

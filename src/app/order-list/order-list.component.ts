@@ -7,6 +7,7 @@ import { SelectionModel } from '@angular/cdk/collections';
 import { FirestoreOrderService } from '../service/firestore-order-service/firestore-order.service';
 import { IOrder } from '../data-classes/Order';
 import { ConfirmDeleteDialogComponent } from '../confirm-delete-dialog/confirm-delete-dialog.component';
+import { SettingsDialogComponent } from '../settings-dialog/settings-dialog.component';
 
 @Component({
   selector: 'app-order-list',
@@ -21,6 +22,7 @@ export class OrderListComponent implements OnInit {
   public highlighted = new SelectionModel<IOrder>(false, []);
   public selectedOrder: IOrder;
   public showButtonsIfOrderIsSelected: boolean = false;
+  public showDeleteButton: boolean = false;
 
   @ViewChild(MatSort, { static: false })
   sort: MatSort;
@@ -67,6 +69,19 @@ export class OrderListComponent implements OnInit {
 
   public deleteOrder(order: IOrder) {
     this.openDeleteOrderDialog(order.id);
+  }
+
+  public openSettingsDialog(): void {
+    const dialogConfig = new MatDialogConfig();
+    dialogConfig.disableClose = true;
+    dialogConfig.autoFocus = true;
+
+    const dialogRef = this.dialog.open(SettingsDialogComponent, dialogConfig);
+    dialogRef.afterClosed().subscribe((shouldPrint) => {
+      if (shouldPrint) {
+        this.showDeleteButton = true;
+      }
+    });
   }
 
   public openDeleteOrderDialog(orderId: string): void {

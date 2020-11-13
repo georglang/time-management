@@ -1,16 +1,26 @@
 <app-header titleInput="Aufträge"></app-header>
-<div id="order-list-content-wrapper">
-  <div class="sub-nav">
-    <input
-      id="search"
-      #searchvalue
-      (keyup)="applyFilter($event.target.value)"
-      placeholder="Suchen"
-      type="text"
-    />
-    <div class="third-wrap"><mat-icon>search</mat-icon></div>
+<div class="sub-nav row">
+  <div class="col-10">
+    <mat-icon class="float-left search-icon">search</mat-icon>
+    <div id="search-wrapper" class="clearfix">
+      <input
+        id="search"
+        class="float-left"
+        #searchvalue
+        (keyup)="applyFilter($event.target.value)"
+        placeholder="Suchen"
+        type="text"
+      />
+    </div>
   </div>
+  <div class="col-2">
+    <div type="button" class="settings-btn" (click)="openSettingsDialog()">
+      <mat-icon class="print-icon">settings</mat-icon>
+    </div>
+  </div>
+</div>
 
+<div id="order-list-content-wrapper">
   <div id="order-list-content">
     <p
       *ngIf="searchvalue.value != 'search here...' && searchvalue.value != ''"
@@ -56,11 +66,14 @@
     </h5>
   </div>
 </div>
+
 <div id="bottom-nav">
   <div *ngIf="showButtonsIfOrderIsSelected">
     <button
-      type="button"
-      id="create-order-watch-btn"
+      [ngClass]="{
+        'create-watch-btn-if-delete-btn-is-active': showDeleteButton,
+        'create-order-watch-btn': !showDeleteButton
+      }"
       type="button"
       mat-fab
       (click)="navigateToOrder(this.selectedOrder)"
@@ -70,8 +83,10 @@
   </div>
   <div *ngIf="showButtonsIfOrderIsSelected">
     <button
-      type="button"
-      id="create-order-edit-btn"
+      [ngClass]="{
+        'create-order-edit-btn-if-delete-btn-is-active': showDeleteButton,
+        'create-order-edit-btn': !showDeleteButton
+      }"
       type="button"
       mat-fab
       (click)="editOrder(this.selectedOrder)"
@@ -80,7 +95,7 @@
     </button>
   </div>
 
-  <div *ngIf="showButtonsIfOrderIsSelected">
+  <div *ngIf="showButtonsIfOrderIsSelected && showDeleteButton">
     <button
       *ngIf="showButtonsIfOrderIsSelected"
       type="button"
