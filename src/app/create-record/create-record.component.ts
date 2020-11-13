@@ -14,6 +14,7 @@ export class CreateRecordComponent implements OnInit {
   public createRecordForm: FormGroup;
   private routeParamOrderId;
   public selectedEmployee;
+  public submitted = false;
   public employees = [
     {
       value: 'Erle Wastl',
@@ -104,7 +105,16 @@ export class CreateRecordComponent implements OnInit {
     }
   }
 
+  get getFormControl() {
+    return this.createRecordForm.controls;
+  }
+
   public onSubmit() {
-    this.createRecord(this.createRecordForm.value, this.routeParamOrderId);
+    this.submitted = true;
+    if (this.createRecordForm.invalid) {
+      return;
+    } else {
+      this.createRecord(this.createRecordForm.value, this.routeParamOrderId);
+    }
   }
 }

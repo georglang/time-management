@@ -39,12 +39,23 @@
                 (click)="picker.open()"
                 autocomplete="off"
                 required
+                [ngClass]="{
+                  'is-invalid': submitted && getFormControl.date.errors
+                }"
               />
               <mat-datepicker-toggle
                 matSuffix
                 [for]="picker"
               ></mat-datepicker-toggle>
               <mat-datepicker #picker></mat-datepicker>
+              <div
+                *ngIf="submitted && getFormControl.date.errors"
+                class="invalid-feedback"
+              >
+                <div *ngIf="getFormControl.date.errors.required">
+                  Bitte <strong>Datum</strong> eingeben
+                </div>
+              </div>
             </mat-form-field>
           </fieldset>
 
@@ -56,10 +67,18 @@
                 placeholder="Art der Arbeit"
                 autocomplete="off"
                 required
+                [ngClass]="{
+                  'is-invalid': submitted && getFormControl.description.errors
+                }"
               />
-              <!-- <mat-error *ngFor="let validation of form_validation_messages.description">
-                  <mat-error class="error-message" *ngIf="item.controls.description.hasError(validation.type) && (item.controls.description.dirty || item.controls.description.touched)">{{validation.message}}</mat-error>
-                </mat-error> -->
+              <div
+                *ngIf="submitted && getFormControl.description.errors"
+                class="invalid-feedback"
+              >
+                <div *ngIf="getFormControl.description.errors.required">
+                  Bitte <strong>Beschreibung</strong> eingeben
+                </div>
+              </div>
             </mat-form-field>
           </fieldset>
 
@@ -73,10 +92,18 @@
                 placeholder="Arbeitsstunden"
                 autocomplete="off"
                 required
+                [ngClass]="{
+                  'is-invalid': submitted && getFormControl.workingHours.errors
+                }"
               />
-              <!-- <mat-error *ngFor="let validation of form_validation_messages.time">
-                  <mat-error class="error-message" *ngIf="item.controls.time.hasError(validation.type) && (item.controls.time.dirty || item.controls.time.touched)">{{validation.message}}</mat-error>
-                </mat-error> -->
+              <div
+                *ngIf="submitted && getFormControl.workingHours.errors"
+                class="invalid-feedback"
+              >
+                <div *ngIf="getFormControl.workingHours.errors.required">
+                  Bitte <strong>Stunden</strong> eingeben
+                </div>
+              </div>
             </mat-form-field>
           </fieldset>
 
@@ -87,6 +114,9 @@
                 [(ngModel)]="selectedEmployee"
                 formControlName="employee"
                 multiple
+                [ngClass]="{
+                  'is-invalid': submitted && getFormControl.employee.errors
+                }"
               >
                 <mat-option
                   *ngFor="let employee of employees"
@@ -95,6 +125,14 @@
                   {{ employee.viewValue }}
                 </mat-option>
               </mat-select>
+              <div
+                *ngIf="submitted && getFormControl.employee.errors"
+                class="invalid-feedback"
+              >
+                <div *ngIf="getFormControl.employee.errors.required">
+                  Bitte <strong>Arbeiter</strong> auswählen
+                </div>
+              </div>
             </mat-form-field>
           </fieldset>
         </form>
