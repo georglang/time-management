@@ -48,7 +48,7 @@ import { OrderDetailComponent } from './order-detail/order-detail.component';
 import { EditRecordComponent } from './edit-record/edit-record.component';
 import { CreateRecordComponent } from './create-record/create-record.component';
 import { ConfirmDeleteDialogComponent } from './confirm-delete-dialog/confirm-delete-dialog.component';
-import { ConfirmPrintDialogComponent } from './confirm-print-dialog/confirm-print-dialog.component';
+import { SettingsDialogComponent } from './settings-dialog/settings-dialog.component';
 
 import { MatSelectModule } from '@angular/material/select';
 import { EditOrderComponent } from './edit-order/edit-order.component';
@@ -64,8 +64,8 @@ import { EditOrderComponent } from './edit-order/edit-order.component';
     EditRecordComponent,
     CreateRecordComponent,
     ConfirmDeleteDialogComponent,
-    ConfirmPrintDialogComponent,
-    ConfirmPrintDialogComponent,
+    SettingsDialogComponent,
+    SettingsDialogComponent,
     EditOrderComponent,
   ],
   imports: [

@@ -22,7 +22,7 @@ moment.locale('de');
 import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
 import { UserOptions } from 'jspdf-autotable';
-import { ConfirmPrintDialogComponent } from '../confirm-print-dialog/confirm-print-dialog.component';
+import { SettingsDialogComponent } from '../settings-dialog/settings-dialog.component';
 
 interface jsPDFWithPlugin extends jsPDF {
   autoTable: (options: UserOptions) => jsPDF;
@@ -31,7 +31,7 @@ interface jsPDFWithPlugin extends jsPDF {
 @Component({
   selector: 'app-order-detail',
   templateUrl: './order-detail.component.html',
-  styleUrls: ['./order-detail.component.sass']
+  styleUrls: ['./order-detail.component.sass'],
 })
 export class OrderDetailComponent implements OnInit {
   @Input() customer;
@@ -184,13 +184,13 @@ export class OrderDetailComponent implements OnInit {
     );
   }
 
-  public openPrintDialog(): void {
+  public openSettingsDialog(): void {
     const dialogConfig = new MatDialogConfig();
     dialogConfig.disableClose = true;
     dialogConfig.autoFocus = true;
 
     const dialogRef = this.dialog.open(
-      ConfirmPrintDialogComponent,
+      SettingsDialogComponent,
       dialogConfig
     );
     dialogRef.afterClosed().subscribe((shouldPrint) => {
