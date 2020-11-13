@@ -1,30 +1,26 @@
 <app-header titleInput="Regiestunden anlegen"></app-header>
 
-<div class="sub-nav">
-  <div class="sub-nav-btn">
-    <mat-icon
-      (click)="navigateToOrderList()"
-      class="navigate-before-icon float-left"
-      >navigate_before</mat-icon
-    >
+<div class="sub-nav row">
+  <div class="col-10">
+    <div type="button" class="nav-before-btn" (click)="navigateToOrderList()">
+      <mat-icon>navigate_before</mat-icon>
+    </div>
   </div>
-
-  <!-- <button type="button" class="sub-nav-btn" (click)="documentEditForm.ngSubmit.emit()" [disabled]="!documentEditForm.form.valid">
-    <mat-icon class="order-complete-icon float-right">check</mat-icon>
-  </button> -->
-  <button
-    type="button"
-    (click)="documentCreateRecordForm.ngSubmit.emit()"
-    class="sub-nav-btn"
-  >
-    <mat-icon class="order-complete-icon float-right">save</mat-icon>
-  </button>
+  <div class="col-2">
+    <div
+      type="button"
+      class="save-btn"
+      (click)="documentCreateRecordForm.ngSubmit.emit()"
+    >
+      <mat-icon>save</mat-icon>
+    </div>
+  </div>
 </div>
 
-<div class="container-fluid">
-  <div id="create-record-content-wrapper" class="row">
-    <div class="col">
-      <div id="create-record-form-wrapper">
+<div id="create-record-component-wrapper" class="row no-gutter">
+  <div class="col-12">
+    <div id="create-record-form-wrapper" class="row no-gutter">
+      <div class="col-12">
         <form
           id="create-record-form"
           [formGroup]="createRecordForm"
@@ -62,8 +58,8 @@
                 required
               />
               <!-- <mat-error *ngFor="let validation of form_validation_messages.description">
-                <mat-error class="error-message" *ngIf="item.controls.description.hasError(validation.type) && (item.controls.description.dirty || item.controls.description.touched)">{{validation.message}}</mat-error>
-              </mat-error> -->
+                  <mat-error class="error-message" *ngIf="item.controls.description.hasError(validation.type) && (item.controls.description.dirty || item.controls.description.touched)">{{validation.message}}</mat-error>
+                </mat-error> -->
             </mat-form-field>
           </fieldset>
 
@@ -79,8 +75,8 @@
                 required
               />
               <!-- <mat-error *ngFor="let validation of form_validation_messages.time">
-                <mat-error class="error-message" *ngIf="item.controls.time.hasError(validation.type) && (item.controls.time.dirty || item.controls.time.touched)">{{validation.message}}</mat-error>
-              </mat-error> -->
+                  <mat-error class="error-message" *ngIf="item.controls.time.hasError(validation.type) && (item.controls.time.dirty || item.controls.time.touched)">{{validation.message}}</mat-error>
+                </mat-error> -->
             </mat-form-field>
           </fieldset>
 
