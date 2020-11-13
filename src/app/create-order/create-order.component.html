@@ -39,10 +39,21 @@
                 (click)="picker.open()"
                 autocomplete="off"
                 required
+                [ngClass]="{
+                  'is-invalid': submitted && getFormControl.date.errors
+                }"
               />
               <mat-datepicker-toggle matSuffix [for]="picker">
               </mat-datepicker-toggle>
               <mat-datepicker #picker></mat-datepicker>
+              <div
+                *ngIf="submitted && getFormControl.date.errors"
+                class="invalid-feedback"
+              >
+                <div *ngIf="getFormControl.date.errors.required">
+                  Bitte <strong>Datum</strong> eingeben
+                </div>
+              </div>
             </mat-form-field>
           </fieldset>
 
@@ -57,7 +68,18 @@
                 placeholder="Firmenname"
                 class="form-control form-control-sm"
                 type="text"
+                [ngClass]="{
+                  'is-invalid': submitted && getFormControl.companyName.errors
+                }"
               />
+              <div
+                *ngIf="submitted && getFormControl.companyName.errors"
+                class="invalid-feedback"
+              >
+                <div *ngIf="getFormControl.companyName.errors.required">
+                  Bitte <strong>Firmenname</strong> eingeben
+                </div>
+              </div>
             </mat-form-field>
           </fieldset>
 
@@ -72,7 +94,18 @@
                 placeholder="Einsatzleiter"
                 class="form-control form-control-sm"
                 type="text"
+                [ngClass]="{
+                  'is-invalid': submitted && getFormControl.contactPerson.errors
+                }"
               />
+              <div
+                *ngIf="submitted && getFormControl.contactPerson.errors"
+                class="invalid-feedback"
+              >
+                <div *ngIf="getFormControl.contactPerson.errors.required">
+                  Bitte <strong>Einsatzleiter</strong> eingeben
+                </div>
+              </div>
             </mat-form-field>
           </fieldset>
 
@@ -87,7 +120,18 @@
                 placeholder="Ort"
                 class="form-control form-control-sm"
                 type="text"
+                [ngClass]="{
+                  'is-invalid': submitted && getFormControl.location.errors
+                }"
               />
+              <div
+                *ngIf="submitted && getFormControl.contactPerson.errors"
+                class="invalid-feedback"
+              >
+                <div *ngIf="getFormControl.location.errors.required">
+                  Bitte <strong>Ort</strong> eingeben
+                </div>
+              </div>
             </mat-form-field>
           </fieldset>
         </form>

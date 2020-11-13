@@ -1,23 +1,24 @@
-import { Component, OnInit } from "@angular/core";
-import { Router } from "@angular/router";
-import { FormBuilder, FormGroup, FormArray, Validators } from "@angular/forms";
+import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
+import { FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
 
-import { Order, IOrder } from "../data-classes/Order";
+import { Order, IOrder } from '../data-classes/Order';
 
-import { ToastrService } from "ngx-toastr";
-import { FirestoreOrderService } from "../service/firestore-order-service/firestore-order.service";
-import { ConnectionService } from "ng-connection-service";
-import { MessageService } from "../service/message-service/message.service";
+import { ToastrService } from 'ngx-toastr';
+import { FirestoreOrderService } from '../service/firestore-order-service/firestore-order.service';
+import { ConnectionService } from 'ng-connection-service';
+import { MessageService } from '../service/message-service/message.service';
 
 @Component({
-  selector: "app-create-order",
-  templateUrl: "./create-order.component.html",
-  styleUrls: ["./create-order.component.sass"],
+  selector: 'app-create-order',
+  templateUrl: './create-order.component.html',
+  styleUrls: ['./create-order.component.sass'],
 })
 export class CreateOrderComponent implements OnInit {
   public createOrderForm: FormGroup;
   public columns: string[];
   public orders: any[]; // IOrder coudn´t be used because of firebase auto generated id,
+  public submitted = false;
 
   constructor(
     private formBuilder: FormBuilder,
@@ -25,20 +26,20 @@ export class CreateOrderComponent implements OnInit {
     private firestoreOrderService: FirestoreOrderService,
     private messageService: MessageService
   ) {
-    this.columns = ["Datum", "Firma", "Einsatzleiter", "Ort"];
+    this.columns = ['Datum', 'Firma', 'Einsatzleiter', 'Ort'];
 
     this.createOrderForm = this.formBuilder.group({
-      date: ["", Validators.required],
-      companyName: ["", Validators.required],
-      location: ["", Validators.required],
-      contactPerson: [""],
+      date: ['', Validators.required],
+      companyName: ['', Validators.required],
+      location: ['', Validators.required],
+      contactPerson: ['', Validators.required],
     });
   }
 
   ngOnInit() {}
 
   public navigateToOrderList() {
-    this.router.navigate(["/"]);
+    this.router.navigate(['/']);
   }
 
   public createOrder(formInput: any): void {
@@ -62,11 +63,11 @@ export class CreateOrderComponent implements OnInit {
               .addOrder(order)
               .then((id: string) => {
                 this.messageService.orderCreatedSuccessful();
-                this.router.navigate(["/order-details/" + id]);
+                this.router.navigate(['/order-details/' + id]);
                 order.id = id;
               })
               .catch((e) => {
-                console.error("can´t create order to firebase", e);
+                console.error('can´t create order to firebase', e);
               });
           } else {
             this.messageService.orderAlreadyExists();
@@ -76,7 +77,16 @@ export class CreateOrderComponent implements OnInit {
     }
   }
 
+  get getFormControl() {
+    return this.createOrderForm.controls;
+  }
+
   public onSubmit() {
-    this.createOrder(this.createOrderForm.value);
+    this.submitted = true;
+    if (this.createOrderForm.invalid) {
+      return;
+    } else {
+      this.createOrder(this.createOrderForm.value);
+    }
   }
 }
