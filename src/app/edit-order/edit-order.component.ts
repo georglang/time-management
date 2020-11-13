@@ -1,25 +1,26 @@
-import { Component, OnInit } from "@angular/core";
-import { FormBuilder, FormGroup, Validators } from "@angular/forms";
-import { Router, ActivatedRoute } from "@angular/router";
-import { IOrder, Order } from "../data-classes/Order";
-import { ITimeRecord } from "../data-classes/TimeRecords";
+import { Component, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Router, ActivatedRoute } from '@angular/router';
+import { IOrder, Order } from '../data-classes/Order';
+import { ITimeRecord } from '../data-classes/TimeRecords';
 
-import { DateAdapter } from "@angular/material/core";
+import { DateAdapter } from '@angular/material/core';
 
-import { MessageService } from "../service/message-service/message.service";
-import { ToastrService } from "ngx-toastr";
-import { FirestoreOrderService } from "../service/firestore-order-service/firestore-order.service";
-import { FirestoreRecordService } from "../service/firestore-record-service/firestore-record.service";
+import { MessageService } from '../service/message-service/message.service';
+import { ToastrService } from 'ngx-toastr';
+import { FirestoreOrderService } from '../service/firestore-order-service/firestore-order.service';
+import { FirestoreRecordService } from '../service/firestore-record-service/firestore-record.service';
 
 @Component({
-  selector: "app-edit-order",
-  templateUrl: "./edit-order.component.html",
-  styleUrls: ["./edit-order.component.sass"],
+  selector: 'app-edit-order',
+  templateUrl: './edit-order.component.html',
+  styleUrls: ['./edit-order.component.sass'],
 })
 export class EditOrderComponent implements OnInit {
   public editOrderForm: FormGroup;
   private orderId: string;
   public order: IOrder;
+  public submitted = false;
 
   constructor(
     private formBuilder: FormBuilder,
@@ -30,19 +31,19 @@ export class EditOrderComponent implements OnInit {
     private firestoreRecordService: FirestoreRecordService,
     private messageService: MessageService
   ) {
-    this.dateAdapter.setLocale("de");
+    this.dateAdapter.setLocale('de');
   }
 
   ngOnInit() {
     this.editOrderForm = this.formBuilder.group({
-      date: ["", Validators.required],
-      companyName: ["", Validators.required],
-      location: ["", Validators.required],
-      contactPerson: [""],
+      date: ['', Validators.required],
+      companyName: ['', Validators.required],
+      location: ['', Validators.required],
+      contactPerson: ['', Validators.required],
     });
 
     this.route.params.subscribe((params) => {
-      this.orderId = params["id"];
+      this.orderId = params['id'];
       this.getOrderByIdFromFirebase(this.orderId);
     });
   }
@@ -79,7 +80,20 @@ export class EditOrderComponent implements OnInit {
   }
 
   public navigateToOrderList(): void {
-    this.router.navigate(["", this.orderId]);
+    this.router.navigate(['', this.orderId]);
+  }
+
+  private updateOrderInFirestore(order: IOrder): void {
+    const _order = { ...order };
+    if (this.firestoreOrderService !== undefined) {
+      this.firestoreOrderService.updateOrder(_order).then(() => {
+        this.messageService.updatedSuccessfully();
+      });
+    }
+  }
+
+  get getFormControl() {
+    return this.editOrderForm.controls;
   }
 
   public onSubmit() {
@@ -92,17 +106,13 @@ export class EditOrderComponent implements OnInit {
       this.orderId
     );
 
-    if (order !== undefined) {
-      this.updateOrderInFirestore(order);
-    }
-  }
-
-  private updateOrderInFirestore(order: IOrder): void {
-    const _order = { ...order };
-    if (this.firestoreOrderService !== undefined) {
-      this.firestoreOrderService.updateOrder(_order).then(() => {
-        this.messageService.updatedSuccessfully();
-      });
+    this.submitted = true;
+    if (this.editOrderForm.invalid) {
+      return;
+    } else {
+      if (order !== undefined) {
+        this.updateOrderInFirestore(order);
+      }
     }
   }
 }
