@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { TimeRecord, ITimeRecord } from '../data-classes/TimeRecords';
@@ -6,6 +6,7 @@ import { DateAdapter } from '@angular/material/core';
 import { FirestoreRecordService } from '../service/firestore-record-service/firestore-record.service';
 import { MessageService } from '../service/message-service/message.service';
 import { ToastrService } from 'ngx-toastr';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-edit-record',
@@ -17,6 +18,8 @@ export class EditRecordComponent implements OnInit {
   private recordId: string;
   private orderId: string;
   public record: ITimeRecord;
+  public submitted = false;
+  private subscription: Subscription = new Subscription();
 
   public employees = [
     {
@@ -72,19 +75,18 @@ export class EditRecordComponent implements OnInit {
 
     this.route.params.subscribe((params) => {
       this.recordId = params['id'];
-
-      if (this.isOnline()) {
-      }
       this.getRecordByIdFromFirebase(this.orderId, this.recordId);
     });
   }
 
-  public isOnline(): boolean {
-    return navigator.onLine;
-  }
+  private getRecordByIdFromFirebase(orderId: string, recordId: string): void {
+    const getRecordById$ = this.firestoreRecordService
+      .getRecordById(orderId)
+      .subscribe(() => {});
 
-  public getRecordByIdFromFirebase(orderId: string, recordId: string): void {
-    this.firestoreRecordService
+    this.subscription.add(getRecordById$);
+
+    const getRecordByOrderId = this.firestoreRecordService
       .getRecordsByOrderId(orderId)
       .subscribe((records: ITimeRecord[]) => {
         if (records !== undefined) {
@@ -96,6 +98,7 @@ export class EditRecordComponent implements OnInit {
           });
         }
       });
+    this.subscription.add(getRecordByOrderId);
   }
 
   public navigateToOrderList(): void {
@@ -103,7 +106,14 @@ export class EditRecordComponent implements OnInit {
   }
 
   public setControl(record: ITimeRecord): void {
-    const date = record.date.toDate();
+    let date;
+
+    if (record.date.seconds !== undefined) {
+      date = record.date.toDate();
+    } else {
+      date = record.date;
+    }
+
     this.editRecordForm.setValue({
       id: record.id,
       date: date,
@@ -111,6 +121,10 @@ export class EditRecordComponent implements OnInit {
       workingHours: record.workingHours,
       employee: record.employee,
     });
+  }
+
+  get getFormControl() {
+    return this.editRecordForm.controls;
   }
 
   public onSubmit() {
@@ -123,7 +137,17 @@ export class EditRecordComponent implements OnInit {
       this.orderId,
       this.record.hasBeenPrinted
     );
+    // this.setControl(record);
 
+    this.submitted = true;
+    if (this.editRecordForm.invalid) {
+      return;
+    } else {
+      this.checkIfRecordExistsInOrderInFirestore(record);
+    }
+  }
+
+  private checkIfRecordExistsInOrderInFirestore(record: ITimeRecord) {
     this.firestoreRecordService
       .checkIfRecordExistsInOrderInFirestore(record)
       .then((doesRecordExist) => {
@@ -137,7 +161,8 @@ export class EditRecordComponent implements OnInit {
 
   private updateRecordInFirestore(orderId: string, record: ITimeRecord): void {
     if (this.firestoreRecordService !== undefined) {
-      this.firestoreRecordService.updateRecord(orderId, record).then((data) => {
+      this.setControl(record);
+      this.firestoreRecordService.updateRecord(orderId, record).then(() => {
         this.showUpdateMessage();
       });
     }
@@ -153,5 +178,9 @@ export class EditRecordComponent implements OnInit {
       'Eintrag',
       successConfig
     );
+  }
+
+  ngOnDestroy(): void {
+    this.subscription.unsubscribe();
   }
 }
