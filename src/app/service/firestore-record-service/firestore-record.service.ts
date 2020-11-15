@@ -44,35 +44,27 @@ export class FirestoreRecordService {
       });
   }
 
-  public getRecordsByOrderId(orderId: string): Observable<ITimeRecord[]> {
+  public getRecordsByOrderId(orderId: string) {
     return this.ordersCollection
       .doc(orderId)
       .collection('records')
-      .snapshotChanges()
-      .pipe(map((actions) => actions.map(this.documentToDomainObject)));
+      .valueChanges();
   }
 
-  public getRecordById(orderId): any {
+  public getRecordById(orderId) {
     return this.ordersCollection
       .doc(orderId)
       .collection('records')
-      .snapshotChanges()
-      .pipe(
-        map((actions) =>
-          actions.map((a) => {
-            const data = a.payload.doc.data() as any;
-            const id = a.payload.doc.id;
-            return { id, ...data };
-          })
-        )
-      );
+      .valueChanges();
   }
 
+  // check if record is in firebase
   public checkIfRecordExistsInOrderInFirestore(
     record: ITimeRecord
   ): Promise<boolean> {
     let doesRecordExist = true;
     return new Promise((resolve, reject) => {
+      // Funktioniert nicht wegen
       this.getRecordsFromRecordsCollectionTest(record.orderId).then(
         (records: any) => {
           if (records.length > 0) {
