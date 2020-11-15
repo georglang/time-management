@@ -88,12 +88,20 @@ export class EditRecordComponent implements OnInit {
 
     const getRecordByOrderId = this.firestoreRecordService
       .getRecordsByOrderId(orderId)
-      .subscribe((records: ITimeRecord[]) => {
+      .subscribe((records: any[]) => {
         if (records !== undefined) {
           records.forEach((record) => {
             if (record.id === recordId) {
-              this.record = record;
-              this.setControl(record);
+              this.record = new TimeRecord(
+                record.date,
+                record.description,
+                record.workingHours,
+                record.employee,
+                record.id,
+                record.orderId,
+                record.hasBeenPrinted
+              );
+              this.setControl(this.record);
             }
           });
         }

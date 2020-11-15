@@ -48,14 +48,14 @@ export class FirestoreRecordService {
     return this.ordersCollection
       .doc(orderId)
       .collection('records')
-      .valueChanges();
+      .valueChanges({ idField: 'id' });
   }
 
   public getRecordById(orderId) {
     return this.ordersCollection
       .doc(orderId)
       .collection('records')
-      .valueChanges();
+      .valueChanges({ idField: 'id' });
   }
 
   // check if record is in firebase

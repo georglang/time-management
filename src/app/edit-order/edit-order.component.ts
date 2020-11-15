@@ -39,7 +39,7 @@ export class EditOrderComponent implements OnInit {
       date: ['', Validators.required],
       companyName: ['', Validators.required],
       location: ['', Validators.required],
-      contactPerson: ['',],
+      contactPerson: ['', Validators.required]
     });
 
     this.route.params.subscribe((params) => {
@@ -62,7 +62,7 @@ export class EditOrderComponent implements OnInit {
     if (this.firestoreOrderService !== undefined) {
       this.firestoreRecordService
         .getRecordsByOrderId(order.id)
-        .subscribe((records: ITimeRecord[]) => {
+        .subscribe((records: any[]) => {
           this.order.records = records;
           this.setControl(order);
         });
