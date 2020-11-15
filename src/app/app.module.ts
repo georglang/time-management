@@ -10,29 +10,14 @@ import { environment } from '../environments/environment';
 import { FIREBASE_OPTIONS } from '@angular/fire';
 import { AngularFirestoreModule } from '@angular/fire/firestore';
 
-// own modules
+// modules
 import { AppRoutingModule } from './router/app.routing.module';
 import { ToastrModule } from 'ngx-toastr';
+import { MaterialModule } from './core/material/material.module';
+import { MAT_DATE_LOCALE } from '@angular/material/core';
 
 // pipes
 import { SortFormArrayByDate } from './pipes/sort-form-array-by-date.pipe';
-
-// Angular Material
-import { MatButtonModule } from '@angular/material/button';
-import { MatCardModule } from '@angular/material/card';
-import { MatNativeDateModule, MAT_DATE_LOCALE } from '@angular/material/core';
-import { MatDatepickerModule } from '@angular/material/datepicker';
-import { MatDialogModule } from '@angular/material/dialog';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatIconModule } from '@angular/material/icon';
-import { MatInputModule } from '@angular/material/input';
-import { MatListModule } from '@angular/material/list';
-import { MatMenuModule } from '@angular/material/menu';
-import { MatTableModule } from '@angular/material/table';
-import { MatTabsModule } from '@angular/material/tabs';
-import { MatToolbarModule } from '@angular/material/toolbar';
-import { MatCheckboxModule } from '@angular/material/checkbox';
-import { MatSnackBarModule } from '@angular/material/snack-bar';
 
 // services
 import { FirestoreOrderService } from './service/firestore-order-service/firestore-order.service';
@@ -48,7 +33,6 @@ import { CreateRecordComponent } from './create-record/create-record.component';
 import { ConfirmDeleteDialogComponent } from './confirm-delete-dialog/confirm-delete-dialog.component';
 import { SettingsDialogComponent } from './settings-dialog/settings-dialog.component';
 
-import { MatSelectModule } from '@angular/material/select';
 import { EditOrderComponent } from './edit-order/edit-order.component';
 import { NoConnectionSnackBarComponent } from './noConnectionSnackBar/noConnectionSnackBar.component';
 
@@ -74,22 +58,7 @@ import { NoConnectionSnackBarComponent } from './noConnectionSnackBar/noConnecti
     AppRoutingModule,
     ReactiveFormsModule,
     FormsModule,
-    MatButtonModule,
-    MatFormFieldModule,
-    MatIconModule,
-    MatDatepickerModule,
-    MatInputModule,
-    MatNativeDateModule,
-    MatListModule,
-    MatCardModule,
-    MatMenuModule,
-    MatToolbarModule,
-    MatTabsModule,
-    MatTableModule,
-    MatDialogModule,
-    MatCheckboxModule,
-    MatSelectModule,
-    MatSnackBarModule,
+    MaterialModule,
     ToastrModule.forRoot(),
     ServiceWorkerModule.register('ngsw-worker.js', {
       enabled: environment.production,
