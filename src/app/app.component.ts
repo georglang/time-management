@@ -1,5 +1,8 @@
 import { Component } from '@angular/core';
 import { SwUpdate } from '@angular/service-worker';
+import { ConnectionService } from 'ng-connection-service';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { NoConnectionSnackBarComponent } from './noConnectionSnackBar/noConnectionSnackBar.component';
 
 @Component({
   selector: 'app-root',
@@ -7,7 +10,12 @@ import { SwUpdate } from '@angular/service-worker';
   styleUrls: ['./app.component.sass'],
 })
 export class AppComponent {
-  constructor(private swUpdate: SwUpdate) {}
+  public isOnline = true;
+  constructor(
+    private swUpdate: SwUpdate,
+    private connectionService: ConnectionService,
+    private noConnectionSnackBar: MatSnackBar
+  ) {}
 
   ngOnInit() {
     if (this.swUpdate.isEnabled) {
@@ -17,5 +25,31 @@ export class AppComponent {
         }
       });
     }
+
+    this.isOnline = navigator.onLine;
+
+    if (!this.isOnline) {
+      this.openNoConnectionSnackBar();
+    }
+
+    this.connectionService.monitor().subscribe((isConnected) => {
+      this.isOnline = isConnected;
+      if (!isConnected) {
+        this.openNoConnectionSnackBar();
+      } else {
+        this.closeNoConnectionSnackBar();
+      }
+    });
+  }
+
+  private openNoConnectionSnackBar() {
+    this.noConnectionSnackBar.openFromComponent(
+      NoConnectionSnackBarComponent,
+      {}
+    );
+  }
+
+  private closeNoConnectionSnackBar() {
+    this.noConnectionSnackBar.dismiss();
   }
 }

@@ -32,6 +32,7 @@ import { MatTableModule } from '@angular/material/table';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 
 // services
 import { FirestoreOrderService } from './service/firestore-order-service/firestore-order.service';
@@ -49,6 +50,7 @@ import { SettingsDialogComponent } from './settings-dialog/settings-dialog.compo
 
 import { MatSelectModule } from '@angular/material/select';
 import { EditOrderComponent } from './edit-order/edit-order.component';
+import { NoConnectionSnackBarComponent } from './noConnectionSnackBar/noConnectionSnackBar.component';
 
 @NgModule({
   declarations: [
@@ -64,6 +66,7 @@ import { EditOrderComponent } from './edit-order/edit-order.component';
     SettingsDialogComponent,
     SettingsDialogComponent,
     EditOrderComponent,
+    NoConnectionSnackBarComponent,
   ],
   imports: [
     BrowserModule,
@@ -86,6 +89,7 @@ import { EditOrderComponent } from './edit-order/edit-order.component';
     MatDialogModule,
     MatCheckboxModule,
     MatSelectModule,
+    MatSnackBarModule,
     ToastrModule.forRoot(),
     ServiceWorkerModule.register('ngsw-worker.js', {
       enabled: environment.production,
