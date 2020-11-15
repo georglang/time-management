@@ -39,7 +39,7 @@ export class EditOrderComponent implements OnInit {
       date: ['', Validators.required],
       companyName: ['', Validators.required],
       location: ['', Validators.required],
-      contactPerson: ['', Validators.required],
+      contactPerson: ['',],
     });
 
     this.route.params.subscribe((params) => {
