@@ -37,7 +37,6 @@
                 name="date"
                 formControlName="date"
                 (click)="picker.open()"
-                autocomplete="off"
                 required
                 [ngClass]="{
                   'is-invalid': submitted && getFormControl.date.errors
@@ -65,7 +64,6 @@
                 matInput
                 formControlName="description"
                 placeholder="Art der Arbeit"
-                autocomplete="off"
                 required
                 [ngClass]="{
                   'is-invalid': submitted && getFormControl.description.errors
@@ -90,7 +88,6 @@
                 step="0.25"
                 formControlName="workingHours"
                 placeholder="Arbeitsstunden"
-                autocomplete="off"
                 required
                 [ngClass]="{
                   'is-invalid': submitted && getFormControl.workingHours.errors
