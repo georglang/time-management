@@ -42,6 +42,7 @@ export class OrderDetailComponent implements OnInit {
     'description',
     'workingHours',
     'employee',
+    'tool',
     'hasBeenPrinted',
   ];
   public dataSource: MatTableDataSource<ITimeRecord>;
@@ -68,7 +69,7 @@ export class OrderDetailComponent implements OnInit {
     private firestoreRecordService: FirestoreRecordService
   ) {
     this.dateAdapter.setLocale('de');
-    this.columns = ['Date', 'Description', 'Time', 'Delete'];
+    this.columns = ['Date', 'Description', 'Time', 'Delete', 'Tool'];
     this.sumOfWorkingHours = 0;
   }
 
@@ -217,10 +218,10 @@ export class OrderDetailComponent implements OnInit {
   /** Selects all rows if they are not all selected; otherwise clear selection. */
   masterToggle() {
     this.isAllSelected()
-    ? this.selection.clear()
-    : // this.dataSource.data.forEach(row => this.selection.select(row));
+      ? this.selection.clear()
+      : this.dataSource.data.forEach((row) => this.selection.select(row));
 
-    this.dataSource.data.forEach((row) => this.selection.select(row));
+    // this.dataSource.data.forEach((row) => this.selection.select(row));
     this.dataSource.data.forEach((row) => {
       if (!row.hasBeenPrinted) {
         this.selection.select(row);
@@ -275,6 +276,7 @@ export class OrderDetailComponent implements OnInit {
         selectedRecord['description'],
         selectedRecord['workingHours'],
         selectedRecord['employee'],
+        selectedRecord['tool'],
       ]);
     });
     return { records, recordsToSave };
@@ -308,7 +310,7 @@ export class OrderDetailComponent implements OnInit {
 
   private autoTableConfig(records) {
     this.pdf.autoTable({
-      head: [['Datum', 'Beschreibung', 'Arbeitsstunden', 'Arbeiter']],
+      head: [['Datum', 'Beschreibung', 'Stunden', 'Arbeiter', 'Gerät']],
       headStyles: { fillColor: [67, 120, 61] },
       body: records,
       margin: {

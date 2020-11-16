@@ -182,6 +182,22 @@
             </mat-cell>
           </ng-container>
 
+          <ng-container matColumnDef="tool">
+            <mat-header-cell *matHeaderCellDef> Gerät </mat-header-cell>
+            <mat-cell *matCellDef="let order">
+              <div class="disable-on-small-device">{{ order.tool }}</div>
+              <mat-form-field>
+                <input
+                  matInput
+                  placeholder="Gerät"
+                  value="{{ order.tool }}"
+                  readonly
+                  [disabled]="order.hasBeenPrinted"
+                />
+              </mat-form-field>
+            </mat-cell>
+          </ng-container>
+
           <ng-container
             id="column-hasBeenPrinted"
             matColumnDef="hasBeenPrinted"
@@ -211,7 +227,9 @@
         </mat-table>
 
         <ng-template #noRecordsFoundTemplate>
-          Keine Einträge gefunden
+          <div class="no-records-found">
+            Keine Einträge gefunden
+          </div>
         </ng-template>
       </div>
     </div>
