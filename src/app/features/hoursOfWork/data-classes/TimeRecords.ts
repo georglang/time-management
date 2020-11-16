@@ -5,6 +5,7 @@ export interface ITimeRecord {
   description: string;
   workingHours: number;
   employee: string;
+  tool: string;
   id?: string; // is necessary when deleting local record after synchronization
   orderId?: string;
   hasBeenPrinted?: boolean;
@@ -15,6 +16,7 @@ export class TimeRecord implements ITimeRecord {
   public description: string;
   public workingHours: number;
   public employee: string;
+  public tool: string;
   public location: string;
   public id: string;
   public orderId: any;
@@ -25,6 +27,7 @@ export class TimeRecord implements ITimeRecord {
     description: string,
     workingHours: number,
     employee: string,
+    tool: string,
     id?: string,
     orderId?: string,
     hasBeenPrinted?: boolean
@@ -33,6 +36,7 @@ export class TimeRecord implements ITimeRecord {
     this.description = description;
     this.workingHours = workingHours;
     this.employee = employee;
+    this.tool = tool;
     this.id = id;
     this.orderId = orderId;
     this.hasBeenPrinted = hasBeenPrinted;
