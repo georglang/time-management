@@ -37,7 +37,7 @@
     "jspdf": "^2.1.1",
     "jspdf-autotable": "^3.5.13",
     "lodash": "^4.17.11",
-    "moment": "^2.22.2",
+    "moment": "^2.29.1",
     "ng-connection-service": "^1.0.4",
     "ngx-toastr": "^9.1.0",
     "pdfjs": "^2.1.0",
