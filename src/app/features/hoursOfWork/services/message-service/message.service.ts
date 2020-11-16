@@ -63,7 +63,7 @@ export class MessageService {
     this.toastr.warning('Konnte nicht aktualisiert werden', 'Eintrag', warningConfig);
   }
 
-  public recordDeletedSuccessful() {
+  public deletedSucessfull() {
     const successConfig = {
       positionClass: 'toast-bottom-center',
       timeout: 500
