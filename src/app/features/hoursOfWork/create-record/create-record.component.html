@@ -108,7 +108,6 @@
             <mat-form-field appearance="fill">
               <mat-label>Arbeiter auswählen</mat-label>
               <mat-select
-                [(ngModel)]="selectedEmployee"
                 formControlName="employee"
                 multiple
                 [ngClass]="{
@@ -128,6 +127,30 @@
               >
                 <div *ngIf="getFormControl.employee.errors.required">
                   Bitte <strong>Arbeiter</strong> auswählen
+                </div>
+              </div>
+            </mat-form-field>
+          </fieldset>
+
+          <fieldset class="form-group">
+            <mat-form-field appearance="fill">
+              <mat-label>Gerät auswählen</mat-label>
+              <mat-select
+                formControlName="tool"
+                [ngClass]="{
+                  'is-invalid': submitted && getFormControl.tool.errors
+                }"
+              >
+                <mat-option *ngFor="let tool of tools" [value]="tool.value">
+                  {{ tool.viewValue }}
+                </mat-option>
+              </mat-select>
+              <div
+                *ngIf="submitted && getFormControl.tool.errors"
+                class="invalid-feedback"
+              >
+                <div *ngIf="getFormControl.tool.errors.required">
+                  Bitte <strong>Gerät</strong> auswählen
                 </div>
               </div>
             </mat-form-field>
