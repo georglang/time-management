@@ -14,7 +14,6 @@ import { TimeRecord } from '../data-classes/TimeRecords';
 export class CreateRecordComponent implements OnInit {
   public createRecordForm: FormGroup;
   private routeParamOrderId;
-  public selectedEmployee;
   public submitted = false;
   public employees = [
     {
@@ -42,6 +41,20 @@ export class CreateRecordComponent implements OnInit {
       viewValue: 'Tschabi Matthias',
     },
   ];
+  public tools = [
+    {
+      value: 'Valtra',
+      viewValue: 'Valtra',
+    },
+    {
+      value: 'HSM',
+      viewValue: 'HSM',
+    },
+    {
+      value: 'Mann mit Motorsäge',
+      viewValue: 'Mann mit Motorsäge',
+    }
+  ];
 
   constructor(
     private router: Router,
@@ -58,6 +71,7 @@ export class CreateRecordComponent implements OnInit {
       description: ['', Validators.required],
       workingHours: ['', Validators.required],
       employee: ['', Validators.required],
+      tool: ['', Validators.required],
     });
 
     this.route.params.subscribe((params) => {
@@ -75,6 +89,7 @@ export class CreateRecordComponent implements OnInit {
       formInput.description,
       formInput.workingHours,
       formInput.employee,
+      formInput.tool,
       '',
       '',
       false
