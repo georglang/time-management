@@ -4,8 +4,8 @@ import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 import { SelectionModel } from '@angular/cdk/collections';
-import { FirestoreOrderService } from '../service/firestore-order-service/firestore-order.service';
 import { IOrder } from '../data-classes/Order';
+import { FirestoreOrderService } from '../services/firestore-order-service/firestore-order.service';
 import { ConfirmDeleteDialogComponent } from '../confirm-delete-dialog/confirm-delete-dialog.component';
 import { SettingsDialogComponent } from '../settings-dialog/settings-dialog.component';
 
@@ -64,7 +64,7 @@ export class OrderListComponent implements OnInit {
   }
 
   public editOrder(order: IOrder) {
-    this.router.navigate(['/edit-order/' + order.id]);
+    this.router.navigate(['hours-of-work/edit-order/' + order.id]);
   }
 
   public deleteOrder(order: IOrder) {
@@ -111,10 +111,10 @@ export class OrderListComponent implements OnInit {
   }
 
   public navigateToOrder(order: IOrder): void {
-    this.router.navigate(['/order-details/' + order.id]);
+    this.router.navigate(['hours-of-work/order-details/' + order.id]);
   }
 
   public navigateToCreateOrder(): void {
-    this.router.navigate(['/create-order']);
+    this.router.navigate(['hours-of-work/create-order']);
   }
 }

@@ -1,15 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
-import { IOrder, Order } from '../data-classes/Order';
-import { ITimeRecord } from '../data-classes/TimeRecords';
 
 import { DateAdapter } from '@angular/material/core';
 
-import { MessageService } from '../service/message-service/message.service';
-import { ToastrService } from 'ngx-toastr';
-import { FirestoreOrderService } from '../service/firestore-order-service/firestore-order.service';
-import { FirestoreRecordService } from '../service/firestore-record-service/firestore-record.service';
+import { IOrder, Order } from '../data-classes/Order';
+import { FirestoreRecordService } from '../services/firestore-record-service/firestore-record.service';
+import { FirestoreOrderService } from '../services/firestore-order-service/firestore-order.service';
+import { MessageService } from '../services/message-service/message.service';
 
 @Component({
   selector: 'app-edit-order',
@@ -39,7 +37,7 @@ export class EditOrderComponent implements OnInit {
       date: ['', Validators.required],
       companyName: ['', Validators.required],
       location: ['', Validators.required],
-      contactPerson: ['', Validators.required]
+      contactPerson: ['', Validators.required],
     });
 
     this.route.params.subscribe((params) => {
@@ -80,7 +78,7 @@ export class EditOrderComponent implements OnInit {
   }
 
   public navigateToOrderList(): void {
-    this.router.navigate(['', this.orderId]);
+    this.router.navigate(['hours-of-work/']);
   }
 
   private updateOrderInFirestore(order: IOrder): void {

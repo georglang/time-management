@@ -1,12 +1,14 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
-import { TimeRecord, ITimeRecord } from '../data-classes/TimeRecords';
+import { Location } from '@angular/common';
+
 import { DateAdapter } from '@angular/material/core';
-import { FirestoreRecordService } from '../service/firestore-record-service/firestore-record.service';
-import { MessageService } from '../service/message-service/message.service';
 import { ToastrService } from 'ngx-toastr';
 import { Subscription } from 'rxjs';
+import { TimeRecord, ITimeRecord } from '../data-classes/TimeRecords';
+import { MessageService } from '../services/message-service/message.service';
+import { FirestoreRecordService } from '../services/firestore-record-service/firestore-record.service';
 
 @Component({
   selector: 'app-edit-record',
@@ -55,7 +57,8 @@ export class EditRecordComponent implements OnInit {
     private dateAdapter: DateAdapter<Date>,
     private firestoreRecordService: FirestoreRecordService,
     private messageService: MessageService,
-    private toastrService: ToastrService
+    private toastrService: ToastrService,
+    private location: Location
   ) {
     this.dateAdapter.setLocale('de');
   }
@@ -109,8 +112,8 @@ export class EditRecordComponent implements OnInit {
     this.subscription.add(getRecordByOrderId);
   }
 
-  public navigateToOrderList(): void {
-    this.router.navigate(['/order-details', this.orderId]);
+  public navigateToRecordList(): void {
+    this.location.back();
   }
 
   public setControl(record: ITimeRecord): void {

@@ -1,13 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 import { Order, IOrder } from '../data-classes/Order';
-
-import { ToastrService } from 'ngx-toastr';
-import { FirestoreOrderService } from '../service/firestore-order-service/firestore-order.service';
-import { ConnectionService } from 'ng-connection-service';
-import { MessageService } from '../service/message-service/message.service';
+import { FirestoreOrderService } from '../services/firestore-order-service/firestore-order.service';
+import { MessageService } from '../services/message-service/message.service';
 
 @Component({
   selector: 'app-create-order',
@@ -63,7 +60,7 @@ export class CreateOrderComponent implements OnInit {
               .addOrder(order)
               .then((id: string) => {
                 this.messageService.orderCreatedSuccessful();
-                this.router.navigate(['/order-details/' + id]);
+                this.router.navigate(['/order-details/']);
                 order.id = id;
               })
               .catch((e) => {

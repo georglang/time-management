@@ -1,9 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Location } from '@angular/common';
+import { MessageService } from '../services/message-service/message.service';
+import { FirestoreRecordService } from '../services/firestore-record-service/firestore-record.service';
 import { TimeRecord } from '../data-classes/TimeRecords';
-import { FirestoreRecordService } from '../service/firestore-record-service/firestore-record.service';
-import { MessageService } from '../service/message-service/message.service';
 
 @Component({
   selector: 'app-create-record',
@@ -47,7 +48,8 @@ export class CreateRecordComponent implements OnInit {
     private route: ActivatedRoute,
     private formBuilder: FormBuilder,
     private firestoreRecordService: FirestoreRecordService,
-    private messageService: MessageService
+    private messageService: MessageService,
+    private location: Location
   ) {}
 
   ngOnInit() {
@@ -64,7 +66,7 @@ export class CreateRecordComponent implements OnInit {
   }
 
   public navigateToOrderList() {
-    this.router.navigate(['/order-details', this.routeParamOrderId]);
+    this.location.back();
   }
 
   public createRecord(formInput: any, orderId: string): void {

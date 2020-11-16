@@ -6,14 +6,15 @@ import { SelectionModel } from '@angular/cdk/collections';
 
 import { DateAdapter } from '@angular/material/core';
 import { TimeRecord, ITimeRecord } from '../data-classes/TimeRecords';
+import { IOrder } from '../data-classes/Order';
+
+import { FirestoreOrderService } from '../services/firestore-order-service/firestore-order.service';
+import { FirestoreRecordService } from '../services/firestore-record-service/firestore-record.service';
+
 import { ConfirmDeleteDialogComponent } from './../confirm-delete-dialog/confirm-delete-dialog.component';
 import { ToastrService } from 'ngx-toastr';
-import { FirestoreOrderService } from '../service/firestore-order-service/firestore-order.service';
-import { FirestoreRecordService } from '../service/firestore-record-service/firestore-record.service';
 
 import * as moment from 'moment';
-import { ConnectionService } from 'ng-connection-service';
-import { IOrder } from '../data-classes/Order';
 moment.locale('de');
 
 // import * as jsPDF from 'jspdf';
@@ -108,7 +109,7 @@ export class OrderDetailComponent implements OnInit {
     if (this.firestoreOrderService !== undefined) {
       this.firestoreRecordService
         .getRecordsByOrderId(orderId)
-        .subscribe((records: ITimeRecord[]) => {
+        .subscribe((records: any[]) => {
           this.order.records = records;
           const recordsSortedByDate = this.order.records.sort(
             (a, b) => b.date.toMillis() - a.date.toMillis()
@@ -146,13 +147,16 @@ export class OrderDetailComponent implements OnInit {
 
   public createNewRecord() {
     this.router.navigate([
-      '/order-details/' + this.paramOrderId + /create-record/,
+      'hours-of-work/order-details/' + this.paramOrderId + /create-record/,
     ]);
   }
 
   public editRecord(record: ITimeRecord) {
     this.router.navigate([
-      '/order-details/' + this.paramOrderId + /edit-record/ + record.id,
+      'hours-of-work/order-details/' +
+        this.paramOrderId +
+        /edit-record/ +
+        record.id,
     ]);
   }
 
@@ -189,10 +193,7 @@ export class OrderDetailComponent implements OnInit {
     dialogConfig.disableClose = true;
     dialogConfig.autoFocus = true;
 
-    const dialogRef = this.dialog.open(
-      SettingsDialogComponent,
-      dialogConfig
-    );
+    const dialogRef = this.dialog.open(SettingsDialogComponent, dialogConfig);
     dialogRef.afterClosed().subscribe((shouldPrint) => {
       if (shouldPrint) {
         this.showPrintButton = true;
