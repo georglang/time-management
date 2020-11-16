@@ -50,6 +50,21 @@ export class EditRecordComponent implements OnInit {
     },
   ];
 
+  public tools = [
+    {
+      value: 'Valtra',
+      viewValue: 'Valtra',
+    },
+    {
+      value: 'HSM',
+      viewValue: 'HSM',
+    },
+    {
+      value: 'Mann mit Motorsäge',
+      viewValue: 'Mann mit Motorsäge',
+    },
+  ];
+
   constructor(
     private formBuilder: FormBuilder,
     private router: Router,
@@ -70,6 +85,7 @@ export class EditRecordComponent implements OnInit {
       description: ['', Validators.required],
       workingHours: [0, Validators.required],
       employee: ['', Validators.required],
+      tool: ['', Validators.required],
     });
 
     this.route.parent.url.subscribe((urlPath) => {
@@ -100,6 +116,7 @@ export class EditRecordComponent implements OnInit {
                 record.description,
                 record.workingHours,
                 record.employee,
+                record.tool,
                 record.id,
                 record.orderId,
                 record.hasBeenPrinted
@@ -131,6 +148,7 @@ export class EditRecordComponent implements OnInit {
       description: record.description,
       workingHours: record.workingHours,
       employee: record.employee,
+      tool: record.tool,
     });
   }
 
@@ -144,6 +162,7 @@ export class EditRecordComponent implements OnInit {
       this.editRecordForm.controls.description.value,
       this.editRecordForm.controls.workingHours.value,
       this.editRecordForm.controls.employee.value,
+      this.editRecordForm.controls.tool.value,
       this.recordId,
       this.orderId,
       this.record.hasBeenPrinted
