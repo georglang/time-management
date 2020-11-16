@@ -8,6 +8,7 @@ import { IOrder } from '../data-classes/Order';
 import { FirestoreOrderService } from '../services/firestore-order-service/firestore-order.service';
 import { ConfirmDeleteDialogComponent } from '../confirm-delete-dialog/confirm-delete-dialog.component';
 import { SettingsDialogComponent } from '../settings-dialog/settings-dialog.component';
+import { MessageService } from '../services/message-service/message.service';
 
 @Component({
   selector: 'app-order-list',
@@ -30,7 +31,8 @@ export class OrderListComponent implements OnInit {
   constructor(
     private router: Router,
     private firestoreOrderService: FirestoreOrderService,
-    public dialog: MatDialog
+    public dialog: MatDialog,
+    private messageService: MessageService
   ) {}
 
   ngOnInit() {
@@ -44,7 +46,7 @@ export class OrderListComponent implements OnInit {
         .subscribe((orders: IOrder[]) => {
           if (orders !== undefined) {
             const ordersSortedByDate = orders.sort(
-              (a, b) => b.date.toMillis() - a.date.toMillis()
+              (a, b) => b.date.seconds - a.date.seconds
             );
             this.dataSource = new MatTableDataSource(ordersSortedByDate);
           } else {
@@ -101,7 +103,14 @@ export class OrderListComponent implements OnInit {
   }
 
   private deleteOrderInFirebase(orderId: string) {
-    this.firestoreOrderService.deleteOrder(orderId);
+    this.firestoreOrderService.deleteOrder(orderId).then((data) => {
+      this.showDeleteMessage();
+      this.getOrdersFromCloudDatabase();
+    });
+  }
+
+  private showDeleteMessage() {
+    this.messageService.deletedSucessfull();
   }
 
   public applyFilter(filterValue: string): void {
