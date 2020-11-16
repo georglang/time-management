@@ -14,12 +14,6 @@ import { FirestoreRecordService } from '../services/firestore-record-service/fir
 import { ConfirmDeleteDialogComponent } from './../confirm-delete-dialog/confirm-delete-dialog.component';
 import { ToastrService } from 'ngx-toastr';
 
-import * as moment from 'moment';
-moment.locale('de');
-
-// import * as jsPDF from 'jspdf';
-// import "jspdf-autotable";
-
 import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
 import { UserOptions } from 'jspdf-autotable';
@@ -35,8 +29,6 @@ interface jsPDFWithPlugin extends jsPDF {
   styleUrls: ['./order-detail.component.sass'],
 })
 export class OrderDetailComponent implements OnInit {
-  @Input() customer;
-
   private paramOrderId;
   public _isOnline;
   public sumOfWorkingHours;
@@ -62,10 +54,9 @@ export class OrderDetailComponent implements OnInit {
   public showButtonsIfRecordIsSelected: boolean = false;
   public showPrintButton: boolean = false;
   public showDeleteButton: boolean = false;
-
   public pdf = new jsPDF() as jsPDFWithPlugin;
-
   public selected = false;
+  public customerData;
 
   constructor(
     private route: ActivatedRoute,
@@ -86,10 +77,6 @@ export class OrderDetailComponent implements OnInit {
       this.paramOrderId = params['id'];
       this.getOrderByIdFromCloudDatabase(this.paramOrderId);
     });
-  }
-
-  public isOnline() {
-    return navigator.onLine;
   }
 
   public navigateToOrderList(): void {
@@ -122,21 +109,11 @@ export class OrderDetailComponent implements OnInit {
   public setRecordDataSource(records: ITimeRecord[]) {
     if (records.length > 0) {
       this.dataSource = new MatTableDataSource<ITimeRecord>(records);
-      this.getSumOfWorkingHours(records);
       this.hasRecordsFound = true;
     } else {
       this.dataSource = new MatTableDataSource<ITimeRecord>();
       this.sumOfWorkingHours = 0;
       this.hasRecordsFound = false;
-    }
-  }
-
-  public getSumOfWorkingHours(records: ITimeRecord[]) {
-    this.sumOfWorkingHours = 0;
-    if (records !== undefined) {
-      records.forEach((record) => {
-        this.sumOfWorkingHours += record.workingHours;
-      });
     }
   }
 
@@ -240,118 +217,25 @@ export class OrderDetailComponent implements OnInit {
   /** Selects all rows if they are not all selected; otherwise clear selection. */
   masterToggle() {
     this.isAllSelected()
-      ? this.selection.clear()
-      : // this.dataSource.data.forEach(row => this.selection.select(row));
+    ? this.selection.clear()
+    : // this.dataSource.data.forEach(row => this.selection.select(row));
 
-        this.dataSource.data.forEach((row) => {
-          if (!row.hasBeenPrinted) {
-            this.selection.select(row);
-          }
-        });
-  }
-
-  private getFormattedDate(date) {
-    var year = date.getFullYear();
-
-    var month = (1 + date.getMonth()).toString();
-    month = month.length > 1 ? month : '0' + month;
-
-    var day = date.getDate().toString();
-    day = day.length > 1 ? day : '0' + day;
-
-    return day + '.' + month + '.' + year;
-  }
-
-  public print() {
-    this.pdf.setFont('Helvetica');
-    this.pdf.setFontSize(12);
-
-    const records = [];
-    const recordsToSave = [];
-
-    this.selection.selected.forEach((selectedRecord) => {
-      recordsToSave.push(selectedRecord);
-      records.push([
-        this.getFormattedDate(selectedRecord.date.toDate()),
-        selectedRecord['description'],
-        selectedRecord['workingHours'],
-        selectedRecord['employee'],
-      ]);
-    });
-
-    const customerInfo = document.getElementById('customer-info');
-
-    const date = customerInfo.children[0].children[0].childNodes[0].childNodes[1].textContent.trim();
-    const customerName = customerInfo.children[0].children[0].childNodes[1].childNodes[1].textContent.trim();
-
-    const location = customerInfo.children[0].children[1].childNodes[0].childNodes[1].textContent.trim();
-    const contactPerson = customerInfo.children[0].children[1].childNodes[1].childNodes[1].textContent.trim();
-
-    this.pdf.text(
-      'Forstbetrieb Tschabi | Hochkreuthweg 3 | 87642 Trauchgau',
-      12,
-      20
-    );
-
-    this.pdf.text('Datum: ', 12, 39);
-    this.pdf.text(date, 42, 359);
-
-    this.pdf.text('Kunde: ', 12, 46);
-    this.pdf.text(customerName, 42, 46);
-
-    this.pdf.text('Ort: ', 12, 53);
-    this.pdf.text(location, 42, 53);
-
-    this.pdf.text('Einsatzleiter: ', 12, 60);
-    this.pdf.text(contactPerson, 42, 60);
-
-    this.pdf.autoTable({
-      head: [['Datum', 'Beschreibung', 'Arbeitsstunden', 'Arbeiter']],
-      body: records,
-      margin: { top: 78 },
-      pageBreak: 'auto',
-      showHead: 'everyPage',
-      showFoot: 'everyPage',
-    });
-
-    this.updateRecordsInFirestore(recordsToSave);
-    this.loadLogo();
-    this.saveAsPdf();
-  }
-
-  private loadLogo() {
-    this.loadImage('assets/img/logo100px.png').then(
-      (logo: HTMLImageElement) => {
-        this.pdf.addImage(logo, 'PNG', 170, 17, 24, 24);
-        this.loadFooterImage();
+    this.dataSource.data.forEach((row) => this.selection.select(row));
+    this.dataSource.data.forEach((row) => {
+      if (!row.hasBeenPrinted) {
+        this.selection.select(row);
       }
-    );
-  }
-
-  private loadFooterImage() {
-    this.loadImage('assets/img/letter_footer.png').then((logo) => {
-      this.pdf.addSvgAsImage('assets/letter_footer.svg', 200, 12, 200, 100);
     });
-  }
-
-  private saveAsPdf() {
-    const dateNow = moment().format('DD.MM.YYYY HH.MM');
-    const filename = 'Regienstunden ' + dateNow + '.pdf';
-    this.pdf.save(filename);
   }
 
   private updateRecordsInFirestore(records: ITimeRecord[]) {
     records.forEach((record) => {
       record.hasBeenPrinted = true;
-      this.firestoreRecordService.updateRecord(record.orderId, record);
-    });
-  }
-
-  private loadImage(url) {
-    return new Promise((resolve) => {
-      let img = new Image();
-      img.onload = () => resolve(img);
-      img.src = url;
+      this.firestoreRecordService
+        .updateRecord(record.orderId, record)
+        .then(() => {
+          this.getRecordsFromCloudDatabase(this.paramOrderId);
+        });
     });
   }
 
@@ -366,4 +250,149 @@ export class OrderDetailComponent implements OnInit {
       this.showButtonsIfRecordIsSelected = true;
     }
   }
+
+  //  print PDF - start
+  public print() {
+    this.autoTableConfig(this.getSelectedRecords().records);
+    this.loadImage('./assets/img/logo100px.png').then(
+      (logo: HTMLImageElement) => {
+        this.addContentToEveryPage(this.pdf, logo);
+        this.saveAsPdf();
+        this.updateRecordsInFirestore(this.getSelectedRecords().recordsToSave);
+      }
+    );
+  }
+
+  private getSelectedRecords() {
+    const records = [];
+    const recordsToSave = [];
+
+    this.selection.selected.forEach((selectedRecord) => {
+      recordsToSave.push(selectedRecord);
+
+      records.push([
+        this.getFormattedDate(selectedRecord.date.toDate()),
+        selectedRecord['description'],
+        selectedRecord['workingHours'],
+        selectedRecord['employee'],
+      ]);
+    });
+    return { records, recordsToSave };
+  }
+
+  private getFormattedDate(date) {
+    var year = date.getFullYear();
+
+    var month = (1 + date.getMonth()).toString();
+    month = month.length > 1 ? month : '0' + month;
+
+    var day = date.getDate().toString();
+    day = day.length > 1 ? day : '0' + day;
+
+    return day + '.' + month + '.' + year;
+  }
+
+  private getCustomerDataFromHTML() {
+    const customerInfo = document.getElementById('customer-info');
+    const date = customerInfo.children[0].children[0].childNodes[1].childNodes[0].textContent.trim();
+    const customerName = customerInfo.children[0].children[1].childNodes[1].textContent.trim();
+    const location = customerInfo.children[1].children[0].children[1].textContent.trim();
+    const contactPerson = customerInfo.children[1].children[1].children[1].textContent.trim();
+    return {
+      date: date,
+      customerName: customerName,
+      location: location,
+      contactPerson: contactPerson,
+    };
+  }
+
+  private autoTableConfig(records) {
+    this.pdf.autoTable({
+      head: [['Datum', 'Beschreibung', 'Arbeitsstunden', 'Arbeiter']],
+      headStyles: { fillColor: [67, 120, 61] },
+      body: records,
+      margin: {
+        top: 78,
+        right: 15,
+        bottom: 55,
+      },
+      pageBreak: 'auto',
+      showFoot: true,
+    });
+  }
+
+  private addContentToEveryPage(doc, logo) {
+    const numberOfPages = doc.internal.getNumberOfPages();
+    const pdfPages = doc.internal.pages;
+
+    for (let i = 1; i < pdfPages.length; i++) {
+      doc.setPage(i);
+      this.addHeaderToEveryPage(logo);
+      this.addFooter(doc, i, numberOfPages);
+    }
+  }
+
+  private addHeaderToEveryPage(logo) {
+    this.customerData = this.getCustomerDataFromHTML();
+    this.pdf.addImage(logo, 'PNG', 170, 17, 24, 24);
+    this.pdf.setFont('helvetica', 'normal');
+    this.pdf.setFontSize(12);
+
+    this.pdf.text(
+      'Forstbetrieb Tschabi | Hochkreuthweg 3 | 87642 Trauchgau',
+      12,
+      20
+    );
+
+    this.pdf.text('Datum: ', 12, 39);
+    this.pdf.text(this.customerData.date, 42, 39);
+
+    this.pdf.text('Kunde: ', 12, 46);
+    this.pdf.text(this.customerData.customerName, 42, 46);
+
+    this.pdf.text('Ort: ', 12, 53);
+    this.pdf.text(this.customerData.location, 42, 53);
+
+    this.pdf.text('Einsatzleiter: ', 12, 60);
+    this.pdf.text(this.customerData.contactPerson, 42, 60);
+  }
+
+  private addFooter(doc: any, i: number, numberOfPages: any) {
+    doc.setFont('helvetica', 'italic');
+    doc.setFontSize(8);
+    doc.text(
+      'Hiermit bestätigt bzw. akzeptiert der oben genannte Auftraggeber, die Angaben der vollbrachten Arbeiten,\nsowie die geleisteten Arbeitsstunden, die dann in Rechnung gestellt werden.\n \n Vielen Dank für Ihren Auftrag \n\n Mit freundlichen Grüßen \n Matthias Tschabi ',
+      12,
+      250
+    );
+
+    doc.text(
+      'Seite ' + String(i) + ' von ' + String(numberOfPages),
+      doc.internal.pageSize.width / 2,
+      287,
+      {
+        align: 'center',
+      }
+    );
+  }
+
+  private loadImage(url: string) {
+    return new Promise((resolve) => {
+      let img = new Image();
+      img.onload = () => resolve(img);
+      img.src = url;
+      resolve(img);
+    });
+  }
+
+  private saveAsPdf() {
+    const filename =
+      'Regienstunden - ' +
+      this.customerData.date +
+      ' - ' +
+      this.customerData.customerName +
+      '.pdf';
+    this.pdf.save(filename);
+  }
+  //  print PDF - end
 }
