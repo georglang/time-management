@@ -1,13 +1,13 @@
-import { Injectable, OnInit } from "@angular/core";
-import { Timestamp, QuerySnapshot } from "@firebase/firestore-types";
+import { Injectable, OnInit } from '@angular/core';
+import { Timestamp, QuerySnapshot } from '@firebase/firestore-types';
 
 // import * as firebase from 'firebase';
 // import 'firebase/firestore';
 // import 'firebase/database';
 
-import { IOrder, Order, IFlattenOrder } from "../../data-classes/Order";
-import { TimeRecord, ITimeRecord } from "../../data-classes/TimeRecords";
-import { FirestoreRecordService } from "../firestore-record-service/firestore-record.service";
+import { IOrder, Order, IFlattenOrder } from '../../data-classes/Order';
+import { TimeRecord, ITimeRecord } from '../../data-classes/TimeRecords';
+import { FirestoreRecordService } from '../firestore-record-service/firestore-record.service';
 import {
   AngularFirestore,
   AngularFirestoreDocument,
@@ -16,9 +16,9 @@ import {
   Action,
   DocumentSnapshotDoesNotExist,
   DocumentSnapshotExists,
-} from "@angular/fire/firestore";
+} from '@angular/fire/firestore';
 
-import { Observable, from } from "rxjs";
+import { Observable, from } from 'rxjs';
 import {
   map,
   tap,
@@ -27,11 +27,11 @@ import {
   mergeMap,
   expand,
   takeWhile,
-} from "rxjs/operators";
-import _ from "lodash";
+} from 'rxjs/operators';
+import _ from 'lodash';
 
 @Injectable({
-  providedIn: "root",
+  providedIn: 'root',
 })
 export class FirestoreOrderService {
   public ordersCollection: AngularFirestoreCollection<IOrder>;
@@ -44,8 +44,8 @@ export class FirestoreOrderService {
     private firestore: AngularFirestore,
     private firestoreRecordService: FirestoreRecordService
   ) {
-    this.ordersCollection = this.firestore.collection<IOrder>("orders");
-    this.recordsCollection = this.firestore.collection<ITimeRecord>("records");
+    this.ordersCollection = this.firestore.collection<IOrder>('orders');
+    this.recordsCollection = this.firestore.collection<ITimeRecord>('records');
   }
 
   public getOrders(): Observable<IOrder[]> {
@@ -73,7 +73,7 @@ export class FirestoreOrderService {
         }
       })
       .catch(function (error) {
-        console.log("getOrderById: no order found", error);
+        console.log('getOrderById: no order found', error);
       });
   }
 
@@ -114,7 +114,7 @@ export class FirestoreOrderService {
         return docReference.id;
       })
       .catch((error) => {
-        console.error("Error adding order: ", error);
+        console.error('Error adding order: ', error);
       });
   }
 

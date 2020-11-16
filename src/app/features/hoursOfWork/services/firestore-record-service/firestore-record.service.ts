@@ -111,7 +111,6 @@ export class FirestoreRecordService {
           if (data.orderId === orderId) {
             records.push(data);
           }
-          console.log('RRRRRecords ', records);
         });
         resolve(records);
       });
