@@ -41,8 +41,8 @@ export class EditRecordComponent implements OnInit {
       viewValue: 'Speer Leonhard',
     },
     {
-      value: 'Strobel Martin',
-      viewValue: 'Strobel Martin',
+      value: 'Strobel Michael',
+      viewValue: 'Strobel Michael',
     },
     {
       value: 'Tschabi Matthias',
@@ -86,7 +86,7 @@ export class EditRecordComponent implements OnInit {
     {
       value: 'Harvester',
       viewValue: 'Harvester',
-    }
+    },
   ];
 
   constructor(
