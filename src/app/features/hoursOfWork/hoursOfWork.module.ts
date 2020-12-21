@@ -18,18 +18,19 @@ import { OrderListComponent } from './order-list/order-list.component';
 import { OrderDetailComponent } from './order-detail/order-detail.component';
 import { CreateOrderComponent } from './create-order/create-order.component';
 import { EditOrderComponent } from './edit-order/edit-order.component';
-import { HeaderComponent } from './header/header.component';
 import { CreateRecordComponent } from './create-record/create-record.component';
 import { EditRecordComponent } from './edit-record/edit-record.component';
 import { ConfirmDeleteDialogComponent } from './confirm-delete-dialog/confirm-delete-dialog.component';
 import { SettingsDialogComponent } from './settings-dialog/settings-dialog.component';
 import { environment } from '../../../environments/environment.prod';
 import { HoursOfWorkRoutingModule } from '../hoursOfWork-routing.module';
-import { MaterialModule } from '../../core/material/material.module';
+import { MaterialModule } from '../../shared/modules/material.module';
+import { MainModule } from '../../shared/modules/main.module';
 
 @NgModule({
   imports: [
     CommonModule,
+    MainModule,
     HoursOfWorkRoutingModule,
     ReactiveFormsModule,
     FormsModule,
@@ -42,7 +43,6 @@ import { MaterialModule } from '../../core/material/material.module';
     OrderListComponent,
     OrderDetailComponent,
     EditOrderComponent,
-    HeaderComponent,
     SortFormArrayByDate,
     CreateRecordComponent,
     EditRecordComponent,

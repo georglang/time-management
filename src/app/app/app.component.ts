@@ -3,6 +3,7 @@ import { SwUpdate } from '@angular/service-worker';
 import { ConnectionService } from 'ng-connection-service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { NoConnectionSnackBarComponent } from './noConnectionSnackBar/noConnectionSnackBar.component';
+import { AuthService } from '../core/auth/auth.service';
 
 @Component({
   selector: 'app-root',
@@ -11,13 +12,19 @@ import { NoConnectionSnackBarComponent } from './noConnectionSnackBar/noConnecti
 })
 export class AppComponent {
   public isOnline = true;
+  public isLoggedIn = false;
   constructor(
     private swUpdate: SwUpdate,
     private connectionService: ConnectionService,
-    private noConnectionSnackBar: MatSnackBar
+    private noConnectionSnackBar: MatSnackBar,
+    private authService: AuthService
   ) {}
 
   ngOnInit() {
+    if (this.authService.isLoggedIn) {
+      this.isLoggedIn = true;
+    }
+
     if (this.swUpdate.isEnabled) {
       this.swUpdate.available.subscribe(() => {
         if (confirm('Neue App-Version verfügbar. Herunterladen?')) {
