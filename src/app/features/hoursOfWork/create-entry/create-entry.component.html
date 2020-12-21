@@ -1,0 +1,335 @@
+<app-header titleInput="Eintrag anlegen"></app-header>
+
+<div class="sub-nav row">
+  <div class="col-10">
+    <div type="button" class="nav-before-btn" (click)="navigateToOrderList()">
+      <mat-icon>navigate_before</mat-icon>
+    </div>
+  </div>
+  <div class="col-2">
+    <div
+      type="button"
+      class="save-btn"
+      (click)="documentCreateEntryForm.ngSubmit.emit()"
+    >
+      <mat-icon>save</mat-icon>
+    </div>
+  </div>
+</div>
+
+<div id="create-entry-component-wrapper" class="row no-gutter">
+  <div class="col-12">
+    <div id="create-entry-form-wrapper" class="row no-gutter">
+      <div class="col-12">
+        <form
+          id="create-entry-form"
+          [formGroup]="createEntryForm"
+          #documentCreateEntryForm="ngForm"
+          (ngSubmit)="onSubmit()"
+        >
+          <fieldset class="form-group">
+            <mat-form-field appearance="fill">
+              <mat-label>Kategorie auswählen</mat-label>
+              <mat-select
+                formControlName="category"
+                [ngClass]="{
+                  'is-invalid': submitted && getFormControl.category.errors
+                }"
+              >
+                <mat-option
+                  *ngFor="let category of categories"
+                  [value]="category.value"
+                >
+                  {{ category.viewValue }}
+                </mat-option>
+              </mat-select>
+              <div
+                *ngIf="submitted && getFormControl.category.errors"
+                class="invalid-feedback"
+              >
+                <div *ngIf="getFormControl.category.errors.required">
+                  Bitte <strong>Kategorie</strong> auswählen
+                </div>
+              </div>
+            </mat-form-field>
+          </fieldset>
+        </form>
+
+        <div *ngIf="optionValue == 'Stunden'">
+          <form
+            id="working-hours-form"
+            [formGroup]="workingHoursForm"
+            #documentWorkingHoursForm="ngForm"
+            (ngSubmit)="onSubmit()"
+          >
+            <fieldset class="form-group">
+              <mat-form-field>
+                <input
+                  matInput
+                  [matDatepicker]="picker"
+                  placeholder="Datum wählen"
+                  id="date"
+                  name="date"
+                  formControlName="date"
+                  (click)="picker.open()"
+                  required
+                  [ngClass]="{
+                    'is-invalid': submitted && getFormControl.date.errors
+                  }"
+                />
+                <mat-datepicker-toggle
+                  matSuffix
+                  [for]="picker"
+                ></mat-datepicker-toggle>
+                <mat-datepicker #picker></mat-datepicker>
+                <div
+                  *ngIf="submitted && getFormControl.date.errors"
+                  class="invalid-feedback"
+                >
+                  <div *ngIf="getFormControl.date.errors.required">
+                    Bitte <strong>Datum</strong> eingeben
+                  </div>
+                </div>
+              </mat-form-field>
+            </fieldset>
+
+            <fieldset class="form-group">
+              <mat-form-field>
+                <input
+                  matInput
+                  formControlName="description"
+                  placeholder="Art der Arbeit"
+                  required
+                  [ngClass]="{
+                    'is-invalid': submitted && getFormControl.description.errors
+                  }"
+                />
+                <div
+                  *ngIf="submitted && getFormControl.description.errors"
+                  class="invalid-feedback"
+                >
+                  <div *ngIf="getFormControl.description.errors.required">
+                    Bitte <strong>Beschreibung</strong> eingeben
+                  </div>
+                </div>
+              </mat-form-field>
+            </fieldset>
+
+            <fieldset class="form-group">
+              <mat-form-field>
+                <input
+                  matInput
+                  type="number"
+                  formControlName="workingHours"
+                  placeholder="Arbeitsstunden"
+                  required
+                  [ngClass]="{
+                    'is-invalid':
+                      submitted && getFormControl.workingHours.errors
+                  }"
+                />
+                <div
+                  *ngIf="submitted && getFormControl.workingHours.errors"
+                  class="invalid-feedback"
+                >
+                  <div *ngIf="getFormControl.workingHours.errors.required">
+                    Bitte <strong>Stunden</strong> eingeben
+                  </div>
+                </div>
+              </mat-form-field>
+            </fieldset>
+
+            <fieldset class="form-group">
+              <mat-form-field appearance="fill">
+                <mat-label>Arbeiter auswählen</mat-label>
+                <mat-select
+                  formControlName="employee"
+                  multiple
+                  [ngClass]="{
+                    'is-invalid': submitted && getFormControl.employee.errors
+                  }"
+                >
+                  <mat-option
+                    *ngFor="let employee of employees"
+                    [value]="employee.value"
+                  >
+                    {{ employee.viewValue }}
+                  </mat-option>
+                </mat-select>
+                <div
+                  *ngIf="submitted && getFormControl.employee.errors"
+                  class="invalid-feedback"
+                >
+                  <div *ngIf="getFormControl.employee.errors.required">
+                    Bitte <strong>Arbeiter</strong> auswählen
+                  </div>
+                </div>
+              </mat-form-field>
+            </fieldset>
+          </form>
+        </div>
+        <div *ngIf="optionValue == 'Material'">
+          <form
+            id="material-form"
+            [formGroup]="materialForm"
+            #documentMaterialForm="ngForm"
+            (ngSubmit)="onSubmit()"
+          >
+            <fieldset class="form-group">
+              <mat-form-field>
+                <input
+                  matInput
+                  [matDatepicker]="picker"
+                  placeholder="Datum wählen"
+                  id="date"
+                  name="date"
+                  formControlName="date"
+                  (click)="picker.open()"
+                  required
+                  [ngClass]="{
+                    'is-invalid': submitted && getFormControl.date.errors
+                  }"
+                />
+                <mat-datepicker-toggle
+                  matSuffix
+                  [for]="picker"
+                ></mat-datepicker-toggle>
+                <mat-datepicker #picker></mat-datepicker>
+                <div
+                  *ngIf="submitted && getFormControl.date.errors"
+                  class="invalid-feedback"
+                >
+                  <div *ngIf="getFormControl.date.errors.required">
+                    Bitte <strong>Datum</strong> eingeben
+                  </div>
+                </div>
+              </mat-form-field>
+            </fieldset>
+
+            <fieldset class="form-group">
+              <mat-form-field>
+                <input
+                  matInput
+                  formControlName="material"
+                  placeholder="Material"
+                  required
+                  [ngClass]="{
+                    'is-invalid': submitted && getFormControl.material.errors
+                  }"
+                />
+                <div
+                  *ngIf="submitted && getFormControl.material.errors"
+                  class="invalid-feedback"
+                >
+                  <div *ngIf="getFormControl.material.errors.required">
+                    Bitte <strong>Material</strong> eingeben
+                  </div>
+                </div>
+              </mat-form-field>
+            </fieldset>
+
+            <fieldset class="form-group">
+              <mat-form-field>
+                <input
+                  matInput
+                  type="number"
+                  formControlName="amount"
+                  placeholder="Anzahl"
+                  required
+                  [ngClass]="{
+                    'is-invalid': submitted && getFormControl.amount.errors
+                  }"
+                />
+                <div
+                  *ngIf="submitted && getFormControl.amount.errors"
+                  class="invalid-feedback"
+                >
+                  <div *ngIf="getFormControl.amount.errors.required">
+                    Bitte <strong>Anzahl</strong> eingeben
+                  </div>
+                </div>
+              </mat-form-field>
+            </fieldset>
+
+            <fieldset class="form-group">
+              <mat-form-field appearance="fill">
+                <mat-label>Einheit auswählen</mat-label>
+                <mat-select
+                  formControlName="unit"
+                  [ngClass]="{
+                    'is-invalid': submitted && getFormControl.unit.errors
+                  }"
+                >
+                  <mat-option *ngFor="let unit of units" [value]="unit.value">
+                    {{ unit.viewValue }}
+                  </mat-option>
+                </mat-select>
+                <div
+                  *ngIf="submitted && getFormControl.unit.errors"
+                  class="invalid-feedback"
+                >
+                  <div *ngIf="getFormControl.unit.errors.required">
+                    Bitte <strong>Einheit</strong> auswählen
+                  </div>
+                </div>
+              </mat-form-field>
+            </fieldset>
+          </form>
+        </div>
+        <div *ngIf="optionValue == 'Notizen'">
+          <form
+            id="notice-form"
+            [formGroup]="noticeForm"
+            #documentNoticeForm="ngForm"
+            (ngSubmit)="onSubmit()"
+          >
+            <fieldset class="form-group">
+              <mat-form-field>
+                <input
+                  matInput
+                  [matDatepicker]="picker"
+                  placeholder="Datum wählen"
+                  id="date"
+                  name="date"
+                  formControlName="date"
+                  (click)="picker.open()"
+                  required
+                  [ngClass]="{
+                    'is-invalid': submitted && getFormControl.date.errors
+                  }"
+                />
+                <mat-datepicker-toggle
+                  matSuffix
+                  [for]="picker"
+                ></mat-datepicker-toggle>
+                <mat-datepicker #picker></mat-datepicker>
+                <div
+                  *ngIf="submitted && getFormControl.date.errors"
+                  class="invalid-feedback"
+                >
+                  <div *ngIf="getFormControl.date.errors.required">
+                    Bitte <strong>Datum</strong> eingeben
+                  </div>
+                </div>
+              </mat-form-field>
+            </fieldset>
+
+            <fieldset class="form-group">
+              <mat-form-field>
+                <mat-label>Autosize textarea</mat-label>
+                <textarea
+                  matInput
+                  cdkTextareaAutosize
+                  #autosize="cdkTextareaAutosize"
+                  cdkAutosizeMinRows="1"
+                  cdkAutosizeMaxRows="5"
+                  formControlName="notice"
+                ></textarea>
+              </mat-form-field>
+            </fieldset>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
