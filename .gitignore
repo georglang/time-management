@@ -40,3 +40,5 @@ Thumbs.db
 
 #credentials
 FirebaseCredentials.js
+
+src/environments/environment.prod.ts
