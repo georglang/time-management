@@ -10,7 +10,7 @@ export class SettingsDialogComponent implements OnInit {
   public modalTitle: string;
   public passwordCorrect: string;
   public hide = true;
-  public isPasswortCorrect = false;
+  public isPasswordCorrect = false;
 
   public passwordForm: FormGroup = new FormGroup({
     password: new FormControl('', [Validators.required, Validators.min(3)]),
@@ -25,7 +25,7 @@ export class SettingsDialogComponent implements OnInit {
   ngOnInit() {
     this.passwordForm.controls['password'].valueChanges.subscribe((input) => {
       if (input === 'Löwenbräu') {
-        this.isPasswortCorrect = true;
+        this.isPasswordCorrect = true;
       }
     });
   }
