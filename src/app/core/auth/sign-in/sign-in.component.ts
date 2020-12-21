@@ -3,11 +3,11 @@ import { FormGroup, FormControl } from '@angular/forms';
 import { AuthService } from '../auth.service';
 
 @Component({
-  selector: 'app-sign-in-form',
-  templateUrl: './sign-in-form.component.html',
-  styleUrls: ['./sign-in-form.component.sass'],
+  selector: 'app-sign-in',
+  templateUrl: './sign-in.component.html',
+  styleUrls: ['./sign-in.component.sass'],
 })
-export class SignInFormComponent implements OnInit {
+export class SignInComponent implements OnInit {
   @Input() error: string | null;
 
   @Output() submitEM = new EventEmitter();

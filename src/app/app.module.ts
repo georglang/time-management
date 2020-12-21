@@ -18,16 +18,12 @@ import { HoursOfWorkModule } from './features/hoursOfWork/hoursOfWork.module';
 import { NoConnectionSnackBarComponent } from './app/noConnectionSnackBar/noConnectionSnackBar.component';
 import { AngularFireModule } from '@angular/fire';
 import { AngularFireAuthModule } from '@angular/fire/auth';
-import { SignInFormComponent as SignInFormComponent } from './core/auth/signIn-form/sign-in-form.component';
+import { SignInComponent } from './core/auth/sign-in/sign-in.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MainModule } from './shared/modules/main.module';
 
 @NgModule({
-  declarations: [
-    AppComponent,
-    SignInFormComponent,
-    NoConnectionSnackBarComponent,
-  ],
+  declarations: [AppComponent, SignInComponent, NoConnectionSnackBarComponent],
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
