@@ -9,16 +9,17 @@
   <div class="col-12">
     <div id="create-record-form-wrapper" class="row no-gutter">
       <div class="col-12">
-        <mat-card id="sign-in-wrapper">
-          <mat-card-content>
-            <form [formGroup]="form" (ngSubmit)="submit()">
+        <div id="sign-in-wrapper">
+          <div>
+            <form [formGroup]="passwordForm" (ngSubmit)="submit()">
               <p>
                 <mat-form-field>
                   <input
                     type="text"
                     matInput
-                    placeholder="Email"
+                    placeholder="Bitte Email eingeben"
                     formControlName="email"
+                    autocomplete="on"
                   />
                 </mat-form-field>
               </p>
@@ -26,12 +27,19 @@
               <p>
                 <mat-form-field>
                   <input
-                    type="password"
                     matInput
-                    placeholder="Password"
+                    placeholder="Bitte Passwort eingeben"
+                    [type]="hide ? 'password' : 'text'"
                     formControlName="password"
-                    autocomplete=""
+                    autocomplete="on"
+                    required
                   />
+                  <mat-icon matSuffix (click)="hide = !hide">{{
+                    hide ? 'visibility_off' : 'visibility'
+                  }}</mat-icon>
+                  <mat-hint *ngIf="!passwordInput.value"
+                    >Passwort eingeben</mat-hint
+                  >
                 </mat-form-field>
               </p>
 
@@ -45,8 +53,8 @@
                 </button>
               </div>
             </form>
-          </mat-card-content>
-        </mat-card>
+          </div>
+        </div>
       </div>
     </div>
   </div>

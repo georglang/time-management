@@ -1,5 +1,6 @@
 import { Input, Component, Output, EventEmitter, OnInit } from '@angular/core';
-import { FormGroup, FormControl } from '@angular/forms';
+import { FormGroup, FormControl, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
 import { AuthService } from '../auth.service';
 
 @Component({
@@ -11,22 +12,32 @@ export class SignInComponent implements OnInit {
   @Input() error: string | null;
 
   @Output() submitEM = new EventEmitter();
-  form: FormGroup = new FormGroup({
-    email: new FormControl(''),
-    password: new FormControl(''),
+  passwordForm: FormGroup = new FormGroup({
+    email: new FormControl('', [Validators.required]),
+    password: new FormControl('', [Validators.required]),
   });
 
-  constructor(private authService: AuthService) {}
+  public hide = true;
+
+  constructor(private authService: AuthService, private router: Router) {}
 
   ngOnInit() {}
 
+  get passwordInput() {
+    return this.passwordForm.get('password');
+  }
+
   submit() {
-    if (this.form.valid) {
-      this.submitEM.emit(this.form.value);
-      this.authService.signIn(
-        this.form.get('email').value,
-        this.form.get('password').value
-      );
+    if (this.passwordForm.valid) {
+      this.submitEM.emit(this.passwordForm.value);
+      this.authService
+        .signIn(
+          this.passwordForm.get('email').value,
+          this.passwordForm.get('password').value
+        )
+        .then((data) => {
+          this.router.navigate(['hours-of-work']);
+        });
     }
   }
 }
