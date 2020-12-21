@@ -1,17 +1,17 @@
 import { NgModule, Component } from '@angular/core';
 import { Routes, RouterModule, PreloadAllModules } from '@angular/router';
 import { HoursOfWorkComponent } from './features/hoursOfWork/hoursOfWork.component';
+import { SignInComponent } from './core/auth/sign-in/sign-in.component';
 
 const routes: Routes = [
+  { path: '', redirectTo: 'hours-of-work', pathMatch: 'full' },
+  { path: 'sign-in', component: SignInComponent },
   {
     path: 'hours-of-work',
     loadChildren: () =>
-      import('./features/hoursOfWork/hoursOfWork.module').then((m) => m.HoursOfWorkModule),
-  },
-  {
-    path: '',
-    redirectTo: 'hours-of-work',
-    pathMatch: 'full',
+      import('./features/hoursOfWork/hoursOfWork.module').then(
+        (m) => m.HoursOfWorkModule
+      ),
   },
 
   // * wildcard if the requested URL doesn´t match any path in the URL
