@@ -6,6 +6,7 @@ import { MessageService } from '../services/message-service/message.service';
 import { FirestoreRecordService } from '../services/firestore-record-service/firestore-record.service';
 import { TimeRecord } from '../data-classes/TimeRecords';
 import { CdkTextareaAutosize } from '@angular/cdk/text-field';
+import { eCategory } from './../data-classes/eCategory';
 
 @Component({
   selector: 'app-create-entry',
@@ -22,19 +23,20 @@ export class CreateEntryComponent implements OnInit {
 
   private routeParamOrderId;
   public submitted = false;
-  public optionValue: string;
+  public optionValue: eCategory;
+  public eCategory = eCategory;
 
   public categories = [
     {
-      value: 'Stunden',
+      value: eCategory.workingHours,
       viewValue: 'Stunden',
     },
     {
-      value: 'Material',
+      value: eCategory.material,
       viewValue: 'Material',
     },
     {
-      value: 'Notizen',
+      value: eCategory.workingHours,
       viewValue: 'Notizen',
     },
   ];
@@ -114,23 +116,7 @@ export class CreateEntryComponent implements OnInit {
     });
   }
 
-  ngOnInit() {
-    this.route.params.subscribe((params) => {
-      this.routeParamOrderId = params.id;
-    });
-
-    this.createEntryForm
-      .get('category')
-      .valueChanges.subscribe((optionValue) => {
-        this.optionValue = optionValue;
-      });
-  }
-
-  public navigateToOrderList() {
-    this.location.back();
-  }
-
-  public createEntry(formInput: any, orderId: string): void {
+  public createWorkingHours(formInput: any, orderId: string): void {
     const record = new TimeRecord(
       formInput.date,
       formInput.description,
@@ -143,6 +129,22 @@ export class CreateEntryComponent implements OnInit {
     );
     record.orderId = orderId;
     this.addRecordToFirebaseRecordsTable(record);
+  }
+
+  ngOnInit() {
+    this.route.params.subscribe((params) => {
+      this.routeParamOrderId = params.id;
+    });
+
+    this.createEntryForm
+      .get('category')
+      .valueChanges.subscribe((optionValue: eCategory) => {
+        this.optionValue = optionValue;
+      });
+  }
+
+  public navigateToOrderList() {
+    this.location.back();
   }
 
   public addRecordToFirebaseRecordsTable(record: any): void {
@@ -178,7 +180,18 @@ export class CreateEntryComponent implements OnInit {
     if (this.createEntryForm.invalid) {
       return;
     } else {
-      this.createEntry(this.createEntryForm.value, this.routeParamOrderId);
+      if (this.optionValue === eCategory.workingHours) {
+        // create working Hours
+      } else if (this.optionValue == eCategory.material) {
+        // create material
+      } else if (this.optionValue === eCategory.notices) {
+        // create notices
+      }
+
+      this.createWorkingHours(
+        this.createEntryForm.value,
+        this.routeParamOrderId
+      );
     }
   }
 }

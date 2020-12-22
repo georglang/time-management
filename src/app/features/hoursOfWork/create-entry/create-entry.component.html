@@ -55,7 +55,7 @@
           </fieldset>
         </form>
 
-        <div *ngIf="optionValue == 'Stunden'">
+        <div *ngIf="optionValue == eCategory.workingHours">
           <form
             id="working-hours-form"
             [formGroup]="workingHoursForm"
@@ -168,7 +168,7 @@
             </fieldset>
           </form>
         </div>
-        <div *ngIf="optionValue == 'Material'">
+        <div *ngIf="optionValue == eCategory.material">
           <form
             id="material-form"
             [formGroup]="materialForm"
@@ -276,7 +276,7 @@
             </fieldset>
           </form>
         </div>
-        <div *ngIf="optionValue == 'Notizen'">
+        <div *ngIf="optionValue == eCategory.notices">
           <form
             id="notice-form"
             [formGroup]="noticeForm"
