@@ -55,7 +55,7 @@
           </fieldset>
         </form>
 
-        <div *ngIf="optionValue == eCategory.workingHours">
+        <div *ngIf="optionValue === eCategory.workingHours">
           <form
             id="working-hours-form"
             [formGroup]="workingHoursForm"
@@ -168,7 +168,7 @@
             </fieldset>
           </form>
         </div>
-        <div *ngIf="optionValue == eCategory.material">
+        <div *ngIf="optionValue === eCategory.material">
           <form
             id="material-form"
             [formGroup]="materialForm"
@@ -276,11 +276,12 @@
             </fieldset>
           </form>
         </div>
-        <div *ngIf="optionValue == eCategory.notices">
+
+        <div *ngIf="optionValue === eCategory.note">
           <form
-            id="notice-form"
-            [formGroup]="noticeForm"
-            #documentNoticeForm="ngForm"
+            id="note-form"
+            [formGroup]="noteForm"
+            #documentNoteForm="ngForm"
             (ngSubmit)="onSubmit()"
           >
             <fieldset class="form-group">
@@ -316,14 +317,14 @@
 
             <fieldset class="form-group">
               <mat-form-field>
-                <mat-label>Autosize textarea</mat-label>
+                <mat-label>Notiz</mat-label>
                 <textarea
                   matInput
                   cdkTextareaAutosize
                   #autosize="cdkTextareaAutosize"
                   cdkAutosizeMinRows="1"
                   cdkAutosizeMaxRows="5"
-                  formControlName="notice"
+                  formControlName="description"
                 ></textarea>
               </mat-form-field>
             </fieldset>
