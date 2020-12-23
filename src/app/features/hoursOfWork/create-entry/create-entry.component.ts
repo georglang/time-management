@@ -1,12 +1,25 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import {
+  FormBuilder,
+  FormGroup,
+  FormControl,
+  Validators,
+} from '@angular/forms';
 import { Location } from '@angular/common';
+import { Observable } from 'rxjs';
+import { map, startWith } from 'rxjs/operators';
+
 import { MessageService } from '../services/message-service/message.service';
 import { FirestoreRecordService } from '../services/firestore-record-service/firestore-record.service';
-import { TimeRecord } from '../data-classes/TimeRecords';
+import { TimeRecord, ITimeRecord } from '../data-classes/TimeRecords';
 import { CdkTextareaAutosize } from '@angular/cdk/text-field';
 import { eCategory } from './../data-classes/eCategory';
+import { INote, Note } from '../data-classes/Note';
+import { IMaterial, Material } from '../data-classes/Material';
+import { FirestoreMaterialService } from '../services/firestore-material-service/firestore-material.service';
+import { FirestoreNoteService } from '../services/firestore-note-service/firestore-note.service';
+import { materials } from '../material-list/materials';
 
 @Component({
   selector: 'app-create-entry',
@@ -19,7 +32,7 @@ export class CreateEntryComponent implements OnInit {
   public createEntryForm: FormGroup;
   public workingHoursForm: FormGroup;
   public materialForm: FormGroup;
-  public noticeForm: FormGroup;
+  public noteForm: FormGroup;
 
   private routeParamOrderId;
   public submitted = false;
@@ -36,7 +49,7 @@ export class CreateEntryComponent implements OnInit {
       viewValue: 'Material',
     },
     {
-      value: eCategory.workingHours,
+      value: eCategory.note,
       viewValue: 'Notizen',
     },
   ];
@@ -84,11 +97,17 @@ export class CreateEntryComponent implements OnInit {
     },
   ];
 
+  filteredOptions: Observable<string[]>;
+  options: string[] = materials;
+  chooseMaterialFormControl = new FormControl();
+
   constructor(
     private router: Router,
     private route: ActivatedRoute,
     private formBuilder: FormBuilder,
     private firestoreRecordService: FirestoreRecordService,
+    private firestoreMaterialService: FirestoreMaterialService,
+    private firestoreNoteService: FirestoreNoteService,
     private messageService: MessageService,
     private location: Location
   ) {
@@ -110,25 +129,10 @@ export class CreateEntryComponent implements OnInit {
       unit: ['', Validators.required],
     });
 
-    this.noticeForm = this.formBuilder.group({
+    this.noteForm = this.formBuilder.group({
       date: ['', Validators.required],
-      notice: ['', Validators.required],
+      description: ['', Validators.required],
     });
-  }
-
-  public createWorkingHours(formInput: any, orderId: string): void {
-    const record = new TimeRecord(
-      formInput.date,
-      formInput.description,
-      formInput.workingHours,
-      formInput.employee,
-      formInput.tool,
-      '',
-      '',
-      false
-    );
-    record.orderId = orderId;
-    this.addRecordToFirebaseRecordsTable(record);
   }
 
   ngOnInit() {
@@ -141,13 +145,26 @@ export class CreateEntryComponent implements OnInit {
       .valueChanges.subscribe((optionValue: eCategory) => {
         this.optionValue = optionValue;
       });
+
+    this.filteredOptions = this.chooseMaterialFormControl.valueChanges.pipe(
+      startWith(''),
+      map((value) => this.filter(value))
+    );
+  }
+
+  private filter(value: string): string[] {
+    const filterValue = value.toLowerCase();
+
+    return this.options.filter(
+      (option) => option.toLowerCase().indexOf(filterValue) === 0
+    );
   }
 
   public navigateToOrderList() {
     this.location.back();
   }
 
-  public addRecordToFirebaseRecordsTable(record: any): void {
+  public addRecordToFirebaseRecordsTable(record: ITimeRecord): void {
     if (this.firestoreRecordService !== undefined) {
       // check if record is already in firestore
       this.firestoreRecordService
@@ -171,6 +188,24 @@ export class CreateEntryComponent implements OnInit {
     }
   }
 
+  public addMaterialToFirebaseMaterialTable(material: IMaterial): void {
+    if (this.firestoreMaterialService !== undefined) {
+      this.firestoreMaterialService.addMaterial(material).then((id: string) => {
+        this.messageService.materialCreatedSuccessfully();
+        this.router.navigate(['order-details', material.orderId]);
+      });
+    }
+  }
+
+  public addNoteToFirebaseNoteTable(note: INote): void {
+    if (this.firestoreNoteService !== undefined) {
+      this.firestoreNoteService.addNote(note).then((id: string) => {
+        this.messageService.materialCreatedSuccessfully();
+        this.router.navigate(['order-details', note.orderId]);
+      });
+    }
+  }
+
   get getFormControl() {
     return this.createEntryForm.controls;
   }
@@ -181,17 +216,48 @@ export class CreateEntryComponent implements OnInit {
       return;
     } else {
       if (this.optionValue === eCategory.workingHours) {
-        // create working Hours
+        this.createWorkingHours(
+          this.createEntryForm.value,
+          this.routeParamOrderId
+        );
       } else if (this.optionValue == eCategory.material) {
-        // create material
-      } else if (this.optionValue === eCategory.notices) {
-        // create notices
+        this.createMaterial(this.materialForm.value, this.routeParamOrderId);
+      } else if (this.optionValue === eCategory.note) {
+        this.createNote(this.noteForm.value, this.routeParamOrderId);
       }
-
-      this.createWorkingHours(
-        this.createEntryForm.value,
-        this.routeParamOrderId
-      );
     }
+  }
+
+  public createWorkingHours(workingHoursFormInput: any, orderId: string): void {
+    const record = new TimeRecord(
+      workingHoursFormInput.date,
+      workingHoursFormInput.description,
+      workingHoursFormInput.workingHours,
+      workingHoursFormInput.employee
+    );
+    record.orderId = orderId;
+    this.addRecordToFirebaseRecordsTable(record);
+  }
+
+  createNote(noteFormInput: any, orderId: string): void {
+    const note = new Note(
+      noteFormInput.date,
+      noteFormInput.description,
+      noteFormInput.uploadUrl,
+      orderId
+    );
+
+    this.addNoteToFirebaseNoteTable(note);
+  }
+  createMaterial(materialFormInput: any, orderId) {
+    const material = new Material(
+      materialFormInput.date,
+      materialFormInput.material,
+      materialFormInput.amount,
+      materialFormInput.unit,
+      orderId
+    );
+
+    this.addMaterialToFirebaseMaterialTable(material);
   }
 }
