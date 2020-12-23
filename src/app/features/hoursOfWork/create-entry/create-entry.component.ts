@@ -206,8 +206,20 @@ export class CreateEntryComponent implements OnInit {
     }
   }
 
-  get getFormControl() {
+  get getFormControlEntryForm() {
     return this.createEntryForm.controls;
+  }
+
+  get getFormControlWorkingHoursForm() {
+    return this.workingHoursForm.controls;
+  }
+
+  get getFormControlMaterialForm() {
+    return this.materialForm.controls;
+  }
+
+  get getFormControlNoteForm() {
+    return this.noteForm.controls;
   }
 
   public onSubmit() {

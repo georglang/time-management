@@ -33,7 +33,8 @@
               <mat-select
                 formControlName="category"
                 [ngClass]="{
-                  'is-invalid': submitted && getFormControl.category.errors
+                  'is-invalid':
+                    submitted && getFormControlEntryForm.category.errors
                 }"
               >
                 <mat-option
@@ -44,10 +45,10 @@
                 </mat-option>
               </mat-select>
               <div
-                *ngIf="submitted && getFormControl.category.errors"
+                *ngIf="submitted && getFormControlEntryForm.category.errors"
                 class="invalid-feedback"
               >
-                <div *ngIf="getFormControl.category.errors.required">
+                <div *ngIf="getFormControlEntryForm.category.errors.required">
                   Bitte <strong>Kategorie</strong> auswählen
                 </div>
               </div>
@@ -187,7 +188,8 @@
                   (click)="picker.open()"
                   required
                   [ngClass]="{
-                    'is-invalid': submitted && getFormControl.date.errors
+                    'is-invalid':
+                      submitted && getFormControlMaterialForm.date.errors
                   }"
                 />
                 <mat-datepicker-toggle
@@ -196,10 +198,10 @@
                 ></mat-datepicker-toggle>
                 <mat-datepicker #picker></mat-datepicker>
                 <div
-                  *ngIf="submitted && getFormControl.date.errors"
+                  *ngIf="submitted && getFormControlMaterialForm.date.errors"
                   class="invalid-feedback"
                 >
-                  <div *ngIf="getFormControl.date.errors.required">
+                  <div *ngIf="getFormControlMaterialForm.date.errors.required">
                     Bitte <strong>Datum</strong> eingeben
                   </div>
                 </div>
@@ -216,7 +218,8 @@
                   [matAutocomplete]="auto"
                   required
                   [ngClass]="{
-                    'is-invalid': submitted && getFormControl.material.errors
+                    'is-invalid':
+                      submitted && getFormControlMaterialForm.material.errors
                   }"
                 />
                 <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete">
@@ -229,10 +232,14 @@
                 </mat-autocomplete>
 
                 <div
-                  *ngIf="submitted && getFormControl.material.errors"
+                  *ngIf="
+                    submitted && getFormControlMaterialForm.material.errors
+                  "
                   class="invalid-feedback"
                 >
-                  <div *ngIf="getFormControl.material.errors.required">
+                  <div
+                    *ngIf="getFormControlMaterialForm.material.errors.required"
+                  >
                     Bitte <strong>Material</strong> eingeben
                   </div>
                 </div>
@@ -248,14 +255,17 @@
                   placeholder="Anzahl"
                   required
                   [ngClass]="{
-                    'is-invalid': submitted && getFormControl.amount.errors
+                    'is-invalid':
+                      submitted && getFormControlMaterialForm.amount.errors
                   }"
                 />
                 <div
-                  *ngIf="submitted && getFormControl.amount.errors"
+                  *ngIf="submitted && getFormControlMaterialForm.amount.errors"
                   class="invalid-feedback"
                 >
-                  <div *ngIf="getFormControl.amount.errors.required">
+                  <div
+                    *ngIf="getFormControlMaterialForm.amount.errors.required"
+                  >
                     Bitte <strong>Anzahl</strong> eingeben
                   </div>
                 </div>
@@ -268,7 +278,8 @@
                 <mat-select
                   formControlName="unit"
                   [ngClass]="{
-                    'is-invalid': submitted && getFormControl.unit.errors
+                    'is-invalid':
+                      submitted && getFormControlMaterialForm.unit.errors
                   }"
                 >
                   <mat-option *ngFor="let unit of units" [value]="unit.value">
@@ -276,10 +287,10 @@
                   </mat-option>
                 </mat-select>
                 <div
-                  *ngIf="submitted && getFormControl.unit.errors"
+                  *ngIf="submitted && getFormControlMaterialForm.unit.errors"
                   class="invalid-feedback"
                 >
-                  <div *ngIf="getFormControl.unit.errors.required">
+                  <div *ngIf="getFormControlMaterialForm.unit.errors.required">
                     Bitte <strong>Einheit</strong> auswählen
                   </div>
                 </div>
@@ -307,7 +318,8 @@
                   (click)="picker.open()"
                   required
                   [ngClass]="{
-                    'is-invalid': submitted && getFormControl.date.errors
+                    'is-invalid':
+                      submitted && getFormControlNoteForm.date.errors
                   }"
                 />
                 <mat-datepicker-toggle
@@ -316,10 +328,10 @@
                 ></mat-datepicker-toggle>
                 <mat-datepicker #picker></mat-datepicker>
                 <div
-                  *ngIf="submitted && getFormControl.date.errors"
+                  *ngIf="submitted && getFormControlNoteForm.date.errors"
                   class="invalid-feedback"
                 >
-                  <div *ngIf="getFormControl.date.errors.required">
+                  <div *ngIf="getFormControlNoteForm.date.errors.required">
                     Bitte <strong>Datum</strong> eingeben
                   </div>
                 </div>
