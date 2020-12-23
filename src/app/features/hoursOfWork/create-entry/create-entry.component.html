@@ -34,7 +34,7 @@
                 formControlName="category"
                 [ngClass]="{
                   'is-invalid':
-                    submitted && getFormControlEntryForm.category.errors
+                    submitted && getEntryFormControls.category.errors
                 }"
               >
                 <mat-option
@@ -45,10 +45,10 @@
                 </mat-option>
               </mat-select>
               <div
-                *ngIf="submitted && getFormControlEntryForm.category.errors"
+                *ngIf="submitted && getEntryFormControls.category.errors"
                 class="invalid-feedback"
               >
-                <div *ngIf="getFormControlEntryForm.category.errors.required">
+                <div *ngIf="getEntryFormControls.category.errors.required">
                   Bitte <strong>Kategorie</strong> auswählen
                 </div>
               </div>
@@ -56,7 +56,7 @@
           </fieldset>
         </form>
 
-        <div *ngIf="optionValue === eCategory.workingHours">
+        <div *ngIf="selectedCategory === eCategory.workingHours">
           <form
             id="working-hours-form"
             [formGroup]="workingHoursForm"
@@ -75,7 +75,8 @@
                   (click)="picker.open()"
                   required
                   [ngClass]="{
-                    'is-invalid': submitted && getFormControl.date.errors
+                    'is-invalid':
+                      submitted && getWorkingHoursFormControls.date.errors
                   }"
                 />
                 <mat-datepicker-toggle
@@ -84,10 +85,10 @@
                 ></mat-datepicker-toggle>
                 <mat-datepicker #picker></mat-datepicker>
                 <div
-                  *ngIf="submitted && getFormControl.date.errors"
+                  *ngIf="submitted && getWorkingHoursFormControls.date.errors"
                   class="invalid-feedback"
                 >
-                  <div *ngIf="getFormControl.date.errors.required">
+                  <div *ngIf="getWorkingHoursFormControls.date.errors.required">
                     Bitte <strong>Datum</strong> eingeben
                   </div>
                 </div>
@@ -102,14 +103,22 @@
                   placeholder="Art der Arbeit"
                   required
                   [ngClass]="{
-                    'is-invalid': submitted && getFormControl.description.errors
+                    'is-invalid':
+                      submitted &&
+                      getWorkingHoursFormControls.description.errors
                   }"
                 />
                 <div
-                  *ngIf="submitted && getFormControl.description.errors"
+                  *ngIf="
+                    submitted && getWorkingHoursFormControls.description.errors
+                  "
                   class="invalid-feedback"
                 >
-                  <div *ngIf="getFormControl.description.errors.required">
+                  <div
+                    *ngIf="
+                      getWorkingHoursFormControls.description.errors.required
+                    "
+                  >
                     Bitte <strong>Beschreibung</strong> eingeben
                   </div>
                 </div>
@@ -126,14 +135,21 @@
                   required
                   [ngClass]="{
                     'is-invalid':
-                      submitted && getFormControl.workingHours.errors
+                      submitted &&
+                      getWorkingHoursFormControls.workingHours.errors
                   }"
                 />
                 <div
-                  *ngIf="submitted && getFormControl.workingHours.errors"
+                  *ngIf="
+                    submitted && getWorkingHoursFormControls.workingHours.errors
+                  "
                   class="invalid-feedback"
                 >
-                  <div *ngIf="getFormControl.workingHours.errors.required">
+                  <div
+                    *ngIf="
+                      getWorkingHoursFormControls.workingHours.errors.required
+                    "
+                  >
                     Bitte <strong>Stunden</strong> eingeben
                   </div>
                 </div>
@@ -147,7 +163,8 @@
                   formControlName="employee"
                   multiple
                   [ngClass]="{
-                    'is-invalid': submitted && getFormControl.employee.errors
+                    'is-invalid':
+                      submitted && getWorkingHoursFormControls.employee.errors
                   }"
                 >
                   <mat-option
@@ -158,10 +175,14 @@
                   </mat-option>
                 </mat-select>
                 <div
-                  *ngIf="submitted && getFormControl.employee.errors"
+                  *ngIf="
+                    submitted && getWorkingHoursFormControls.employee.errors
+                  "
                   class="invalid-feedback"
                 >
-                  <div *ngIf="getFormControl.employee.errors.required">
+                  <div
+                    *ngIf="getWorkingHoursFormControls.employee.errors.required"
+                  >
                     Bitte <strong>Arbeiter</strong> auswählen
                   </div>
                 </div>
@@ -169,7 +190,8 @@
             </fieldset>
           </form>
         </div>
-        <div *ngIf="optionValue === eCategory.material">
+
+        <div *ngIf="selectedCategory === eCategory.material">
           <form
             id="material-form"
             [formGroup]="materialForm"
@@ -189,7 +211,7 @@
                   required
                   [ngClass]="{
                     'is-invalid':
-                      submitted && getFormControlMaterialForm.date.errors
+                      submitted && getMaterialFormControls.date.errors
                   }"
                 />
                 <mat-datepicker-toggle
@@ -198,10 +220,10 @@
                 ></mat-datepicker-toggle>
                 <mat-datepicker #picker></mat-datepicker>
                 <div
-                  *ngIf="submitted && getFormControlMaterialForm.date.errors"
+                  *ngIf="submitted && getMaterialFormControls.date.errors"
                   class="invalid-feedback"
                 >
-                  <div *ngIf="getFormControlMaterialForm.date.errors.required">
+                  <div *ngIf="getMaterialFormControls.date.errors.required">
                     Bitte <strong>Datum</strong> eingeben
                   </div>
                 </div>
@@ -212,14 +234,13 @@
               <mat-form-field>
                 <input
                   matInput
-                  [formControl]="chooseMaterialFormControl"
                   formControlName="material"
                   placeholder="Material auswählen"
                   [matAutocomplete]="auto"
                   required
                   [ngClass]="{
                     'is-invalid':
-                      submitted && getFormControlMaterialForm.material.errors
+                      submitted && getMaterialFormControls.material.errors
                   }"
                 />
                 <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete">
@@ -232,14 +253,10 @@
                 </mat-autocomplete>
 
                 <div
-                  *ngIf="
-                    submitted && getFormControlMaterialForm.material.errors
-                  "
+                  *ngIf="submitted && getMaterialFormControls.material.errors"
                   class="invalid-feedback"
                 >
-                  <div
-                    *ngIf="getFormControlMaterialForm.material.errors.required"
-                  >
+                  <div *ngIf="getMaterialFormControls.material.errors.required">
                     Bitte <strong>Material</strong> eingeben
                   </div>
                 </div>
@@ -256,16 +273,14 @@
                   required
                   [ngClass]="{
                     'is-invalid':
-                      submitted && getFormControlMaterialForm.amount.errors
+                      submitted && getMaterialFormControls.amount.errors
                   }"
                 />
                 <div
-                  *ngIf="submitted && getFormControlMaterialForm.amount.errors"
+                  *ngIf="submitted && getMaterialFormControls.amount.errors"
                   class="invalid-feedback"
                 >
-                  <div
-                    *ngIf="getFormControlMaterialForm.amount.errors.required"
-                  >
+                  <div *ngIf="getMaterialFormControls.amount.errors.required">
                     Bitte <strong>Anzahl</strong> eingeben
                   </div>
                 </div>
@@ -279,7 +294,7 @@
                   formControlName="unit"
                   [ngClass]="{
                     'is-invalid':
-                      submitted && getFormControlMaterialForm.unit.errors
+                      submitted && getMaterialFormControls.unit.errors
                   }"
                 >
                   <mat-option *ngFor="let unit of units" [value]="unit.value">
@@ -287,10 +302,10 @@
                   </mat-option>
                 </mat-select>
                 <div
-                  *ngIf="submitted && getFormControlMaterialForm.unit.errors"
+                  *ngIf="submitted && getMaterialFormControls.unit.errors"
                   class="invalid-feedback"
                 >
-                  <div *ngIf="getFormControlMaterialForm.unit.errors.required">
+                  <div *ngIf="getMaterialFormControls.unit.errors.required">
                     Bitte <strong>Einheit</strong> auswählen
                   </div>
                 </div>
@@ -299,7 +314,7 @@
           </form>
         </div>
 
-        <div *ngIf="optionValue === eCategory.note">
+        <div *ngIf="selectedCategory === eCategory.note">
           <form
             id="note-form"
             [formGroup]="noteForm"
@@ -318,8 +333,7 @@
                   (click)="picker.open()"
                   required
                   [ngClass]="{
-                    'is-invalid':
-                      submitted && getFormControlNoteForm.date.errors
+                    'is-invalid': submitted && getNoteFormControls.date.errors
                   }"
                 />
                 <mat-datepicker-toggle
@@ -328,10 +342,10 @@
                 ></mat-datepicker-toggle>
                 <mat-datepicker #picker></mat-datepicker>
                 <div
-                  *ngIf="submitted && getFormControlNoteForm.date.errors"
+                  *ngIf="submitted && getNoteFormControls.date.errors"
                   class="invalid-feedback"
                 >
-                  <div *ngIf="getFormControlNoteForm.date.errors.required">
+                  <div *ngIf="getNoteFormControls.date.errors.required">
                     Bitte <strong>Datum</strong> eingeben
                   </div>
                 </div>

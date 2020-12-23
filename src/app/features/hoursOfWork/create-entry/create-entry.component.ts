@@ -36,7 +36,7 @@ export class CreateEntryComponent implements OnInit {
 
   private routeParamOrderId;
   public submitted = false;
-  public optionValue: eCategory;
+  public selectedCategory: eCategory;
   public eCategory = eCategory;
 
   public categories = [
@@ -99,7 +99,6 @@ export class CreateEntryComponent implements OnInit {
 
   filteredOptions: Observable<string[]>;
   options: string[] = materials;
-  chooseMaterialFormControl = new FormControl();
 
   constructor(
     private router: Router,
@@ -142,11 +141,11 @@ export class CreateEntryComponent implements OnInit {
 
     this.createEntryForm
       .get('category')
-      .valueChanges.subscribe((optionValue: eCategory) => {
-        this.optionValue = optionValue;
+      .valueChanges.subscribe((category: eCategory) => {
+        this.selectedCategory = category;
       });
 
-    this.filteredOptions = this.chooseMaterialFormControl.valueChanges.pipe(
+    this.filteredOptions = this.materialForm.valueChanges.pipe(
       startWith(''),
       map((value) => this.filter(value))
     );
@@ -206,19 +205,19 @@ export class CreateEntryComponent implements OnInit {
     }
   }
 
-  get getFormControlEntryForm() {
+  get getEntryFormControls() {
     return this.createEntryForm.controls;
   }
 
-  get getFormControlWorkingHoursForm() {
+  get getWorkingHoursFormControls() {
     return this.workingHoursForm.controls;
   }
 
-  get getFormControlMaterialForm() {
+  get getMaterialFormControls() {
     return this.materialForm.controls;
   }
 
-  get getFormControlNoteForm() {
+  get getNoteFormControls() {
     return this.noteForm.controls;
   }
 
@@ -227,14 +226,14 @@ export class CreateEntryComponent implements OnInit {
     if (this.createEntryForm.invalid) {
       return;
     } else {
-      if (this.optionValue === eCategory.workingHours) {
+      if (this.selectedCategory === eCategory.workingHours) {
         this.createWorkingHours(
           this.createEntryForm.value,
           this.routeParamOrderId
         );
-      } else if (this.optionValue == eCategory.material) {
+      } else if (this.selectedCategory == eCategory.material) {
         this.createMaterial(this.materialForm.value, this.routeParamOrderId);
-      } else if (this.optionValue === eCategory.note) {
+      } else if (this.selectedCategory === eCategory.note) {
         this.createNote(this.noteForm.value, this.routeParamOrderId);
       }
     }
@@ -261,6 +260,7 @@ export class CreateEntryComponent implements OnInit {
 
     this.addNoteToFirebaseNoteTable(note);
   }
+
   createMaterial(materialFormInput: any, orderId) {
     const material = new Material(
       materialFormInput.date,
