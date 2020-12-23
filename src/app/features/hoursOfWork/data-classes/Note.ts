@@ -4,7 +4,7 @@ export interface INote {
   id?: string;
   date: Timestamp;
   description: string;
-  uploadUrl: string;
+  uploadUrl?: string;
   orderId: string;
 }
 
@@ -17,12 +17,12 @@ export class Note implements INote {
   constructor(
     date: Timestamp,
     description: string,
-    uploadUrl: string,
-    orderId: string
+    orderId: string,
+    uploadUrl: string = ''
   ) {
     this.date = date;
     this.description = description;
-    this.uploadUrl = uploadUrl;
     this.orderId = orderId;
+    this.uploadUrl = uploadUrl;
   }
 }
