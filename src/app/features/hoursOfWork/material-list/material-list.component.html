@@ -1,0 +1,99 @@
+<div id="material-list-component-wrapper" class="row no-gutters">
+  <div class="col-12">
+    <div id="material-list-wrapper" class="row no-gutters">
+      <div class="col-12">
+        <mat-table
+          #table
+          [dataSource]="dataSource"
+          matSort
+          *ngIf="hasMaterialsFound; else noRecordsFoundTemplate"
+        >
+          <ng-container matColumnDef="id">
+            <mat-header-cell *matHeaderCellDef> Id</mat-header-cell>
+            <mat-cell *matCellDef="let material">
+              <div>Id:</div>
+              {{ material.id }}
+            </mat-cell>
+          </ng-container>
+
+          <ng-container matColumnDef="date">
+            <mat-header-cell *matHeaderCellDef> Datum</mat-header-cell>
+            <mat-cell *matCellDef="let material">
+              <div class="disable-on-small-device">
+                {{ material?.date?.seconds * 1000 | date: 'dd.MM.yyyy' }}
+              </div>
+              <mat-form-field class="">
+                <input
+                  matInput
+                  placeholder="Datum"
+                  value="{{
+                    material?.date?.seconds * 1000 | date: 'dd.MM.yyyy'
+                  }}"
+                  readonly
+                />
+              </mat-form-field>
+            </mat-cell>
+          </ng-container>
+
+          <ng-container matColumnDef="material">
+            <mat-header-cell *matHeaderCellDef>Material </mat-header-cell>
+            <mat-cell *matCellDef="let material">
+              <div class="disable-on-small-device">
+                {{ material.material }}
+              </div>
+              <mat-form-field>
+                <input
+                  matInput
+                  placeholder="Material"
+                  value="{{ material.material }}"
+                  readonly
+                />
+              </mat-form-field>
+            </mat-cell>
+          </ng-container>
+
+          <ng-container matColumnDef="amount">
+            <mat-header-cell *matHeaderCellDef> Material </mat-header-cell>
+            <mat-cell *matCellDef="let material">
+              <div class="disable-on-small-device">
+                {{ material.amount }}
+              </div>
+              <mat-form-field class="hello">
+                <input
+                  matInput
+                  placeholder="Material"
+                  value="{{ material.amount }}"
+                  readonly
+                />
+              </mat-form-field>
+            </mat-cell>
+          </ng-container>
+
+          <ng-container matColumnDef="unit">
+            <mat-header-cell *matHeaderCellDef> Einheit </mat-header-cell>
+            <mat-cell *matCellDef="let material">
+              <div class="disable-on-small-device">
+                {{ material.unit }}
+              </div>
+              <mat-form-field>
+                <input
+                  matInput
+                  placeholder="Einheit"
+                  value="{{ material.unit }}"
+                  readonly
+                />
+              </mat-form-field>
+            </mat-cell>
+          </ng-container>
+
+          <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+          <mat-row *matRowDef="let row; columns: displayedColumns"></mat-row>
+        </mat-table>
+
+        <ng-template #noRecordsFoundTemplate>
+          <div class="no-materials-found">Keine Einträge gefunden</div>
+        </ng-template>
+      </div>
+    </div>
+  </div>
+</div>
