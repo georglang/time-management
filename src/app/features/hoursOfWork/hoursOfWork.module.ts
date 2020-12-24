@@ -18,14 +18,16 @@ import { OrderListComponent } from './order-list/order-list.component';
 import { OrderDetailComponent } from './order-detail/order-detail.component';
 import { CreateOrderComponent } from './create-order/create-order.component';
 import { EditOrderComponent } from './edit-order/edit-order.component';
-import { CreateRecordComponent } from './create-record/create-record.component';
+import { CreateEntryComponent } from './create-entry/create-entry.component';
 import { EditRecordComponent } from './edit-record/edit-record.component';
 import { ConfirmDeleteDialogComponent } from './confirm-delete-dialog/confirm-delete-dialog.component';
 import { SettingsDialogComponent } from './settings-dialog/settings-dialog.component';
 import { environment } from '../../../environments/environment.prod';
 import { HoursOfWorkRoutingModule } from '../hoursOfWork-routing.module';
 import { MaterialModule } from '../../shared/modules/material.module';
-import { MainModule } from '../../shared/modules/main.module';
+import { MainModule } from 'src/app/shared/modules/main.module';
+import { CreateMaterialComponent } from './create-material/create-material.component';
+import { MaterialListComponent } from './material-list/material-list.component';
 
 @NgModule({
   imports: [
@@ -44,10 +46,12 @@ import { MainModule } from '../../shared/modules/main.module';
     OrderDetailComponent,
     EditOrderComponent,
     SortFormArrayByDate,
-    CreateRecordComponent,
+    CreateEntryComponent,
+    CreateMaterialComponent,
     EditRecordComponent,
     ConfirmDeleteDialogComponent,
     SettingsDialogComponent,
+    MaterialListComponent,
   ],
   providers: [
     FirestoreOrderService,
