@@ -36,7 +36,7 @@ export class CreateOrderComponent implements OnInit {
   ngOnInit() {}
 
   public navigateToOrderList() {
-    this.router.navigate(['/hours-of-work']);
+    this.router.navigate(['orders']);
   }
 
   public createOrder(formInput: any): void {
@@ -60,7 +60,7 @@ export class CreateOrderComponent implements OnInit {
               .addOrder(order)
               .then((id: string) => {
                 this.messageService.orderCreatedSuccessful();
-                this.router.navigate(['/hours-of-work/']);
+                this.router.navigate(['orders']);
                 order.id = id;
               })
               .catch((e) => {
