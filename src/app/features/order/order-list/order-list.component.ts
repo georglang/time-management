@@ -66,7 +66,7 @@ export class OrderListComponent implements OnInit {
   }
 
   public editOrder(order: IOrder) {
-    this.router.navigate(['hours-of-work/edit-order/' + order.id]);
+    this.router.navigate(['orders/edit-order/' + order.id]);
   }
 
   public deleteOrder(order: IOrder) {
@@ -124,6 +124,6 @@ export class OrderListComponent implements OnInit {
   }
 
   public navigateToCreateOrder(): void {
-    this.router.navigate(['hours-of-work/create-order']);
+    this.router.navigate(['orders/create-order']);
   }
 }
