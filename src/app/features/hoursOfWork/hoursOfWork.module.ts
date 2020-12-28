@@ -28,6 +28,7 @@ import { MaterialModule } from '../../shared/modules/material.module';
 import { MainModule } from 'src/app/shared/modules/main.module';
 import { CreateMaterialComponent } from './create-material/create-material.component';
 import { MaterialListComponent } from './material-list/material-list.component';
+import { EditMaterialComponent } from './edit-material/edit-material.component';
 
 @NgModule({
   imports: [
@@ -52,6 +53,7 @@ import { MaterialListComponent } from './material-list/material-list.component';
     ConfirmDeleteDialogComponent,
     SettingsDialogComponent,
     MaterialListComponent,
+    EditMaterialComponent,
   ],
   providers: [
     FirestoreOrderService,
