@@ -8,11 +8,11 @@ import { TimeRecord } from '../data-classes/TimeRecords';
 
 @Component({
   selector: 'app-create-record',
-  templateUrl: './create-record.component.html',
-  styleUrls: ['./create-record.component.sass'],
+  templateUrl: './create-working-hour.component.html',
+  styleUrls: ['./create-working-hour.component.sass'],
 })
-export class CreateRecordComponent implements OnInit {
-  public createRecordForm: FormGroup;
+export class CreateWorkingHourComponent implements OnInit {
+  public createWorkingHourForm: FormGroup;
   private routeParamOrderId;
   public submitted = false;
   public employees = [
@@ -90,7 +90,7 @@ export class CreateRecordComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.createRecordForm = this.formBuilder.group({
+    this.createWorkingHourForm = this.formBuilder.group({
       date: ['', Validators.required],
       description: ['', Validators.required],
       workingHours: ['', Validators.required],
@@ -107,19 +107,18 @@ export class CreateRecordComponent implements OnInit {
     this.location.back();
   }
 
-  public createRecord(formInput: any, orderId: string): void {
-    const record = new TimeRecord(
+  public createWorkingHour(formInput: any, orderId: string): void {
+    const workingHour = new TimeRecord(
       formInput.date,
       formInput.description,
       formInput.workingHours,
       formInput.employee,
       formInput.tool,
       '',
-      '',
       false
     );
-    record.orderId = orderId;
-    this.addRecordToFirebaseRecordsTable(record);
+    workingHour.orderId = orderId;
+    this.addRecordToFirebaseRecordsTable(workingHour);
   }
 
   public addRecordToFirebaseRecordsTable(record: any): void {
@@ -147,15 +146,15 @@ export class CreateRecordComponent implements OnInit {
   }
 
   get getFormControl() {
-    return this.createRecordForm.controls;
+    return this.createWorkingHourForm.controls;
   }
 
   public onSubmit() {
     this.submitted = true;
-    if (this.createRecordForm.invalid) {
+    if (this.createWorkingHourForm.invalid) {
       return;
     } else {
-      this.createRecord(this.createRecordForm.value, this.routeParamOrderId);
+      this.createWorkingHour(this.createWorkingHourForm.value, this.routeParamOrderId);
     }
   }
 }

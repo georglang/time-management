@@ -1,8 +1,8 @@
-<app-header titleInput="Regiestunden anlegen"></app-header>
+<app-header titleInput="Bearbeiten"></app-header>
 
 <div class="sub-nav row">
   <div class="col-10">
-    <div type="button" class="nav-before-btn" (click)="navigateToOrderList()">
+    <div type="button" class="nav-before-btn" (click)="navigateToRecordList()">
       <mat-icon>navigate_before</mat-icon>
     </div>
   </div>
@@ -10,21 +10,21 @@
     <div
       type="button"
       class="save-btn"
-      (click)="documentCreateRecordForm.ngSubmit.emit()"
+      (click)="documentEditForm.ngSubmit.emit()"
     >
       <mat-icon>save</mat-icon>
     </div>
   </div>
 </div>
 
-<div id="create-record-component-wrapper" class="row no-gutter">
+<div id="edit-record-component-wrapper" class="row no-gutter">
   <div class="col-12">
-    <div id="create-record-form-wrapper" class="row no-gutter">
+    <div id="edit-record-form-wrapper" class="row no-gutter">
       <div class="col-12">
         <form
-          id="create-record-form"
-          [formGroup]="createRecordForm"
-          #documentCreateRecordForm="ngForm"
+          id="edit-record-form"
+          [formGroup]="editWorkingHourForm"
+          #documentEditForm="ngForm"
           (ngSubmit)="onSubmit()"
         >
           <fieldset class="form-group">
@@ -62,6 +62,7 @@
             <mat-form-field>
               <input
                 matInput
+                set
                 formControlName="description"
                 placeholder="Art der Arbeit"
                 required
@@ -126,7 +127,7 @@
                 class="invalid-feedback"
               >
                 <div *ngIf="getFormControl.employee.errors.required">
-                  Bitte <strong>Arbeiter</strong> auswählen
+                  Bitte <strong>Arbeiter</strong> eingeben
                 </div>
               </div>
             </mat-form-field>

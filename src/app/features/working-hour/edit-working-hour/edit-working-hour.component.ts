@@ -12,11 +12,11 @@ import { FirestoreRecordService } from '../services/firestore-record-service/fir
 
 @Component({
   selector: 'app-edit-record',
-  templateUrl: './edit-record.component.html',
-  styleUrls: ['./edit-record.component.sass'],
+  templateUrl: './edit-working-hour.component.html',
+  styleUrls: ['./edit-working-hour.component.sass'],
 })
-export class EditRecordComponent implements OnInit {
-  public editRecordForm: FormGroup;
+export class EditWorkingHourComponent implements OnInit {
+  public editWorkingHourForm: FormGroup;
   private recordId: string;
   private orderId: string;
   public record: ITimeRecord;
@@ -103,7 +103,7 @@ export class EditRecordComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.editRecordForm = this.formBuilder.group({
+    this.editWorkingHourForm = this.formBuilder.group({
       id: [''],
       date: ['', Validators.required],
       description: ['', Validators.required],
@@ -140,10 +140,8 @@ export class EditRecordComponent implements OnInit {
                 record.description,
                 record.workingHours,
                 record.employee,
-                record.tool,
                 record.id,
-                record.orderId,
-                record.hasBeenPrinted
+                record.orderId
               );
               this.setControl(this.record);
             }
@@ -166,35 +164,32 @@ export class EditRecordComponent implements OnInit {
       date = record.date;
     }
 
-    this.editRecordForm.setValue({
+    this.editWorkingHourForm.setValue({
       id: record.id,
       date: date,
       description: record.description,
       workingHours: record.workingHours,
       employee: record.employee,
-      tool: record.tool,
     });
   }
 
   get getFormControl() {
-    return this.editRecordForm.controls;
+    return this.editWorkingHourForm.controls;
   }
 
   public onSubmit() {
     const record = new TimeRecord(
-      this.editRecordForm.controls.date.value,
-      this.editRecordForm.controls.description.value,
-      this.editRecordForm.controls.workingHours.value,
-      this.editRecordForm.controls.employee.value,
-      this.editRecordForm.controls.tool.value,
+      this.editWorkingHourForm.controls.date.value,
+      this.editWorkingHourForm.controls.description.value,
+      this.editWorkingHourForm.controls.workingHours.value,
+      this.editWorkingHourForm.controls.employee.value,
       this.recordId,
-      this.orderId,
-      this.record.hasBeenPrinted
+      this.orderId
     );
     // this.setControl(record);
 
     this.submitted = true;
-    if (this.editRecordForm.invalid) {
+    if (this.editWorkingHourForm.invalid) {
       return;
     } else {
       this.checkIfRecordExistsInOrderInFirestore(record);

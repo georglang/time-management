@@ -14,12 +14,12 @@ import { MessageService } from '../services/message-service/message.service';
 import { FirestoreRecordService } from '../services/firestore-record-service/firestore-record.service';
 import { TimeRecord, ITimeRecord } from '../data-classes/TimeRecords';
 import { CdkTextareaAutosize } from '@angular/cdk/text-field';
-import { eCategory } from './../data-classes/eCategory';
+import { eCategory } from '../data-classes/eCategory';
 import { INote, Note } from '../data-classes/Note';
 import { IMaterial, Material } from '../data-classes/Material';
 import { FirestoreMaterialService } from '../services/firestore-material-service/firestore-material.service';
 import { FirestoreNoteService } from '../services/firestore-note-service/firestore-note.service';
-import { materials } from '../material-list/materials';
+import { materials } from '../../material/material-list/materials';
 
 @Component({
   selector: 'app-create-entry',

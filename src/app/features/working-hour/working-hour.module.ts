@@ -1,6 +1,5 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { HoursOfWorkComponent } from './hoursOfWork.component';
 
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 
@@ -15,31 +14,30 @@ import { FirestoreRecordService } from './services/firestore-record-service/fire
 
 import { SortFormArrayByDate } from '../../shared/pipes/sort-form-array-by-date.pipe';
 import { CreateEntryComponent } from './create-entry/create-entry.component';
-import { EditRecordComponent } from './edit-record/edit-record.component';
+import { EditWorkingHourComponent } from './edit-working-hour/edit-working-hour.component';
 import { ConfirmDeleteDialogComponent } from './confirm-delete-dialog/confirm-delete-dialog.component';
 import { SettingsDialogComponent } from './settings-dialog/settings-dialog.component';
 import { environment } from '../../../environments/environment.prod';
 import { MainModule } from 'src/app/shared/modules/main.module';
-import { HoursOfWorkRoutingModule } from './hoursOfWork-routing.module';
+import { WorkingHourRoutingModule } from './working-hour-routing.module';
+import { AngularMaterialModule } from 'src/app/shared/modules/angular-material.module';
 
 @NgModule({
   imports: [
     CommonModule,
     MainModule,
-    HoursOfWorkRoutingModule,
+    WorkingHourRoutingModule,
     ReactiveFormsModule,
     FormsModule,
     AngularFirestoreModule,
-    MaterialModule,
+    AngularMaterialModule,
   ],
   declarations: [
-    HoursOfWorkComponent,
     SortFormArrayByDate,
     CreateEntryComponent,
-    EditRecordComponent,
+    EditWorkingHourComponent,
     ConfirmDeleteDialogComponent,
     SettingsDialogComponent,
-    EditMaterialComponent,
   ],
   providers: [
     FirestoreOrderService,
@@ -55,4 +53,4 @@ import { HoursOfWorkRoutingModule } from './hoursOfWork-routing.module';
     },
   ],
 })
-export class HoursOfWorkModule {}
+export class WorkingHourModule {}

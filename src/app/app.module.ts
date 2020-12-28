@@ -11,8 +11,8 @@ import { AppRoutingModule } from './app.routing.module';
 
 // modules
 import { ToastrModule } from 'ngx-toastr';
-import { MaterialModule } from './shared/modules/material.module';
-import { HoursOfWorkModule } from './features/hoursOfWork/hoursOfWork.module';
+import { AngularMaterialModule } from './shared/modules/angular-material.module';
+import { WorkingHourModule } from './features/working-hour/working-hour.module';
 
 // components
 import { NoConnectionSnackBarComponent } from './app/noConnectionSnackBar/noConnectionSnackBar.component';
@@ -29,11 +29,11 @@ import { MainModule } from './shared/modules/main.module';
     BrowserAnimationsModule,
     AppRoutingModule,
     MainModule,
-    MaterialModule,
-    HoursOfWorkModule,
+    AngularMaterialModule,
+    WorkingHourModule,
     ToastrModule.forRoot(),
     ServiceWorkerModule.register('ngsw-worker.js', {
-      enabled: environment.production,
+      enabled: true,
     }),
     AngularFireModule.initializeApp(environment.firebase),
     AngularFireAuthModule,

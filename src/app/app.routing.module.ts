@@ -14,8 +14,8 @@ const routes: Routes = [
   {
     path: 'hours-of-work',
     loadChildren: () =>
-      import('./features/hoursOfWork/hoursOfWork.module').then(
-        (m) => m.HoursOfWorkModule
+      import('./features/working-hour/working-hour.module').then(
+        (m) => m.WorkingHourModule
       ),
   },
   {
@@ -26,7 +26,7 @@ const routes: Routes = [
 
   // * wildcard if the requested URL doesn´t match any path in the URL
   // could also be a 404 page
-  { path: '**', redirectTo: 'hoursOfWork', pathMatch: 'full' },
+  { path: '**', redirectTo: 'working-hours', pathMatch: 'full' },
 ];
 
 @NgModule({

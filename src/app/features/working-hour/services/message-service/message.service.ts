@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class MessageService {
   constructor(private toastr: ToastrService) {}
@@ -10,15 +10,15 @@ export class MessageService {
   public orderCreatedSuccessful() {
     const successConfig = {
       positionClass: 'toast-bottom-center',
-      timeout: 2000
+      timeout: 2000,
     };
-    this.toastr.success('Erfolgreich erstellt', 'Auftrag', successConfig);
+    this.toastr.success('Erfolgreich angelegt', 'Auftrag', successConfig);
   }
 
   public orderAlreadyExists() {
     const errorConfig = {
       positionClass: 'toast-bottom-center',
-      timeout: 2000
+      timeout: 2000,
     };
     this.toastr.error('Existiert bereits', 'Auftrag', errorConfig);
   }
@@ -26,15 +26,23 @@ export class MessageService {
   public recordAlreadyExists() {
     const errorConfig = {
       positionClass: 'toast-bottom-center',
-      timeout: 2000
+      timeout: 2000,
     };
     this.toastr.error('Existiert bereits', 'Eintrag', errorConfig);
+  }
+
+  public materialAlreadyExists() {
+    const errorConfig = {
+      positionClass: 'toast-bottom-center',
+      timeout: 2000,
+    };
+    this.toastr.error('Existiert bereits', 'Material', errorConfig);
   }
 
   public recordDoesNotExist() {
     const errorConfig = {
       positionClass: 'toast-bottom-center',
-      timeout: 2000
+      timeout: 2000,
     };
     this.toastr.error('Nicht gefunden', 'Eintrag', errorConfig);
   }
@@ -42,15 +50,15 @@ export class MessageService {
   public recordCreatedSuccessfully() {
     const successConfig = {
       positionClass: 'toast-bottom-center',
-      timeout: 2000
+      timeout: 2000,
     };
-    this.toastr.success('Erfolgreich erstellt', 'Eintrag', successConfig);
+    this.toastr.success('Erfolgreich angelegt', 'Eintrag', successConfig);
   }
 
   public updatedSuccessfully() {
     const successConfig = {
       positionClass: 'toast-bottom-center',
-      timeout: 2000
+      timeout: 2000,
     };
     this.toastr.success('Erfolgreich aktualisiert', 'Eintrag', successConfig);
   }
@@ -58,16 +66,28 @@ export class MessageService {
   public recordCouldNotBeUpdated() {
     const warningConfig = {
       positionClass: 'toast-bottom-center',
-      timeout: 500
+      timeout: 500,
     };
-    this.toastr.warning('Konnte nicht aktualisiert werden', 'Eintrag', warningConfig);
+    this.toastr.warning(
+      'Konnte nicht aktualisiert werden',
+      'Eintrag',
+      warningConfig
+    );
   }
 
   public deletedSucessfull() {
     const successConfig = {
       positionClass: 'toast-bottom-center',
-      timeout: 500
+      timeout: 500,
     };
     this.toastr.success('Erfolgreich gelöscht', 'Eintrag', successConfig);
+  }
+
+  public materialCreatedSuccessfully() {
+    const successConfig = {
+      positionClass: 'toast-bottom-center',
+      timeout: 2000,
+    };
+    this.toastr.success('Erfolgreich angelegt', 'Material', successConfig);
   }
 }

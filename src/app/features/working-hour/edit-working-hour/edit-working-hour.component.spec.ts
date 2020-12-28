@@ -1,20 +1,20 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
-import { CreateRecordComponent } from './create-record.component';
+import { EditWorkingHourComponent } from './edit-working-hour.component';
 
-describe('CreateRecordComponent', () => {
-  let component: CreateRecordComponent;
-  let fixture: ComponentFixture<CreateRecordComponent>;
+describe('EditWorkingHourComponent', () => {
+  let component: EditWorkingHourComponent;
+  let fixture: ComponentFixture<EditWorkingHourComponent>;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ CreateRecordComponent ]
+      declarations: [ EditWorkingHourComponent ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(CreateRecordComponent);
+    fixture = TestBed.createComponent(EditWorkingHourComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

@@ -2,7 +2,7 @@ import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
 import { CreateEntryComponent } from './create-entry.component';
 
-describe('CreateRecordComponent', () => {
+describe('CreateEntryComponent', () => {
   let component: CreateEntryComponent;
   let fixture: ComponentFixture<CreateEntryComponent>;
 
