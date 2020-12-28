@@ -23,7 +23,7 @@ export class MessageService {
     this.toastr.error('Existiert bereits', 'Auftrag', errorConfig);
   }
 
-  public recordAlreadyExists() {
+  public workingHourAlreadyExists() {
     const errorConfig = {
       positionClass: 'toast-bottom-center',
       timeout: 2000,
@@ -39,7 +39,7 @@ export class MessageService {
     this.toastr.error('Existiert bereits', 'Material', errorConfig);
   }
 
-  public recordDoesNotExist() {
+  public workingHourDoesNotExist() {
     const errorConfig = {
       positionClass: 'toast-bottom-center',
       timeout: 2000,
@@ -63,7 +63,7 @@ export class MessageService {
     this.toastr.success('Erfolgreich aktualisiert', 'Eintrag', successConfig);
   }
 
-  public recordCouldNotBeUpdated() {
+  public workingHourCouldNotBeUpdated() {
     const warningConfig = {
       positionClass: 'toast-bottom-center',
       timeout: 500,

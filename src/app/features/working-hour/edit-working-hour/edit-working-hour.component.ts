@@ -8,18 +8,18 @@ import { ToastrService } from 'ngx-toastr';
 import { Subscription } from 'rxjs';
 import { WorkingHour, IWorkingHour } from '../WorkingHour';
 import { MessageService } from '../services/message-service/message.service';
-import { FirestoreRecordService } from '../services/firestore-record-service/firestore-record.service';
+import { FirestoreWorkingHourService } from '../services/firestore-working-hour-service/firestore-working-hour.service';
 
 @Component({
-  selector: 'app-edit-record',
+  selector: 'app-edit-working-hour',
   templateUrl: './edit-working-hour.component.html',
   styleUrls: ['./edit-working-hour.component.sass'],
 })
 export class EditWorkingHourComponent implements OnInit {
   public editWorkingHourForm: FormGroup;
-  private recordId: string;
+  private workingHourId: string;
   private orderId: string;
-  public record: IWorkingHour;
+  public workingHour: IWorkingHour;
   public submitted = false;
   private subscription: Subscription = new Subscription();
 
@@ -94,7 +94,7 @@ export class EditWorkingHourComponent implements OnInit {
     private router: Router,
     private route: ActivatedRoute,
     private dateAdapter: DateAdapter<Date>,
-    private firestoreRecordService: FirestoreRecordService,
+    private firestoreWorkingHourService: FirestoreWorkingHourService,
     private messageService: MessageService,
     private toastrService: ToastrService,
     private location: Location
@@ -117,59 +117,62 @@ export class EditWorkingHourComponent implements OnInit {
     });
 
     this.route.params.subscribe((params) => {
-      this.recordId = params['id'];
-      this.getRecordByIdFromFirebase(this.orderId, this.recordId);
+      this.workingHourId = params['id'];
+      this.getWorkingHourByIdFromFirebase(this.orderId, this.workingHourId);
     });
   }
 
-  private getRecordByIdFromFirebase(orderId: string, recordId: string): void {
-    const getRecordById$ = this.firestoreRecordService
-      .getRecordById(orderId)
+  private getWorkingHourByIdFromFirebase(
+    orderId: string,
+    workingHourId: string
+  ): void {
+    const getWorkingHourById$ = this.firestoreWorkingHourService
+      .getWorkingHourById(orderId)
       .subscribe(() => {});
 
-    this.subscription.add(getRecordById$);
+    this.subscription.add(getWorkingHourById$);
 
-    const getRecordByOrderId = this.firestoreRecordService
-      .getRecordsByOrderId(orderId)
-      .subscribe((records: any[]) => {
-        if (records !== undefined) {
-          records.forEach((record) => {
-            if (record.id === recordId) {
-              this.record = new WorkingHour(
-                record.date,
-                record.description,
-                record.workingHours,
-                record.employee,
-                record.id,
-                record.orderId
+    const getWorkingHourByOrderId = this.firestoreWorkingHourService
+      .getWorkingHoursByOrderId(orderId)
+      .subscribe((workingHours: any[]) => {
+        if (workingHours !== undefined) {
+          workingHours.forEach((workingHour) => {
+            if (workingHour.id === workingHourId) {
+              this.workingHour = new WorkingHour(
+                workingHour.date,
+                workingHour.description,
+                workingHour.workingHours,
+                workingHour.employee,
+                workingHour.id,
+                workingHour.orderId
               );
-              this.setControl(this.record);
+              this.setControl(this.workingHour);
             }
           });
         }
       });
-    this.subscription.add(getRecordByOrderId);
+    this.subscription.add(getWorkingHourByOrderId);
   }
 
-  public navigateToRecordList(): void {
+  public navigateToWorkingHoursList(): void {
     this.location.back();
   }
 
-  public setControl(record: IWorkingHour): void {
+  public setControl(workingHour: IWorkingHour): void {
     let date;
 
-    if (record.date.seconds !== undefined) {
-      date = record.date.toDate();
+    if (workingHour.date.seconds !== undefined) {
+      date = workingHour.date.toDate();
     } else {
-      date = record.date;
+      date = workingHour.date;
     }
 
     this.editWorkingHourForm.setValue({
-      id: record.id,
+      id: workingHour.id,
       date: date,
-      description: record.description,
-      workingHours: record.workingHours,
-      employee: record.employee,
+      description: workingHour.description,
+      workingHours: workingHour.workingHours,
+      employee: workingHour.employee,
     });
   }
 
@@ -178,42 +181,49 @@ export class EditWorkingHourComponent implements OnInit {
   }
 
   public onSubmit() {
-    const record = new WorkingHour(
+    const workingHour = new WorkingHour(
       this.editWorkingHourForm.controls.date.value,
       this.editWorkingHourForm.controls.description.value,
       this.editWorkingHourForm.controls.workingHours.value,
       this.editWorkingHourForm.controls.employee.value,
-      this.recordId,
+      this.workingHourId,
       this.orderId
     );
-    // this.setControl(record);
+    // this.setControl(workingHour);
 
     this.submitted = true;
     if (this.editWorkingHourForm.invalid) {
       return;
     } else {
-      this.checkIfRecordExistsInOrderInFirestore(record);
+      this.checkIfWorkingHourExistsInOrderInFirestore(workingHour);
     }
   }
 
-  private checkIfRecordExistsInOrderInFirestore(record: IWorkingHour) {
-    this.firestoreRecordService
-      .checkIfRecordExistsInOrderInFirestore(record)
-      .then((doesRecordExist) => {
-        if (!doesRecordExist) {
-          this.updateRecordInFirestore(this.orderId, record);
+  private checkIfWorkingHourExistsInOrderInFirestore(
+    workingHour: IWorkingHour
+  ) {
+    this.firestoreWorkingHourService
+      .checkIfWorkingHourExistsInOrderInFirestore(workingHour)
+      .then((doesWorkingHourExist) => {
+        if (!doesWorkingHourExist) {
+          this.updateWorkingHourInFirestore(this.orderId, workingHour);
         } else {
-          this.messageService.recordAlreadyExists();
+          this.messageService.workingHourAlreadyExists();
         }
       });
   }
 
-  private updateRecordInFirestore(orderId: string, record: IWorkingHour): void {
-    if (this.firestoreRecordService !== undefined) {
-      this.setControl(record);
-      this.firestoreRecordService.updateRecord(orderId, record).then(() => {
-        this.showUpdateMessage();
-      });
+  private updateWorkingHourInFirestore(
+    orderId: string,
+    workingHour: IWorkingHour
+  ): void {
+    if (this.firestoreWorkingHourService !== undefined) {
+      this.setControl(workingHour);
+      this.firestoreWorkingHourService
+        .updateWorkingHour(orderId, workingHour)
+        .then(() => {
+          this.showUpdateMessage();
+        });
     }
   }
 

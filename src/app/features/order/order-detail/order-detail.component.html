@@ -83,7 +83,7 @@
               #table
               [dataSource]="dataSource"
               matSort
-              *ngIf="hasRecordsFound; else noRecordsFoundTemplate"
+              *ngIf="hasWorkingHoursFound; else noWorkingHoursFoundTemplate"
             >
               <ng-container matColumnDef="select">
                 <mat-header-cell *matHeaderCellDef>
@@ -240,8 +240,8 @@
               ></mat-row>
             </mat-table>
 
-            <ng-template #noRecordsFoundTemplate>
-              <div class="no-records-found">Keine Einträge gefunden</div>
+            <ng-template #noWorkingHoursFoundFoundTemplate>
+              <div class="no-working-hours-found">Keine Einträge gefunden</div>
             </ng-template>
           </div>
         </div>
@@ -255,18 +255,18 @@
 
   <div id="bottom-nav">
     <div
-      *ngIf="showButtonsIfRecordIsSelected"
+      *ngIf="showButtonsIfWorkingHourIsSelected"
       [ngClass]="{
-        'create-record-edit-btn-if-print-is-not-active': !showPrintButton,
-        'create-record-edit-btn': showPrintButton,
-        'create-record-edit-btn-if-delete-is-not-active': !showDeleteButton
+        'create-working-hour-edit-btn-if-print-is-not-active': !showPrintButton,
+        'create-working-hour-edit-btn': showPrintButton,
+        'create-working-hour-edit-btn-if-delete-is-not-active': !showDeleteButton
       }"
     >
       <button
         type="button"
         mat-fab
-        (click)="editWorkingHour(this.selectedRecord)"
-        id="edit-record-btn"
+        (click)="editWorkingHour(this.selectedWorkingHour)"
+        id="edit-working-hour-btn"
       >
         <i class="material-icons">edit</i>
       </button>
@@ -276,10 +276,10 @@
       <button
         type="button"
         [ngClass]="{
-          'create-record-edit-btn-if-print-is-not-active': !showPrintButton,
-          'create-record-edit-btn': showPrintButton
+          'create-working-hour-edit-btn-if-print-is-not-active': !showPrintButton,
+          'create-working-hour-edit-btn': showPrintButton
         }"
-        id="create-record-print-btn"
+        id="create-working-hour-print-btn"
         type="button"
         mat-fab
         (click)="print()"
@@ -288,12 +288,12 @@
       </button>
     </div>
 
-    <div *ngIf="showButtonsIfRecordIsSelected && showDeleteButton">
+    <div *ngIf="showButtonsIfWorkingHourIsSelected && showDeleteButton">
       <button
-        id="create-record-delete-btn"
+        id="create-working-hour-delete-btn"
         type="button"
         mat-fab
-        (click)="deleteRecord(this.selectedRecord)"
+        (click)="deleteWorkingHour(this.selectedWorkingHour)"
       >
         <i class="material-icons">delete</i>
       </button>
@@ -303,7 +303,7 @@
       id="create-entry-btn"
       type="button"
       mat-fab
-      (click)="createNewRecord()"
+      (click)="createNewWorkingHour()"
     >
       <i class="material-icons">add</i>
     </button>

@@ -10,7 +10,7 @@ import { AngularFirestoreModule } from '@angular/fire/firestore';
 
 // services
 import { FirestoreOrderService } from '../order/services/firestore-order-service/firestore-order.service';
-import { FirestoreRecordService } from './services/firestore-record-service/firestore-record.service';
+import { FirestoreWorkingHourService } from './services/firestore-working-hour-service/firestore-working-hour.service';
 
 import { SortFormArrayByDate } from '../../shared/pipes/sort-form-array-by-date.pipe';
 import { CreateEntryComponent } from './create-entry/create-entry.component';
@@ -41,7 +41,7 @@ import { AngularMaterialModule } from 'src/app/shared/modules/angular-material.m
   ],
   providers: [
     FirestoreOrderService,
-    FirestoreRecordService,
+    FirestoreWorkingHourService,
     SortFormArrayByDate,
     {
       provide: FIREBASE_OPTIONS,

@@ -47,9 +47,9 @@ export class CreateNoteComponent implements OnInit {
   }
 
   public createNote(formInput: any, orderId: string): void {
-    // const record = new Note(formInput.date, formInput.description);
-    // record.orderId = orderId;
-    // this.addRecordToFirebaseRecordsTable(record);
+    // const workingHour = new Note(formInput.date, formInput.description);
+    // workingHour.orderId = orderId;
+    // this.addWorkingHourToFirebaseWorkingHoursTable(workingHour);
   }
 
   public onSubmit() {

@@ -6,7 +6,7 @@ export interface IOrder {
   contactPerson?: string;
   date: Timestamp;
   location: string;
-  records?: IWorkingHour[];
+  workingHours?: IWorkingHour[];
   id?: any;
 }
 
@@ -21,7 +21,7 @@ export class Order implements IOrder {
   public contactPerson: string;
   public date: Timestamp;
   public location: string;
-  public records: IWorkingHour[];
+  public workingHours: IWorkingHour[];
   public id: any;
 
   constructor(
@@ -29,16 +29,16 @@ export class Order implements IOrder {
     companyName: string,
     location: string,
     contactPerson?: string,
-    records?: IWorkingHour[],
+    workingHours?: IWorkingHour[],
     id?: any
   ) {
     this.date = date;
     this.companyName = companyName;
     this.location = location;
-    if (records === undefined) {
-      this.records = [];
+    if (workingHours === undefined) {
+      this.workingHours = [];
     } else {
-      this.records = records;
+      this.workingHours = workingHours;
     }
     if (contactPerson) {
       this.contactPerson = contactPerson;

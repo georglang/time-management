@@ -3,11 +3,11 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Location } from '@angular/common';
 import { MessageService } from '../services/message-service/message.service';
-import { FirestoreRecordService } from '../services/firestore-record-service/firestore-record.service';
 import { WorkingHour } from '../WorkingHour';
+import { FirestoreWorkingHourService } from '../services/firestore-working-hour-service/firestore-working-hour.service';
 
 @Component({
-  selector: 'app-create-record',
+  selector: 'app-create-working-hour',
   templateUrl: './create-working-hour.component.html',
   styleUrls: ['./create-working-hour.component.sass'],
 })
@@ -84,7 +84,7 @@ export class CreateWorkingHourComponent implements OnInit {
     private router: Router,
     private route: ActivatedRoute,
     private formBuilder: FormBuilder,
-    private firestoreRecordService: FirestoreRecordService,
+    private firestoreWorkingHourService: FirestoreWorkingHourService,
     private messageService: MessageService,
     private location: Location
   ) {}
@@ -118,28 +118,28 @@ export class CreateWorkingHourComponent implements OnInit {
       false
     );
     workingHour.orderId = orderId;
-    this.addRecordToFirebaseRecordsTable(workingHour);
+    this.addWorkingHourToFirebaseWorkingHourTable(workingHour);
   }
 
-  public addRecordToFirebaseRecordsTable(record: any): void {
-    if (this.firestoreRecordService !== undefined) {
-      // check if record is already in firestore
-      this.firestoreRecordService
-        .checkIfRecordExistsInOrderInFirestore(record)
+  public addWorkingHourToFirebaseWorkingHourTable(woringHour: any): void {
+    if (this.firestoreWorkingHourService !== undefined) {
+      // check if working hour is already in firestore
+      this.firestoreWorkingHourService
+        .checkIfWorkingHourExistsInOrderInFirestore(woringHour)
         .then((isAlreadyInFirestore: boolean) => {
           if (!isAlreadyInFirestore) {
-            this.firestoreRecordService
-              .addTimeRecord(record)
+            this.firestoreWorkingHourService
+              .addWorkingHour(woringHour)
               .then((id: string) => {
                 this.messageService.workingHourCreatedSuccessfully();
-                this.router.navigate(['order-details', record.orderId]);
-                record.id = id;
+                this.router.navigate(['order-details', woringHour.orderId]);
+                woringHour.id = id;
               })
               .catch((e) => {
-                console.error('can´t create record to firebase', e);
+                console.error('can´t create working hour to firebase', e);
               });
           } else {
-            this.messageService.recordAlreadyExists();
+            this.messageService.workingHourAlreadyExists();
           }
         });
     }

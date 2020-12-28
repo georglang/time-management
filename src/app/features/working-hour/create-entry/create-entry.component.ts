@@ -11,7 +11,7 @@ import { Observable } from 'rxjs';
 import { map, startWith } from 'rxjs/operators';
 
 import { MessageService } from '../services/message-service/message.service';
-import { FirestoreRecordService } from '../services/firestore-record-service/firestore-record.service';
+import { FirestoreWorkingHourService } from '../services/firestore-working-hour-service/firestore-working-hour.service';
 import { WorkingHour, IWorkingHour } from '../WorkingHour';
 import { CdkTextareaAutosize } from '@angular/cdk/text-field';
 import { eCategory } from '../data-classes/eCategory';
@@ -104,7 +104,7 @@ export class CreateEntryComponent implements OnInit {
     private router: Router,
     private route: ActivatedRoute,
     private formBuilder: FormBuilder,
-    private firestoreRecordService: FirestoreRecordService,
+    private firestoreWorkingHourService: FirestoreWorkingHourService,
     private firestoreMaterialService: FirestoreMaterialService,
     private firestoreNoteService: FirestoreNoteService,
     private messageService: MessageService,
@@ -163,25 +163,25 @@ export class CreateEntryComponent implements OnInit {
     this.location.back();
   }
 
-  public addRecordToFirebaseRecordsTable(record: IWorkingHour): void {
-    if (this.firestoreRecordService !== undefined) {
-      // check if record is already in firestore
-      this.firestoreRecordService
-        .checkIfRecordExistsInOrderInFirestore(record)
+  public addWorkingHourToFirebaseWorkingHoursTable(workingHour: IWorkingHour): void {
+    if (this.firestoreWorkingHourService !== undefined) {
+      // check if working hour is already in firestore
+      this.firestoreWorkingHourService
+        .checkIfWorkingHourExistsInOrderInFirestore(workingHour)
         .then((isAlreadyInFirestore: boolean) => {
           if (!isAlreadyInFirestore) {
-            this.firestoreRecordService
-              .addTimeRecord(record)
+            this.firestoreWorkingHourService
+              .addWorkingHour(workingHour)
               .then((id: string) => {
                 this.messageService.workingHourCreatedSuccessfully();
-                this.router.navigate(['order-details', record.orderId]);
-                record.id = id;
+                this.router.navigate(['order-details', workingHour.orderId]);
+                workingHour.id = id;
               })
               .catch((e) => {
-                console.error('can´t create record to firebase', e);
+                console.error('can´t create working hour to firebase', e);
               });
           } else {
-            this.messageService.recordAlreadyExists();
+            this.messageService.workingHourAlreadyExists();
           }
         });
     }
@@ -240,14 +240,14 @@ export class CreateEntryComponent implements OnInit {
   }
 
   public createWorkingHours(workingHoursFormInput: any, orderId: string): void {
-    const record = new WorkingHour(
+    const workingHour = new WorkingHour(
       workingHoursFormInput.date,
       workingHoursFormInput.description,
       workingHoursFormInput.workingHours,
       workingHoursFormInput.employee
     );
-    record.orderId = orderId;
-    this.addRecordToFirebaseRecordsTable(record);
+    workingHour.orderId = orderId;
+    this.addWorkingHourToFirebaseWorkingHoursTable(workingHour);
   }
 
   createNote(noteFormInput: any, orderId: string): void {

@@ -25,7 +25,7 @@ const routes: Routes = [
     children: [
       { path: '', component: OrderDetailComponent },
       { path: 'create-entry', component: CreateEntryComponent },
-      { path: 'edit-record/:id', component: EditWorkingHourComponent },
+      { path: 'edit-working-hour/:id', component: EditWorkingHourComponent },
       { path: 'edit-material/:id', component: EditMaterialComponent },
     ],
   },

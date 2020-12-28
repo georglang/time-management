@@ -57,8 +57,8 @@ export class MaterialListComponent implements OnInit {
     }
   }
 
-  public showEditAndDeleteButton(selectedRecord: IMaterial) {
-    this.selectedMaterial = selectedRecord;
+  public showEditAndDeleteButton(selectedWorkingHour: IMaterial) {
+    this.selectedMaterial = selectedWorkingHour;
     if (this.highlighted.selected.length == 0) {
       this.showButtonsIfMaterialIsSelected = false;
     } else {
@@ -77,7 +77,7 @@ export class MaterialListComponent implements OnInit {
   }
 
   public deleteMaterial(material: IMaterial) {
-    this.openDeleteRecordDialog(material.id);
+    this.openDeleteWorkingHourDialog(material.id);
   }
 
   public createEntry() {
@@ -86,7 +86,7 @@ export class MaterialListComponent implements OnInit {
     ]);
   }
 
-  public openDeleteRecordDialog(materialId: string): void {
+  public openDeleteWorkingHourDialog(materialId: string): void {
     const dialogConfig = new MatDialogConfig();
     dialogConfig.disableClose = true;
     dialogConfig.autoFocus = true;

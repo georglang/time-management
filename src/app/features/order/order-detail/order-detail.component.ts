@@ -5,14 +5,11 @@ import { MatTableDataSource } from '@angular/material/table';
 import { SelectionModel } from '@angular/cdk/collections';
 
 import { DateAdapter } from '@angular/material/core';
-import {
-  WorkingHour,
-  IWorkingHour,
-} from '../../working-hour/WorkingHour';
+import { WorkingHour, IWorkingHour } from '../../working-hour/WorkingHour';
 import { IOrder } from '../Order';
 
 import { FirestoreOrderService } from '../services/firestore-order-service/firestore-order.service';
-import { FirestoreRecordService } from '../../working-hour/services/firestore-record-service/firestore-record.service';
+import { FirestoreWorkingHourService } from '../../working-hour/services/firestore-working-hour-service/firestore-working-hour.service';
 
 import { ConfirmDeleteDialogComponent } from '../../working-hour/confirm-delete-dialog/confirm-delete-dialog.component';
 import { ToastrService } from 'ngx-toastr';
@@ -38,7 +35,7 @@ export class OrderDetailComponent implements OnInit {
   public order: IOrder;
   public columns: string[];
   public totalTime = 0.0;
-  public records: IWorkingHour[] = [];
+  public workingHours: IWorkingHour[] = [];
   public displayedColumns = [
     'select',
     'date',
@@ -49,13 +46,13 @@ export class OrderDetailComponent implements OnInit {
     'hasBeenPrinted',
   ];
   public dataSource: MatTableDataSource<IWorkingHour>;
-  public hasRecordsFound: boolean = false;
+  public hasWorkingHoursFound: boolean = false;
   public dateFormated;
   public selection = new SelectionModel<IWorkingHour>(true, []);
 
   public highlighted = new SelectionModel<IWorkingHour>(false, []);
-  public selectedRecord: IWorkingHour;
-  public showButtonsIfRecordIsSelected: boolean = false;
+  public selectedWorkingHour: IWorkingHour;
+  public showButtonsIfWorkingHourIsSelected: boolean = false;
   public showPrintButton: boolean = false;
   public showDeleteButton: boolean = false;
   public pdf = new jsPDF() as jsPDFWithPlugin;
@@ -69,7 +66,7 @@ export class OrderDetailComponent implements OnInit {
     private toastrService: ToastrService,
     public dialog: MatDialog,
     private firestoreOrderService: FirestoreOrderService,
-    private firestoreRecordService: FirestoreRecordService
+    private firestoreWorkingHourService: FirestoreWorkingHourService
   ) {
     this.dateAdapter.setLocale('de');
     this.columns = ['Date', 'Description', 'Time', 'Delete', 'Tool'];
@@ -91,62 +88,62 @@ export class OrderDetailComponent implements OnInit {
     this.firestoreOrderService.getOrderById(orderId).then((order: IOrder) => {
       if (order !== undefined) {
         this.order = order;
-        this.getRecordsFromCloudDatabase(orderId);
+        this.getWorkingHoursFromCloudDatabase(orderId);
       }
     });
   }
 
-  public getRecordsFromCloudDatabase(orderId: string): any {
+  public getWorkingHoursFromCloudDatabase(orderId: string): any {
     if (this.firestoreOrderService !== undefined) {
-      this.firestoreRecordService
-        .getRecordsByOrderId(orderId)
-        .subscribe((records: any[]) => {
-          this.order.records = records;
-          const recordsSortedByDate = this.order.records.sort(
+      this.firestoreWorkingHourService
+        .getWorkingHoursByOrderId(orderId)
+        .subscribe((workingHours: any[]) => {
+          this.order.workingHours = workingHours;
+          const workingHoursSortedByDate = this.order.workingHours.sort(
             (a, b) => b.date.toMillis() - a.date.toMillis()
           );
-          this.setRecordDataSource(recordsSortedByDate);
+          this.setWorkingHoursDataSource(workingHoursSortedByDate);
         });
     }
   }
 
-  public setRecordDataSource(records: IWorkingHour[]) {
-    if (records.length > 0) {
-      this.dataSource = new MatTableDataSource<IWorkingHour>(records);
-      this.hasRecordsFound = true;
+  public setWorkingHoursDataSource(workingHours: IWorkingHour[]) {
+    if (workingHours.length > 0) {
+      this.dataSource = new MatTableDataSource<IWorkingHour>(workingHours);
+      this.hasWorkingHoursFound = true;
     } else {
       this.dataSource = new MatTableDataSource<IWorkingHour>();
       this.sumOfWorkingHours = 0;
-      this.hasRecordsFound = false;
+      this.hasWorkingHoursFound = false;
     }
   }
 
-  public getRecords(orderId: string) {
-    const records: WorkingHour[] = [];
-    this.dataSource.data = records;
+  public getWorkingHours(orderId: string) {
+    const workingHours: WorkingHour[] = [];
+    this.dataSource.data = workingHours;
   }
 
-  public createNewRecord() {
+  public createNewWorkingHour() {
     this.router.navigate([
       'hours-of-work/order-details/' + this.paramOrderId + /create-entry/,
     ]);
   }
 
-  public editWorkingHour(record: IWorkingHour) {
+  public editWorkingHour(workingHour: IWorkingHour) {
     this.router.navigate([
       'hours-of-work/order-details/' +
         this.paramOrderId +
-        /edit-record/ +
-        record.id,
+        /edit-working-hour/ +
+        workingHour.id,
     ]);
   }
 
-  public deleteRecord(record: IWorkingHour) {
-    this.openDeleteRecordDialog(record.id);
+  public deleteWorkingHour(workingHour: IWorkingHour) {
+    this.openDeleteWorkingHourDialog(workingHour.id);
   }
 
-  public archiveRecord(record: IWorkingHour) {
-    record.hasBeenPrinted = true;
+  public archiveWorkingHour(workingHour: IWorkingHour) {
+    workingHour.hasBeenPrinted = true;
   }
 
   public showDeleteMessage() {
@@ -183,7 +180,7 @@ export class OrderDetailComponent implements OnInit {
     });
   }
 
-  public openDeleteRecordDialog(recordId: string): void {
+  public openDeleteWorkingHourDialog(workingHourId: string): void {
     const dialogConfig = new MatDialogConfig();
     dialogConfig.disableClose = true;
     dialogConfig.autoFocus = true;
@@ -194,17 +191,17 @@ export class OrderDetailComponent implements OnInit {
     );
     dialogRef.afterClosed().subscribe((shouldDelete) => {
       if (shouldDelete) {
-        this.deleteRecordInFirebase(recordId);
+        this.deleteWorkingHourInFirebase(workingHourId);
       }
     });
   }
 
-  public deleteRecordInFirebase(recordId: string): void {
-    this.firestoreRecordService
-      .deleteRecord(this.paramOrderId, recordId)
+  public deleteWorkingHourInFirebase(workingHourId: string): void {
+    this.firestoreWorkingHourService
+      .deleteWorkingHours(this.paramOrderId, workingHourId)
       .then((data) => {
         this.showDeleteMessage();
-        this.getRecordsFromCloudDatabase(this.paramOrderId);
+        this.getWorkingHoursFromCloudDatabase(this.paramOrderId);
       });
   }
 
@@ -232,57 +229,62 @@ export class OrderDetailComponent implements OnInit {
     });
   }
 
-  private updateRecordsInFirestore(records: IWorkingHour[]) {
-    records.forEach((record) => {
-      record.hasBeenPrinted = true;
-      this.firestoreRecordService
-        .updateRecord(record.orderId, record)
+  private updateWorkingHoursInFirestore(workingHours: IWorkingHour[]) {
+    workingHours.forEach((workingHour) => {
+      workingHour.hasBeenPrinted = true;
+      this.firestoreWorkingHourService
+        .updateWorkingHour(workingHour.orderId, workingHour)
         .then(() => {
-          this.getRecordsFromCloudDatabase(this.paramOrderId);
+          this.getWorkingHoursFromCloudDatabase(this.paramOrderId);
         });
     });
   }
 
-  public showEditAndDeleteButton(selectedRecord: IWorkingHour) {
-    this.selectedRecord = selectedRecord;
+  public showEditAndDeleteButton(selectedWorkingHour: IWorkingHour) {
+    this.selectedWorkingHour = selectedWorkingHour;
     if (
       this.highlighted.selected.length == 0 ||
-      selectedRecord.hasBeenPrinted
+      selectedWorkingHour.hasBeenPrinted
     ) {
-      this.showButtonsIfRecordIsSelected = false;
+      this.showButtonsIfWorkingHourIsSelected = false;
     } else {
-      this.showButtonsIfRecordIsSelected = true;
+      this.showButtonsIfWorkingHourIsSelected = true;
     }
   }
 
   //  print PDF - start
   public print() {
-    this.autoTableConfig(this.getSelectedRecords().records);
+    this.autoTableConfig(this.getSelectedWorkingHours().workingHours);
     this.loadImage('./assets/img/logo100px.png').then(
       (logo: HTMLImageElement) => {
         this.addContentToEveryPage(this.pdf, logo);
         this.saveAsPdf();
-        this.updateRecordsInFirestore(this.getSelectedRecords().recordsToSave);
+        this.updateWorkingHoursInFirestore(
+          this.getSelectedWorkingHours().workingHoursToSave
+        );
       }
     );
   }
 
-  private getSelectedRecords() {
-    const records = [];
-    const recordsToSave = [];
+  private getSelectedWorkingHours() {
+    const workingHours = [];
+    const workingHoursToSave = [];
 
-    this.selection.selected.forEach((selectedRecord) => {
-      recordsToSave.push(selectedRecord);
+    this.selection.selected.forEach((selectedWorkingHour) => {
+      workingHoursToSave.push(selectedWorkingHour);
 
-      records.push([
-        this.getFormattedDate(selectedRecord.date.toDate()),
-        selectedRecord['description'],
-        selectedRecord['workingHours'],
-        selectedRecord['employee'],
-        selectedRecord['tool'],
+      workingHours.push([
+        this.getFormattedDate(selectedWorkingHour.date.toDate()),
+        selectedWorkingHour['description'],
+        selectedWorkingHour['workingHours'],
+        selectedWorkingHour['employee'],
+        selectedWorkingHour['tool'],
       ]);
     });
-    return { records, recordsToSave };
+    return {
+      workingHours: workingHours,
+      workingHoursToSave: workingHoursToSave,
+    };
   }
 
   private getFormattedDate(date) {
@@ -311,11 +313,11 @@ export class OrderDetailComponent implements OnInit {
     };
   }
 
-  private autoTableConfig(records) {
+  private autoTableConfig(workingHours) {
     this.pdf.autoTable({
       head: [['Datum', 'Beschreibung', 'Stunden', 'Arbeiter', 'Gerät']],
       headStyles: { fillColor: [67, 120, 61] },
-      body: records,
+      body: workingHours,
       margin: {
         top: 78,
         right: 15,

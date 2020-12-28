@@ -5,7 +5,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { DateAdapter } from '@angular/material/core';
 
 import { IOrder, Order } from '../Order';
-import { FirestoreRecordService } from '../../working-hour/services/firestore-record-service/firestore-record.service';
+import { FirestoreWorkingHourService } from '../../working-hour/services/firestore-working-hour-service/firestore-working-hour.service';
 import { FirestoreOrderService } from '../services/firestore-order-service/firestore-order.service';
 import { MessageService } from '../../working-hour/services/message-service/message.service';
 
@@ -26,7 +26,7 @@ export class EditOrderComponent implements OnInit {
     private route: ActivatedRoute,
     private dateAdapter: DateAdapter<Date>,
     private firestoreOrderService: FirestoreOrderService,
-    private firestoreRecordService: FirestoreRecordService,
+    private firestoreWorkingHourService: FirestoreWorkingHourService,
     private messageService: MessageService
   ) {
     this.dateAdapter.setLocale('de');
@@ -51,17 +51,17 @@ export class EditOrderComponent implements OnInit {
       order.id = orderId;
       if (order !== undefined) {
         this.order = order;
-        this.getRecordsFromCloudDatabase(order);
+        this.getWorkingHoursFromCloudDatabase(order);
       }
     });
   }
 
-  private getRecordsFromCloudDatabase(order: IOrder): void {
+  private getWorkingHoursFromCloudDatabase(order: IOrder): void {
     if (this.firestoreOrderService !== undefined) {
-      this.firestoreRecordService
-        .getRecordsByOrderId(order.id)
-        .subscribe((records: any[]) => {
-          this.order.records = records;
+      this.firestoreWorkingHourService
+        .getWorkingHoursByOrderId(order.id)
+        .subscribe((workingHours: any[]) => {
+          this.order.workingHours = workingHours;
           this.setControl(order);
         });
     }
@@ -100,7 +100,7 @@ export class EditOrderComponent implements OnInit {
       this.editOrderForm.controls.companyName.value,
       this.editOrderForm.controls.location.value,
       this.editOrderForm.controls.contactPerson.value,
-      this.order.records,
+      this.order.workingHours,
       this.orderId
     );
 
