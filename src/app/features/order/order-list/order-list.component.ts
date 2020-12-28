@@ -4,11 +4,11 @@ import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 import { SelectionModel } from '@angular/cdk/collections';
-import { IOrder } from '../data-classes/Order';
-import { FirestoreOrderService } from '../services/firestore-order-service/firestore-order.service';
-import { ConfirmDeleteDialogComponent } from '../confirm-delete-dialog/confirm-delete-dialog.component';
-import { SettingsDialogComponent } from '../settings-dialog/settings-dialog.component';
-import { MessageService } from '../services/message-service/message.service';
+import { IOrder } from '../../hoursOfWork/data-classes/Order';
+import { FirestoreOrderService } from '../../hoursOfWork/services/firestore-order-service/firestore-order.service';
+import { ConfirmDeleteDialogComponent } from '../../hoursOfWork/confirm-delete-dialog/confirm-delete-dialog.component';
+import { SettingsDialogComponent } from '../../hoursOfWork/settings-dialog/settings-dialog.component';
+import { MessageService } from '../../hoursOfWork/services/message-service/message.service';
 
 @Component({
   selector: 'app-order-list',

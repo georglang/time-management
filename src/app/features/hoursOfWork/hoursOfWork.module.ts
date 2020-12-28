@@ -14,21 +14,18 @@ import { FirestoreOrderService } from './services/firestore-order-service/firest
 import { FirestoreRecordService } from './services/firestore-record-service/firestore-record.service';
 
 import { SortFormArrayByDate } from '../../shared/pipes/sort-form-array-by-date.pipe';
-import { OrderListComponent } from './order-list/order-list.component';
-import { OrderDetailComponent } from './order-detail/order-detail.component';
-import { CreateOrderComponent } from './create-order/create-order.component';
-import { EditOrderComponent } from './edit-order/edit-order.component';
 import { CreateEntryComponent } from './create-entry/create-entry.component';
 import { EditRecordComponent } from './edit-record/edit-record.component';
 import { ConfirmDeleteDialogComponent } from './confirm-delete-dialog/confirm-delete-dialog.component';
 import { SettingsDialogComponent } from './settings-dialog/settings-dialog.component';
 import { environment } from '../../../environments/environment.prod';
-import { HoursOfWorkRoutingModule } from '../hoursOfWork-routing.module';
 import { MaterialModule } from '../../shared/modules/material.module';
 import { MainModule } from 'src/app/shared/modules/main.module';
 import { CreateMaterialComponent } from './create-material/create-material.component';
 import { MaterialListComponent } from './material-list/material-list.component';
 import { EditMaterialComponent } from './edit-material/edit-material.component';
+import { HoursOfWorkRoutingModule } from './hoursOfWork-routing.module';
+import { LazyLoadedTabNavigationComponent } from '../../shared/components/lazy-loaded-tab-navigation/lazy-loaded-tab-navigation.component';
 
 @NgModule({
   imports: [
@@ -42,10 +39,6 @@ import { EditMaterialComponent } from './edit-material/edit-material.component';
   ],
   declarations: [
     HoursOfWorkComponent,
-    CreateOrderComponent,
-    OrderListComponent,
-    OrderDetailComponent,
-    EditOrderComponent,
     SortFormArrayByDate,
     CreateEntryComponent,
     CreateMaterialComponent,
@@ -54,6 +47,7 @@ import { EditMaterialComponent } from './edit-material/edit-material.component';
     SettingsDialogComponent,
     MaterialListComponent,
     EditMaterialComponent,
+    LazyLoadedTabNavigationComponent,
   ],
   providers: [
     FirestoreOrderService,

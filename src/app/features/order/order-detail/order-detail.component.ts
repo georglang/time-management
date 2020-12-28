@@ -5,19 +5,19 @@ import { MatTableDataSource } from '@angular/material/table';
 import { SelectionModel } from '@angular/cdk/collections';
 
 import { DateAdapter } from '@angular/material/core';
-import { TimeRecord, ITimeRecord } from '../data-classes/TimeRecords';
-import { IOrder } from '../data-classes/Order';
+import { TimeRecord, ITimeRecord } from '../../hoursOfWork/data-classes/TimeRecords';
+import { IOrder } from '../../hoursOfWork/data-classes/Order';
 
-import { FirestoreOrderService } from '../services/firestore-order-service/firestore-order.service';
-import { FirestoreRecordService } from '../services/firestore-record-service/firestore-record.service';
+import { FirestoreOrderService } from '../../hoursOfWork/services/firestore-order-service/firestore-order.service';
+import { FirestoreRecordService } from '../../hoursOfWork/services/firestore-record-service/firestore-record.service';
 
-import { ConfirmDeleteDialogComponent } from './../confirm-delete-dialog/confirm-delete-dialog.component';
+import { ConfirmDeleteDialogComponent } from '../../hoursOfWork/confirm-delete-dialog/confirm-delete-dialog.component';
 import { ToastrService } from 'ngx-toastr';
 
 import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
 import { UserOptions } from 'jspdf-autotable';
-import { SettingsDialogComponent } from '../settings-dialog/settings-dialog.component';
+import { SettingsDialogComponent } from '../../hoursOfWork/settings-dialog/settings-dialog.component';
 
 interface jsPDFWithPlugin extends jsPDF {
   autoTable: (options: UserOptions) => jsPDF;
@@ -29,7 +29,7 @@ interface jsPDFWithPlugin extends jsPDF {
   styleUrls: ['./order-detail.component.sass'],
 })
 export class OrderDetailComponent implements OnInit {
-  private paramOrderId;
+  public paramOrderId;
   public _isOnline;
   public sumOfWorkingHours;
   public order: IOrder;
@@ -125,7 +125,7 @@ export class OrderDetailComponent implements OnInit {
 
   public createNewRecord() {
     this.router.navigate([
-      'hours-of-work/order-details/' + this.paramOrderId + /create-record/,
+      'hours-of-work/order-details/' + this.paramOrderId + /create-entry/,
     ]);
   }
 
