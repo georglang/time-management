@@ -19,13 +19,8 @@ import { EditRecordComponent } from './edit-record/edit-record.component';
 import { ConfirmDeleteDialogComponent } from './confirm-delete-dialog/confirm-delete-dialog.component';
 import { SettingsDialogComponent } from './settings-dialog/settings-dialog.component';
 import { environment } from '../../../environments/environment.prod';
-import { MaterialModule } from '../../shared/modules/material.module';
 import { MainModule } from 'src/app/shared/modules/main.module';
-import { CreateMaterialComponent } from './create-material/create-material.component';
-import { MaterialListComponent } from './material-list/material-list.component';
-import { EditMaterialComponent } from './edit-material/edit-material.component';
 import { HoursOfWorkRoutingModule } from './hoursOfWork-routing.module';
-import { LazyLoadedTabNavigationComponent } from '../../shared/components/lazy-loaded-tab-navigation/lazy-loaded-tab-navigation.component';
 
 @NgModule({
   imports: [
@@ -41,13 +36,10 @@ import { LazyLoadedTabNavigationComponent } from '../../shared/components/lazy-l
     HoursOfWorkComponent,
     SortFormArrayByDate,
     CreateEntryComponent,
-    CreateMaterialComponent,
     EditRecordComponent,
     ConfirmDeleteDialogComponent,
     SettingsDialogComponent,
-    MaterialListComponent,
     EditMaterialComponent,
-    LazyLoadedTabNavigationComponent,
   ],
   providers: [
     FirestoreOrderService,
