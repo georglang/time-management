@@ -12,13 +12,13 @@ import { map, startWith } from 'rxjs/operators';
 
 import { MessageService } from '../services/message-service/message.service';
 import { FirestoreRecordService } from '../services/firestore-record-service/firestore-record.service';
-import { TimeRecord, ITimeRecord } from '../data-classes/TimeRecords';
+import { WorkingHour, IWorkingHour } from '../WorkingHour';
 import { CdkTextareaAutosize } from '@angular/cdk/text-field';
 import { eCategory } from '../data-classes/eCategory';
-import { INote, Note } from '../data-classes/Note';
-import { IMaterial, Material } from '../data-classes/Material';
-import { FirestoreMaterialService } from '../services/firestore-material-service/firestore-material.service';
-import { FirestoreNoteService } from '../services/firestore-note-service/firestore-note.service';
+import { INote, Note } from '../../note/Note';
+import { IMaterial, Material } from '../../material/Material';
+import { FirestoreMaterialService } from '../../material/services/firestore-material-service/firestore-material.service';
+import { FirestoreNoteService } from '../../note/firestore-note-service/firestore-note.service';
 import { materials } from '../../material/material-list/materials';
 
 @Component({
@@ -163,7 +163,7 @@ export class CreateEntryComponent implements OnInit {
     this.location.back();
   }
 
-  public addRecordToFirebaseRecordsTable(record: ITimeRecord): void {
+  public addRecordToFirebaseRecordsTable(record: IWorkingHour): void {
     if (this.firestoreRecordService !== undefined) {
       // check if record is already in firestore
       this.firestoreRecordService
@@ -173,7 +173,7 @@ export class CreateEntryComponent implements OnInit {
             this.firestoreRecordService
               .addTimeRecord(record)
               .then((id: string) => {
-                this.messageService.recordCreatedSuccessfully();
+                this.messageService.workingHourCreatedSuccessfully();
                 this.router.navigate(['order-details', record.orderId]);
                 record.id = id;
               })
@@ -240,7 +240,7 @@ export class CreateEntryComponent implements OnInit {
   }
 
   public createWorkingHours(workingHoursFormInput: any, orderId: string): void {
-    const record = new TimeRecord(
+    const record = new WorkingHour(
       workingHoursFormInput.date,
       workingHoursFormInput.description,
       workingHoursFormInput.workingHours,

@@ -4,10 +4,10 @@ import { Router, ActivatedRoute } from '@angular/router';
 
 import { DateAdapter } from '@angular/material/core';
 
-import { IOrder, Order } from '../../hoursOfWork/data-classes/Order';
-import { FirestoreRecordService } from '../../hoursOfWork/services/firestore-record-service/firestore-record.service';
-import { FirestoreOrderService } from '../../hoursOfWork/services/firestore-order-service/firestore-order.service';
-import { MessageService } from '../../hoursOfWork/services/message-service/message.service';
+import { IOrder, Order } from '../Order';
+import { FirestoreRecordService } from '../../working-hour/services/firestore-record-service/firestore-record.service';
+import { FirestoreOrderService } from '../services/firestore-order-service/firestore-order.service';
+import { MessageService } from '../../working-hour/services/message-service/message.service';
 
 @Component({
   selector: 'app-edit-order',

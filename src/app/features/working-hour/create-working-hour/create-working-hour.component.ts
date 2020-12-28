@@ -4,7 +4,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Location } from '@angular/common';
 import { MessageService } from '../services/message-service/message.service';
 import { FirestoreRecordService } from '../services/firestore-record-service/firestore-record.service';
-import { TimeRecord } from '../data-classes/TimeRecords';
+import { WorkingHour } from '../WorkingHour';
 
 @Component({
   selector: 'app-create-record',
@@ -108,7 +108,7 @@ export class CreateWorkingHourComponent implements OnInit {
   }
 
   public createWorkingHour(formInput: any, orderId: string): void {
-    const workingHour = new TimeRecord(
+    const workingHour = new WorkingHour(
       formInput.date,
       formInput.description,
       formInput.workingHours,
@@ -131,7 +131,7 @@ export class CreateWorkingHourComponent implements OnInit {
             this.firestoreRecordService
               .addTimeRecord(record)
               .then((id: string) => {
-                this.messageService.recordCreatedSuccessfully();
+                this.messageService.workingHourCreatedSuccessfully();
                 this.router.navigate(['order-details', record.orderId]);
                 record.id = id;
               })
@@ -154,7 +154,10 @@ export class CreateWorkingHourComponent implements OnInit {
     if (this.createWorkingHourForm.invalid) {
       return;
     } else {
-      this.createWorkingHour(this.createWorkingHourForm.value, this.routeParamOrderId);
+      this.createWorkingHour(
+        this.createWorkingHourForm.value,
+        this.routeParamOrderId
+      );
     }
   }
 }

@@ -2,9 +2,9 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
-import { Order, IOrder } from '../../hoursOfWork/data-classes/Order';
-import { FirestoreOrderService } from '../../hoursOfWork/services/firestore-order-service/firestore-order.service';
-import { MessageService } from '../../hoursOfWork/services/message-service/message.service';
+import { Order, IOrder } from '../Order';
+import { FirestoreOrderService } from '../services/firestore-order-service/firestore-order.service';
+import { MessageService } from '../../working-hour/services/message-service/message.service';
 
 @Component({
   selector: 'app-create-order',

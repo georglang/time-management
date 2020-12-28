@@ -8,8 +8,8 @@ import {
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
-import { IOrder } from '../../data-classes/Order';
-import { INote, Note } from '../../data-classes/Note';
+import { IOrder } from '../../order/Order';
+import { INote, Note } from '../Note';
 
 @Injectable({
   providedIn: 'root',

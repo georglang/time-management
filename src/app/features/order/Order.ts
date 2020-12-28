@@ -1,12 +1,12 @@
 import { Timestamp } from '@firebase/firestore-types';
-import { ITimeRecord } from './TimeRecords';
+import { IWorkingHour } from '../working-hour/WorkingHour';
 
 export interface IOrder {
   companyName: string;
   contactPerson?: string;
   date: Timestamp;
   location: string;
-  records?: ITimeRecord[];
+  records?: IWorkingHour[];
   id?: any;
 }
 
@@ -21,7 +21,7 @@ export class Order implements IOrder {
   public contactPerson: string;
   public date: Timestamp;
   public location: string;
-  public records: ITimeRecord[];
+  public records: IWorkingHour[];
   public id: any;
 
   constructor(
@@ -29,7 +29,7 @@ export class Order implements IOrder {
     companyName: string,
     location: string,
     contactPerson?: string,
-    records?: ITimeRecord[],
+    records?: IWorkingHour[],
     id?: any
   ) {
     this.date = date;

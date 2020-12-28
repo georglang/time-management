@@ -6,10 +6,10 @@ import { Location } from '@angular/common';
 import { DateAdapter } from '@angular/material/core';
 import { ToastrService } from 'ngx-toastr';
 import { Subscription } from 'rxjs';
-import { Material, IMaterial } from '../../hoursOfWork/data-classes/Material';
+import { Material, IMaterial } from '../Material';
 Material;
-import { MessageService } from '../../hoursOfWork/services/message-service/message.service';
-import { FirestoreMaterialService } from '../../hoursOfWork/services/firestore-material-service/firestore-material.service';
+import { MessageService } from '../../working-hour/services/message-service/message.service';
+import { FirestoreMaterialService } from '../services/firestore-material-service/firestore-material.service';
 
 @Component({
   selector: 'app-edit-material',

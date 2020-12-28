@@ -5,9 +5,9 @@ import { Timestamp, QuerySnapshot } from '@firebase/firestore-types';
 // import 'firebase/firestore';
 // import 'firebase/database';
 
-import { IOrder, Order, IFlattenOrder } from '../../data-classes/Order';
-import { TimeRecord, ITimeRecord } from '../../data-classes/TimeRecords';
-import { FirestoreRecordService } from '../firestore-record-service/firestore-record.service';
+import { IOrder, Order, IFlattenOrder } from '../../Order';
+import { WorkingHour, IWorkingHour } from '../../../working-hour/WorkingHour';
+import { FirestoreRecordService } from '../../../working-hour/services/firestore-record-service/firestore-record.service';
 import {
   AngularFirestore,
   AngularFirestoreDocument,
@@ -28,14 +28,14 @@ import {
   expand,
   takeWhile,
 } from 'rxjs/operators';
-import _ from 'lodash';
+import _ from 'src/app/features/material/services/firestore-material-service/node_modules/lodash';
 
 @Injectable({
   providedIn: 'root',
 })
 export class FirestoreOrderService {
   public ordersCollection: AngularFirestoreCollection<IOrder>;
-  public recordsCollection: AngularFirestoreCollection<ITimeRecord>;
+  public recordsCollection: AngularFirestoreCollection<IWorkingHour>;
   public order: Observable<IOrder[]>;
   private orders: Observable<IOrder[]>;
   private ordersInFirestore: any[] = [];
@@ -45,7 +45,7 @@ export class FirestoreOrderService {
     private firestoreRecordService: FirestoreRecordService
   ) {
     this.ordersCollection = this.firestore.collection<IOrder>('orders');
-    this.recordsCollection = this.firestore.collection<ITimeRecord>('records');
+    this.recordsCollection = this.firestore.collection<IWorkingHour>('records');
   }
 
   public getOrders(): Observable<IOrder[]> {

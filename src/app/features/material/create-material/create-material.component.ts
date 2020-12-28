@@ -7,10 +7,10 @@ import { map, startWith } from 'rxjs/operators';
 import { materials } from '../material-list/materials';
 
 import { Location } from '@angular/common';
-import { MessageService } from '../../hoursOfWork/services/message-service/message.service';
+import { MessageService } from '../../working-hour/services/message-service/message.service';
 
-import { Material } from '../../hoursOfWork/data-classes/Material';
-import { FirestoreMaterialService } from '../../hoursOfWork/services/firestore-material-service/firestore-material.service';
+import { Material } from '../Material';
+import { FirestoreMaterialService } from '../services/firestore-material-service/firestore-material.service';
 
 @Component({
   selector: 'app-create-material',
@@ -86,12 +86,12 @@ export class CreateMaterialComponent implements OnInit {
       this.firestoreMaterialService
         .addMaterial(material)
         .then((id: string) => {
-          this.messageService.recordCreatedSuccessfully();
+          this.messageService.workingHourCreatedSuccessfully();
           this.router.navigate(['order-details', material.orderId]);
           material.id = id;
         })
         .catch((e) => {
-          console.error('can´t create record to firebase', e);
+          console.error('can´t create working hour in firebase', e);
         });
     }
   }

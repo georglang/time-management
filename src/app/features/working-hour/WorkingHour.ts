@@ -1,6 +1,6 @@
 import { Timestamp } from '@firebase/firestore-types';
 
-export interface ITimeRecord {
+export interface IWorkingHour {
   date: Timestamp;
   description: string;
   workingHours: number;
@@ -10,7 +10,7 @@ export interface ITimeRecord {
   hasBeenPrinted?: boolean;
 }
 
-export class TimeRecord implements ITimeRecord {
+export class WorkingHour implements IWorkingHour {
   public date: Timestamp;
   public description: string;
   public workingHours: number;

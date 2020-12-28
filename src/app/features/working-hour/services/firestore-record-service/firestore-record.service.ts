@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { TimeRecord, ITimeRecord } from '../../data-classes/TimeRecords';
-import { IOrder } from '../../data-classes/Order';
+import { WorkingHour, IWorkingHour } from '../../WorkingHour';
+import { IOrder } from '../../../order/Order';
 import {
   AngularFirestore,
   AngularFirestoreCollection,
@@ -9,18 +9,18 @@ import {
 
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import _ from 'lodash';
+import _ from 'src/app/features/material/services/firestore-material-service/node_modules/lodash';
 
 @Injectable({
   providedIn: 'root',
 })
 export class FirestoreRecordService {
   private ordersCollection: AngularFirestoreCollection<IOrder>;
-  private recordsCollection: AngularFirestoreCollection<ITimeRecord>;
+  private recordsCollection: AngularFirestoreCollection<IWorkingHour>;
 
   constructor(private afs: AngularFirestore) {
     this.ordersCollection = this.afs.collection<IOrder>('orders');
-    this.recordsCollection = this.afs.collection<ITimeRecord>('records');
+    this.recordsCollection = this.afs.collection<IWorkingHour>('records');
   }
 
   documentToDomainObject = (dToDO) => {
@@ -29,7 +29,7 @@ export class FirestoreRecordService {
     return object;
   };
 
-  public addTimeRecord(record: ITimeRecord) {
+  public addTimeRecord(record: IWorkingHour) {
     const _record = { ...record };
     delete _record.id;
     return this.ordersCollection
@@ -44,7 +44,7 @@ export class FirestoreRecordService {
       });
   }
 
-  public getRecordsByOrderId(orderId: string): Observable<ITimeRecord[]> {
+  public getRecordsByOrderId(orderId: string): Observable<IWorkingHour[]> {
     return this.ordersCollection
       .doc(orderId)
       .collection('records')
@@ -69,7 +69,7 @@ export class FirestoreRecordService {
   }
 
   public checkIfRecordExistsInOrderInFirestore(
-    record: ITimeRecord
+    record: IWorkingHour
   ): Promise<boolean> {
     let doesRecordExist = true;
     return new Promise((resolve, reject) => {
@@ -95,7 +95,7 @@ export class FirestoreRecordService {
     const records: DocumentData[] = [];
     return this.recordsCollection.ref.get().then((querySnapshot) => {
       querySnapshot.forEach((doc) => {
-        const data = doc.data() as TimeRecord;
+        const data = doc.data() as WorkingHour;
         records.push(data);
       });
       return records;
@@ -103,11 +103,11 @@ export class FirestoreRecordService {
   }
 
   public getRecordsFromRecordsCollectionTest(orderId): Promise<any> {
-    const records: ITimeRecord[] = [];
+    const records: IWorkingHour[] = [];
     return new Promise((resolve, reject) => {
       this.recordsCollection.ref.get().then((querySnapshot) => {
         querySnapshot.forEach((doc) => {
-          const data = doc.data() as TimeRecord;
+          const data = doc.data() as WorkingHour;
           if (data.orderId === orderId) {
             records.push(data);
           }
@@ -117,7 +117,7 @@ export class FirestoreRecordService {
     });
   }
 
-  public updateRecord(orderId: string, record: ITimeRecord) {
+  public updateRecord(orderId: string, record: IWorkingHour) {
     const _record = { ...record };
 
     return this.ordersCollection
@@ -136,9 +136,9 @@ export class FirestoreRecordService {
       .delete();
   }
 
-  private compareIfRecordIsOnline(newRecord: ITimeRecord, records): boolean {
+  private compareIfRecordIsOnline(newRecord: IWorkingHour, records): boolean {
     let isRecordAlreadyOnline = false;
-    const recordToCompare: ITimeRecord = Object();
+    const recordToCompare: IWorkingHour = Object();
     Object.assign(recordToCompare, newRecord);
     delete recordToCompare.id;
     records.forEach((recordOnline) => {

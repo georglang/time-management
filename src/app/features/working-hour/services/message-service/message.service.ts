@@ -47,7 +47,7 @@ export class MessageService {
     this.toastr.error('Nicht gefunden', 'Eintrag', errorConfig);
   }
 
-  public recordCreatedSuccessfully() {
+  public workingHourCreatedSuccessfully() {
     const successConfig = {
       positionClass: 'toast-bottom-center',
       timeout: 2000,

@@ -1,0 +1,76 @@
+<app-header titleInput="Notiz hinzufügen"></app-header>
+
+<div class="sub-nav row">
+  <div class="col-10">
+    <div type="button" class="nav-before-btn" (click)="navigateToOrderList()">
+      <mat-icon>navigate_before</mat-icon>
+    </div>
+  </div>
+  <div class="col-2">
+    <div
+      type="button"
+      class="save-btn"
+      (click)="documentCreateNoteForm.ngSubmit.emit()"
+    >
+      <mat-icon>save</mat-icon>
+    </div>
+  </div>
+</div>
+
+<div id="create-note-component-wrapper" class="row no-gutter">
+  <div class="col-12">
+    <div id="create-note-form-wrapper" class="row no-gutter">
+      <div class="col-12">
+        <form
+          id="create-note-form"
+          [formGroup]="createNoteForm"
+          (ngSubmit)="onSubmit()"
+        >
+          <fieldset class="form-group">
+            <mat-form-field>
+              <mat-label>Notizen eingeben</mat-label>
+              <textarea
+                matInput
+                cdkTextareaAutosize
+                #autosize="cdkTextareaAutosize"
+                cdkAutosizeMinRows="1"
+                cdkAutosizeMaxRows="5"
+              ></textarea>
+              <div
+                *ngIf="submitted && getFormControl.description.errors"
+                class="invalid-feedback"
+              >
+                <div *ngIf="getFormControl.description.errors.required">
+                  Bitte <strong>Material</strong> eingeben
+                </div>
+              </div>
+            </mat-form-field>
+          </fieldset>
+
+          <fieldset class="form-group">
+            <mat-form-field>
+              <input
+                matInput
+                formControlName="numberOfPieces"
+                placeholder="Anzahl"
+                required
+                [ngClass]="{
+                  'is-invalid':
+                    submitted && getFormControl.numberOfPieces.errors
+                }"
+              />
+              <div
+                *ngIf="submitted && getFormControl.numberOfPieces.errors"
+                class="invalid-feedback"
+              >
+                <div *ngIf="getFormControl.numberOfPieces.errors.required">
+                  Bitte <strong>Stückzahl</strong> eingeben
+                </div>
+              </div>
+            </mat-form-field>
+          </fieldset>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

@@ -5,19 +5,22 @@ import { MatTableDataSource } from '@angular/material/table';
 import { SelectionModel } from '@angular/cdk/collections';
 
 import { DateAdapter } from '@angular/material/core';
-import { TimeRecord, ITimeRecord } from '../../hoursOfWork/data-classes/TimeRecords';
-import { IOrder } from '../../hoursOfWork/data-classes/Order';
+import {
+  WorkingHour,
+  IWorkingHour,
+} from '../../working-hour/WorkingHour';
+import { IOrder } from '../Order';
 
-import { FirestoreOrderService } from '../../hoursOfWork/services/firestore-order-service/firestore-order.service';
-import { FirestoreRecordService } from '../../hoursOfWork/services/firestore-record-service/firestore-record.service';
+import { FirestoreOrderService } from '../services/firestore-order-service/firestore-order.service';
+import { FirestoreRecordService } from '../../working-hour/services/firestore-record-service/firestore-record.service';
 
-import { ConfirmDeleteDialogComponent } from '../../hoursOfWork/confirm-delete-dialog/confirm-delete-dialog.component';
+import { ConfirmDeleteDialogComponent } from '../../working-hour/confirm-delete-dialog/confirm-delete-dialog.component';
 import { ToastrService } from 'ngx-toastr';
 
 import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
 import { UserOptions } from 'jspdf-autotable';
-import { SettingsDialogComponent } from '../../hoursOfWork/settings-dialog/settings-dialog.component';
+import { SettingsDialogComponent } from '../../working-hour/settings-dialog/settings-dialog.component';
 
 interface jsPDFWithPlugin extends jsPDF {
   autoTable: (options: UserOptions) => jsPDF;
@@ -35,7 +38,7 @@ export class OrderDetailComponent implements OnInit {
   public order: IOrder;
   public columns: string[];
   public totalTime = 0.0;
-  public records: ITimeRecord[] = [];
+  public records: IWorkingHour[] = [];
   public displayedColumns = [
     'select',
     'date',
@@ -45,13 +48,13 @@ export class OrderDetailComponent implements OnInit {
     'tool',
     'hasBeenPrinted',
   ];
-  public dataSource: MatTableDataSource<ITimeRecord>;
+  public dataSource: MatTableDataSource<IWorkingHour>;
   public hasRecordsFound: boolean = false;
   public dateFormated;
-  public selection = new SelectionModel<ITimeRecord>(true, []);
+  public selection = new SelectionModel<IWorkingHour>(true, []);
 
-  public highlighted = new SelectionModel<ITimeRecord>(false, []);
-  public selectedRecord: ITimeRecord;
+  public highlighted = new SelectionModel<IWorkingHour>(false, []);
+  public selectedRecord: IWorkingHour;
   public showButtonsIfRecordIsSelected: boolean = false;
   public showPrintButton: boolean = false;
   public showDeleteButton: boolean = false;
@@ -107,19 +110,19 @@ export class OrderDetailComponent implements OnInit {
     }
   }
 
-  public setRecordDataSource(records: ITimeRecord[]) {
+  public setRecordDataSource(records: IWorkingHour[]) {
     if (records.length > 0) {
-      this.dataSource = new MatTableDataSource<ITimeRecord>(records);
+      this.dataSource = new MatTableDataSource<IWorkingHour>(records);
       this.hasRecordsFound = true;
     } else {
-      this.dataSource = new MatTableDataSource<ITimeRecord>();
+      this.dataSource = new MatTableDataSource<IWorkingHour>();
       this.sumOfWorkingHours = 0;
       this.hasRecordsFound = false;
     }
   }
 
   public getRecords(orderId: string) {
-    const records: TimeRecord[] = [];
+    const records: WorkingHour[] = [];
     this.dataSource.data = records;
   }
 
@@ -129,7 +132,7 @@ export class OrderDetailComponent implements OnInit {
     ]);
   }
 
-  public editRecord(record: ITimeRecord) {
+  public editWorkingHour(record: IWorkingHour) {
     this.router.navigate([
       'hours-of-work/order-details/' +
         this.paramOrderId +
@@ -138,11 +141,11 @@ export class OrderDetailComponent implements OnInit {
     ]);
   }
 
-  public deleteRecord(record: ITimeRecord) {
+  public deleteRecord(record: IWorkingHour) {
     this.openDeleteRecordDialog(record.id);
   }
 
-  public archiveRecord(record: ITimeRecord) {
+  public archiveRecord(record: IWorkingHour) {
     record.hasBeenPrinted = true;
   }
 
@@ -229,7 +232,7 @@ export class OrderDetailComponent implements OnInit {
     });
   }
 
-  private updateRecordsInFirestore(records: ITimeRecord[]) {
+  private updateRecordsInFirestore(records: IWorkingHour[]) {
     records.forEach((record) => {
       record.hasBeenPrinted = true;
       this.firestoreRecordService
@@ -240,7 +243,7 @@ export class OrderDetailComponent implements OnInit {
     });
   }
 
-  public showEditAndDeleteButton(selectedRecord: ITimeRecord) {
+  public showEditAndDeleteButton(selectedRecord: IWorkingHour) {
     this.selectedRecord = selectedRecord;
     if (
       this.highlighted.selected.length == 0 ||

@@ -6,10 +6,10 @@ import { OrderDetailComponent } from './order-detail/order-detail.component';
 import { CreateOrderComponent } from './create-order/create-order.component';
 import { EditOrderComponent } from './edit-order/edit-order.component';
 
-import { CreateEntryComponent } from '../hoursOfWork/create-entry/create-entry.component';
-import { EditRecordComponent } from '../hoursOfWork/edit-record/edit-record.component';
-import { EditMaterialComponent } from '../hoursOfWork/edit-material/edit-material.component';
-import { Order } from '../hoursOfWork/data-classes/Order';
+import { CreateEntryComponent } from '../working-hour/create-entry/create-entry.component';
+import { EditWorkingHourComponent } from '../working-hour/edit-working-hour/edit-working-hour.component';
+import { EditMaterialComponent } from '../material/edit-material/edit-material.component';
+import { Order } from './Order';
 
 const routes: Routes = [
   {
@@ -25,7 +25,7 @@ const routes: Routes = [
     children: [
       { path: '', component: OrderDetailComponent },
       { path: 'create-entry', component: CreateEntryComponent },
-      { path: 'edit-record/:id', component: EditRecordComponent },
+      { path: 'edit-record/:id', component: EditWorkingHourComponent },
       { path: 'edit-material/:id', component: EditMaterialComponent },
     ],
   },

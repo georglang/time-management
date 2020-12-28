@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
-import { IMaterial, Material } from '../../data-classes/Material';
+import { IMaterial, Material } from '../../Material';
 
-import { IOrder } from '../../data-classes/Order';
+import { IOrder } from '../../../order/Order';
 
 import {
   AngularFirestore,

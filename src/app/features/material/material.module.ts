@@ -5,7 +5,11 @@ import { MaterialListComponent } from './material-list/material-list.component';
 import { EditMaterialComponent } from './edit-material/edit-material.component';
 
 @NgModule({
-  imports: [CommonModule, MaterialListComponent, EditMaterialComponent],
-  declarations: [MaterialComponent],
+  imports: [CommonModule],
+  declarations: [
+    MaterialComponent,
+    MaterialListComponent,
+    EditMaterialComponent,
+  ],
 })
 export class MaterialModule {}

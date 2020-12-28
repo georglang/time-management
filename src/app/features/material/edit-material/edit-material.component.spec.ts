@@ -1,20 +1,21 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
-import { EditRecordComponent } from './edit-material.component';
+import { EditMaterialComponent } from './edit-material.component';
 
-describe('EditRecordComponent', () => {
-  let component: EditRecordComponent;
-  let fixture: ComponentFixture<EditRecordComponent>;
+describe('EditMaterialComponent', () => {
+  let component: EditMaterialComponent;
+  let fixture: ComponentFixture<EditMaterialComponent>;
 
-  beforeEach(waitForAsync(() => {
-    TestBed.configureTestingModule({
-      declarations: [ EditRecordComponent ]
+  beforeEach(
+    waitForAsync(() => {
+      TestBed.configureTestingModule({
+        declarations: [EditMaterialComponent],
+      }).compileComponents();
     })
-    .compileComponents();
-  }));
+  );
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(EditRecordComponent);
+    fixture = TestBed.createComponent(EditMaterialComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

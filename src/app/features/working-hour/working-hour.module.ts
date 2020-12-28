@@ -9,7 +9,7 @@ import { MAT_DATE_LOCALE } from '@angular/material/core';
 import { AngularFirestoreModule } from '@angular/fire/firestore';
 
 // services
-import { FirestoreOrderService } from './services/firestore-order-service/firestore-order.service';
+import { FirestoreOrderService } from '../order/services/firestore-order-service/firestore-order.service';
 import { FirestoreRecordService } from './services/firestore-record-service/firestore-record.service';
 
 import { SortFormArrayByDate } from '../../shared/pipes/sort-form-array-by-date.pipe';

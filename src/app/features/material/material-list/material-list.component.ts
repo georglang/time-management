@@ -3,13 +3,13 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 import { ToastrService } from 'ngx-toastr';
 
-import { FirestoreMaterialService } from '../../hoursOfWork/services/firestore-material-service/firestore-material.service';
-import { IMaterial } from '../../hoursOfWork/data-classes/Material';
+import { FirestoreMaterialService } from '../services/firestore-material-service/firestore-material.service';
+import { IMaterial } from '../Material';
 
 import { MatTableDataSource } from '@angular/material/table';
 import { SelectionModel } from '@angular/cdk/collections';
 
-import { ConfirmDeleteDialogComponent } from '../../hoursOfWork/confirm-delete-dialog/confirm-delete-dialog.component';
+import { ConfirmDeleteDialogComponent } from '../../working-hour/confirm-delete-dialog/confirm-delete-dialog.component';
 
 @Component({
   selector: 'app-material-list',

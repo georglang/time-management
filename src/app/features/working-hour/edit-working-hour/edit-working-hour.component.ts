@@ -6,7 +6,7 @@ import { Location } from '@angular/common';
 import { DateAdapter } from '@angular/material/core';
 import { ToastrService } from 'ngx-toastr';
 import { Subscription } from 'rxjs';
-import { TimeRecord, ITimeRecord } from '../data-classes/TimeRecords';
+import { WorkingHour, IWorkingHour } from '../WorkingHour';
 import { MessageService } from '../services/message-service/message.service';
 import { FirestoreRecordService } from '../services/firestore-record-service/firestore-record.service';
 
@@ -19,7 +19,7 @@ export class EditWorkingHourComponent implements OnInit {
   public editWorkingHourForm: FormGroup;
   private recordId: string;
   private orderId: string;
-  public record: ITimeRecord;
+  public record: IWorkingHour;
   public submitted = false;
   private subscription: Subscription = new Subscription();
 
@@ -135,7 +135,7 @@ export class EditWorkingHourComponent implements OnInit {
         if (records !== undefined) {
           records.forEach((record) => {
             if (record.id === recordId) {
-              this.record = new TimeRecord(
+              this.record = new WorkingHour(
                 record.date,
                 record.description,
                 record.workingHours,
@@ -155,7 +155,7 @@ export class EditWorkingHourComponent implements OnInit {
     this.location.back();
   }
 
-  public setControl(record: ITimeRecord): void {
+  public setControl(record: IWorkingHour): void {
     let date;
 
     if (record.date.seconds !== undefined) {
@@ -178,7 +178,7 @@ export class EditWorkingHourComponent implements OnInit {
   }
 
   public onSubmit() {
-    const record = new TimeRecord(
+    const record = new WorkingHour(
       this.editWorkingHourForm.controls.date.value,
       this.editWorkingHourForm.controls.description.value,
       this.editWorkingHourForm.controls.workingHours.value,
@@ -196,7 +196,7 @@ export class EditWorkingHourComponent implements OnInit {
     }
   }
 
-  private checkIfRecordExistsInOrderInFirestore(record: ITimeRecord) {
+  private checkIfRecordExistsInOrderInFirestore(record: IWorkingHour) {
     this.firestoreRecordService
       .checkIfRecordExistsInOrderInFirestore(record)
       .then((doesRecordExist) => {
@@ -208,7 +208,7 @@ export class EditWorkingHourComponent implements OnInit {
       });
   }
 
-  private updateRecordInFirestore(orderId: string, record: ITimeRecord): void {
+  private updateRecordInFirestore(orderId: string, record: IWorkingHour): void {
     if (this.firestoreRecordService !== undefined) {
       this.setControl(record);
       this.firestoreRecordService.updateRecord(orderId, record).then(() => {
