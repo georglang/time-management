@@ -1,0 +1,152 @@
+<app-header titleInput="Bearbeiten"></app-header>
+
+<div class="sub-nav row">
+  <div class="col-10">
+    <div
+      type="button"
+      class="nav-before-btn"
+      (click)="navigateToMaterialList()"
+    >
+      <mat-icon>navigate_before</mat-icon>
+    </div>
+  </div>
+  <div class="col-2">
+    <div
+      type="button"
+      class="save-btn"
+      (click)="documentEditMaterialForm.ngSubmit.emit()"
+    >
+      <mat-icon>save</mat-icon>
+    </div>
+  </div>
+</div>
+
+<div id="edit-material-component-wrapper" class="row no-gutter">
+  <div class="col-12">
+    <div id="edit-material-form-wrapper" class="row no-gutter">
+      <div class="col-12">
+        <form
+          id="material-form"
+          [formGroup]="editMaterialForm"
+          #documentEditMaterialForm="ngForm"
+          (ngSubmit)="onSubmit()"
+        >
+          <fieldset class="form-group">
+            <mat-form-field>
+              <input
+                matInput
+                [matDatepicker]="picker"
+                placeholder="Datum wählen"
+                id="date"
+                name="date"
+                formControlName="date"
+                (click)="picker.open()"
+                required
+                [ngClass]="{
+                  'is-invalid':
+                    submitted && getEditMaterialFormControls.date.errors
+                }"
+              />
+              <mat-datepicker-toggle
+                matSuffix
+                [for]="picker"
+              ></mat-datepicker-toggle>
+              <mat-datepicker #picker></mat-datepicker>
+              <div
+                *ngIf="submitted && getEditMaterialFormControls.date.errors"
+                class="invalid-feedback"
+              >
+                <div *ngIf="getEditMaterialFormControls.date.errors.required">
+                  Bitte <strong>Datum</strong> eingeben
+                </div>
+              </div>
+            </mat-form-field>
+          </fieldset>
+
+          <fieldset class="form-group">
+            <mat-form-field>
+              <input
+                matInput
+                formControlName="material"
+                placeholder="Material auswählen"
+                required
+                [ngClass]="{
+                  'is-invalid':
+                    submitted && getEditMaterialFormControls.material.errors
+                }"
+              />
+              <!-- <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete">
+                <mat-option
+                  *ngFor="let option of filteredOptions | async"
+                  [value]="option"
+                >
+                  {{ option }}
+                </mat-option>
+              </mat-autocomplete> -->
+
+              <div
+                *ngIf="submitted && getEditMaterialFormControls.material.errors"
+                class="invalid-feedback"
+              >
+                <div
+                  *ngIf="getEditMaterialFormControls.material.errors.required"
+                >
+                  Bitte <strong>Material</strong> eingeben
+                </div>
+              </div>
+            </mat-form-field>
+          </fieldset>
+
+          <fieldset class="form-group">
+            <mat-form-field>
+              <input
+                matInput
+                type="number"
+                formControlName="amount"
+                placeholder="Anzahl"
+                required
+                [ngClass]="{
+                  'is-invalid':
+                    submitted && getEditMaterialFormControls.amount.errors
+                }"
+              />
+              <div
+                *ngIf="submitted && getEditMaterialFormControls.amount.errors"
+                class="invalid-feedback"
+              >
+                <div *ngIf="getEditMaterialFormControls.amount.errors.required">
+                  Bitte <strong>Anzahl</strong> eingeben
+                </div>
+              </div>
+            </mat-form-field>
+          </fieldset>
+
+          <fieldset class="form-group">
+            <mat-form-field appearance="fill">
+              <mat-label>Einheit auswählen</mat-label>
+              <mat-select
+                formControlName="unit"
+                [ngClass]="{
+                  'is-invalid':
+                    submitted && getEditMaterialFormControls.unit.errors
+                }"
+              >
+                <mat-option *ngFor="let unit of units" [value]="unit.value">
+                  {{ unit.viewValue }}
+                </mat-option>
+              </mat-select>
+              <div
+                *ngIf="submitted && getEditMaterialFormControls.unit.errors"
+                class="invalid-feedback"
+              >
+                <div *ngIf="getEditMaterialFormControls.unit.errors.required">
+                  Bitte <strong>Einheit</strong> auswählen
+                </div>
+              </div>
+            </mat-form-field>
+          </fieldset>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

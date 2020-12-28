@@ -1,0 +1,98 @@
+<app-header titleInput="Material hinzufügen"></app-header>
+
+<div class="sub-nav row">
+  <div class="col-10">
+    <div type="button" class="nav-before-btn" (click)="navigateToOrderList()">
+      <mat-icon>navigate_before</mat-icon>
+    </div>
+  </div>
+  <div class="col-2">
+    <div
+      type="button"
+      class="save-btn"
+      (click)="documentCreateMaterialForm.ngSubmit.emit()"
+    >
+      <mat-icon>save</mat-icon>
+    </div>
+  </div>
+</div>
+
+<div id="create-material-component-wrapper" class="row no-gutter">
+  <div class="col-12">
+    <div id="create-material-form-wrapper" class="row no-gutter">
+      <div class="col-12">
+        <form
+          id="create-material-form"
+          [formGroup]="createMaterialForm"
+          #documentCreateMaterialForm="ngForm"
+          (ngSubmit)="onSubmit()"
+        >
+
+
+
+
+
+          <fieldset class="form-group">
+            <mat-form-field>
+              <input
+                type="text"
+                placeholder="Material auswählen"
+                matInput
+                [formControl]="myControl"
+                formControlName="description"
+                [matAutocomplete]="auto"
+                [ngClass]="{
+                  'is-invalid': submitted && getFormControl.description.errors
+                }"
+              />
+              <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete">
+                <mat-option
+                  *ngFor="let option of filteredOptions | async"
+                  [value]="option"
+                >
+                  {{ option }}
+                </mat-option>
+              </mat-autocomplete>
+              <div
+                *ngIf="submitted && getFormControl.description.errors"
+                class="invalid-feedback"
+              >
+                <div *ngIf="getFormControl.description.errors.required">
+                  Bitte <strong>Material</strong> eingeben
+                </div>
+              </div>
+            </mat-form-field>
+          </fieldset>
+
+
+
+
+
+
+          <fieldset class="form-group">
+            <mat-form-field>
+              <input
+                matInput
+                formControlName="numberOfPieces"
+                placeholder="Anzahl"
+                required
+                [ngClass]="{
+                  'is-invalid':
+                    submitted && getFormControl.numberOfPieces.errors
+                }"
+              />
+              <div
+                *ngIf="submitted && getFormControl.numberOfPieces.errors"
+                class="invalid-feedback"
+              >
+                <div *ngIf="getFormControl.numberOfPieces.errors.required">
+                  Bitte <strong>Stückzahl</strong> eingeben
+                </div>
+              </div>
+            </mat-form-field>
+          </fieldset>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
