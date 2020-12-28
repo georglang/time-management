@@ -78,7 +78,7 @@ export class EditOrderComponent implements OnInit {
   }
 
   public navigateToOrderList(): void {
-    this.router.navigate(['hours-of-work/']);
+    this.router.navigate(['orders']);
   }
 
   private updateOrderInFirestore(order: IOrder): void {
