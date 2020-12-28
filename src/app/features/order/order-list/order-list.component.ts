@@ -120,7 +120,7 @@ export class OrderListComponent implements OnInit {
   }
 
   public navigateToOrder(order: IOrder): void {
-    this.router.navigate(['hours-of-work/order-details/' + order.id]);
+    this.router.navigate(['orders/order-details/' + order.id]);
   }
 
   public navigateToCreateOrder(): void {
