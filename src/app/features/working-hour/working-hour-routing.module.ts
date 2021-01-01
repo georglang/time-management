@@ -10,10 +10,10 @@ const routes: Routes = [
     pathMatch: 'full',
     // canActivate: [AuthGuard],
   },
-  {
-    path: 'hours-of-work',
-    component: WorkingHourListComponent,
-  },
+  // {
+  //   path: 'working-hours',
+  //   component: WorkingHourListComponent,
+  // },
 ];
 
 @NgModule({

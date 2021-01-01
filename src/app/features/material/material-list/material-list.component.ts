@@ -67,9 +67,8 @@ export class MaterialListComponent implements OnInit {
   }
 
   public editMaterial(material: IMaterial) {
-    debugger;
     this.router.navigate([
-      'hours-of-work/order-details/' +
+      'working-hours/order-details/' +
         material.orderId +
         '/edit-material/' +
         material.id,
@@ -82,7 +81,7 @@ export class MaterialListComponent implements OnInit {
 
   public createEntry() {
     this.router.navigate([
-      'hours-of-work/order-details/' + this.paramOrderId + /create-entry/,
+      'working-hours/order-details/' + this.paramOrderId + /create-entry/,
     ]);
   }
 

@@ -3,7 +3,7 @@ import { Routes, RouterModule, PreloadAllModules } from '@angular/router';
 import { SignInComponent } from './core/auth/sign-in/sign-in.component';
 
 const routes: Routes = [
-  // { path: '', redirectTo: 'hours-of-work', pathMatch: 'full' },
+  // { path: '', redirectTo: 'working-hours', pathMatch: 'full' },
   { path: '', redirectTo: 'orders', pathMatch: 'full' },
   { path: 'sign-in', component: SignInComponent },
   {
@@ -11,22 +11,22 @@ const routes: Routes = [
     loadChildren: () =>
       import('./features/order/order.module').then((m) => m.OrderModule),
   },
-  {
-    path: 'hours-of-work',
-    loadChildren: () =>
-      import('./features/working-hour/working-hour.module').then(
-        (m) => m.WorkingHourModule
-      ),
-  },
-  {
-    path: 'notes',
-    loadChildren: () =>
-      import('./features/note/note.module').then((m) => m.NoteModule),
-  },
+  // {
+  //   path: 'orders/order-detail/:id/working-hours/',
+  //   loadChildren: () =>
+  //     import('./features/working-hour/working-hour.module').then(
+  //       (m) => m.WorkingHourModule
+  //     ),
+  // },
+  // {
+  //   path: 'notes',
+  //   loadChildren: () =>
+  //     import('./features/note/note.module').then((m) => m.NoteModule),
+  // },
 
   // * wildcard if the requested URL doesn´t match any path in the URL
   // could also be a 404 page
-  { path: '**', redirectTo: 'working-hours', pathMatch: 'full' },
+  //{ path: '**', redirectTo: 'working-hours', pathMatch: 'full' },
 ];
 
 @NgModule({
