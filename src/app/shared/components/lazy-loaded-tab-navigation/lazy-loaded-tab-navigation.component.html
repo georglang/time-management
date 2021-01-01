@@ -1,15 +1,13 @@
 <nav mat-tab-nav-bar>
   <a
     mat-tab-link
-    *ngFor="let tabItem of tabs"
-    [routerLink]="tabItem.route"
+    *ngFor="let tab of tabsWithRoutes"
+    [routerLink]="tab.route"
     routerLinkActive
     #rla="routerLinkActive"
     [active]="rla.isActive"
   >
-    <mat-icon class="mr-8">{{ tabItem.icon }}</mat-icon>
-    {{ tabItem.label }}
+    <mat-icon class="mr-8">{{ tab.icon }}</mat-icon>
+    {{ tab.label }} <br />
   </a>
 </nav>
-
-<router-outlet></router-outlet>

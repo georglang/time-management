@@ -2,18 +2,21 @@ import { ITabItem } from './ITabItem';
 
 export const tabs: ITabItem[] = [
   {
+    feature: 'workingHours',
     label: 'Stunden',
     icon: 'access_time',
-    route: '/hours',
+    route: '',
   },
   {
+    feature: 'materials',
     label: 'Material',
     icon: 'material',
-    route: '/material',
+    route: '',
   },
   {
-    label: 'Notes',
+    feature: 'notes',
+    label: 'Notizen',
     icon: 'sticky_note_2',
-    route: '/notes',
+    route: '',
   },
 ];
