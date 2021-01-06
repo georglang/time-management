@@ -2,26 +2,42 @@
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 6.2.0.
 
-## Development server
+## Current Angular version
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
+11.0.5
 
-## Code scaffolding
+## Git commit message convention:
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+[link to conventional commits](https://www.conventionalcommits.org/en/v1.0.0/)
 
-## Build
+### Format
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory. Use the `--prod` flag for a production build.
+**type(scope): subject**
 
-## Running unit tests
+### Types
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+- **feat:** A new feature  
+  e.g. feat(user): add login button
 
-## Running end-to-end tests
+- **fix:** A bug fix  
+  e.g. fix(userService): add additional parameter to getUserData method
+- **refactor(renaming/cleanup):** Code changes that neither fixes a bug or adds a feature  
+  e.g. refactor(cleanup): app.component.ts
+- **docs:**
+  e.g. docs(readme): how to get started section
+- **merge(branch into branch):**  
+  e.g. merge(dev into main)
+- **update(angular / package.json):** update angular version or dependencies in package.json  
+  e.g. update(angular): to version 11.0.5
 
-Run `ng e2e` to execute the end-to-end tests via [Protractor](http://www.protractortest.org/).
+### Scope
 
-## Further help
+A scope Is provided in parentheses after a type.  
+A scope is a phrase describing parts of the code affected by the changes.  
+e.g. **feat(userService)**
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI README](https://github.com/angular/angular-cli/blob/master/README.md).
+### Subject
+
+A subject contains a short description of the applied changes.  
+"verb in present-tense" + "rest of message"  
+e.g. "remove unused user component"
