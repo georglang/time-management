@@ -36,7 +36,7 @@ export class SignInComponent implements OnInit {
           this.passwordForm.get('password').value
         )
         .then((data) => {
-          this.router.navigate(['hours-of-work']);
+          this.router.navigate(['orders']);
         });
     }
   }

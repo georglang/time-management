@@ -26,7 +26,7 @@ const routes: Routes = [
 
   // * wildcard if the requested URL doesn´t match any path in the URL
   // could also be a 404 page
-  //{ path: '**', redirectTo: 'working-hours', pathMatch: 'full' },
+  { path: '**', redirectTo: 'orders', pathMatch: 'full' },
 ];
 
 @NgModule({

@@ -20,7 +20,8 @@ import { AngularFireModule } from '@angular/fire';
 import { AngularFireAuthModule } from '@angular/fire/auth';
 import { SignInComponent } from './core/auth/sign-in/sign-in.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { MainModule } from './shared/modules/main.module';
+import { SharedModule } from './shared/shared.module';
+import { OrderModule } from './features/order/order.module';
 
 @NgModule({
   declarations: [AppComponent, SignInComponent, NoConnectionSnackBarComponent],
@@ -28,17 +29,16 @@ import { MainModule } from './shared/modules/main.module';
     BrowserModule,
     BrowserAnimationsModule,
     AppRoutingModule,
-    MainModule,
-    AngularMaterialModule,
-    WorkingHourModule,
     ToastrModule.forRoot(),
     ServiceWorkerModule.register('ngsw-worker.js', {
       enabled: true,
     }),
     AngularFireModule.initializeApp(environment.firebase),
     AngularFireAuthModule,
-    FormsModule,
-    ReactiveFormsModule,
+    // FormsModule,
+    // ReactiveFormsModule,
+    OrderModule,
+    // WorkingHourModule,
   ],
   providers: [],
   bootstrap: [AppComponent],

@@ -18,14 +18,12 @@ import { EditWorkingHourComponent } from './edit-working-hour/edit-working-hour.
 import { ConfirmDeleteDialogComponent } from './confirm-delete-dialog/confirm-delete-dialog.component';
 import { SettingsDialogComponent } from './settings-dialog/settings-dialog.component';
 import { environment } from '../../../environments/environment.prod';
-import { MainModule } from 'src/app/shared/modules/main.module';
 import { WorkingHourRoutingModule } from './working-hour-routing.module';
 import { AngularMaterialModule } from 'src/app/shared/modules/angular-material.module';
 
 @NgModule({
   imports: [
     CommonModule,
-    MainModule,
     WorkingHourRoutingModule,
     ReactiveFormsModule,
     FormsModule,

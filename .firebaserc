@@ -1,5 +1,14 @@
 {
   "projects": {
     "default": "angular-pwa-98394"
+  },
+  "targets": {
+    "angular-pwa-98394": {
+      "hosting": {
+        "angular-pwa": [
+          "angular-pwa-98394"
+        ]
+      }
+    }
   }
 }

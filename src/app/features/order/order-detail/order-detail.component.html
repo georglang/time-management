@@ -13,7 +13,7 @@
   </div>
 </div>
 
-<!-- <div id="order-detail-component-wrapper" class="row no-gutters">
+<div id="order-detail-component-wrapper" class="row no-gutters">
   <div class="col-12">
     <div id="customer-info-wrapper" class="row no-gutters clearfix">
       <div class="col-12">
@@ -75,7 +75,7 @@
       </div>
     </div>
 
-    <mat-tab-group mat-align-tabs="center">
+    <!-- <mat-tab-group mat-align-tabs="center">
       <mat-tab label="Zeiten">
         <div id="order-detail-table-wrapper" class="row no-gutter">
           <div class="col-12">
@@ -250,7 +250,9 @@
         <app-material-list></app-material-list>
       </mat-tab>
       <mat-tab label="Notizen">Notizen</mat-tab>
-    </mat-tab-group>
+    </mat-tab-group> -->
+
+    <app-lazy-loaded-tab-navigation></app-lazy-loaded-tab-navigation>
   </div>
 
   <div id="bottom-nav">
@@ -308,6 +310,4 @@
       <i class="material-icons">add</i>
     </button>
   </div>
-</div> -->
-
-<app-lazy-loaded-tab-navigation></app-lazy-loaded-tab-navigation>
+</div>
