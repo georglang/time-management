@@ -1,10 +1,6 @@
 import { Injectable, OnInit } from '@angular/core';
 import { Timestamp, QuerySnapshot } from '@firebase/firestore-types';
 
-// import * as firebase from 'firebase';
-// import 'firebase/firestore';
-// import 'firebase/database';
-
 import { IOrder, Order, IFlattenOrder } from '../../Order';
 import { WorkingHour, IWorkingHour } from '../../../working-hour/WorkingHour';
 import { FirestoreWorkingHourService } from '../../../working-hour/services/firestore-working-hour-service/firestore-working-hour.service';
