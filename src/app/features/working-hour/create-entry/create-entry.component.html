@@ -23,7 +23,7 @@
       <div class="col-12">
         <form
           id="create-entry-form"
-          [formGroup]="createEntryForm"
+          formGroup="createEntryForm"
           #documentCreateEntryForm="ngForm"
           (ngSubmit)="onSubmit()"
         >
@@ -59,7 +59,7 @@
         <div *ngIf="selectedCategory === eCategory.workingHours">
           <form
             id="working-hours-form"
-            [formGroup]="workingHoursForm"
+            formGroup="workingHoursForm"
             #documentWorkingHoursForm="ngForm"
             (ngSubmit)="onSubmit()"
           >
@@ -194,7 +194,7 @@
         <div *ngIf="selectedCategory === eCategory.material">
           <form
             id="material-form"
-            [formGroup]="materialForm"
+            formGroup="materialForm"
             #documentMaterialForm="ngForm"
             (ngSubmit)="onSubmit()"
           >
@@ -317,7 +317,7 @@
         <div *ngIf="selectedCategory === eCategory.note">
           <form
             id="note-form"
-            [formGroup]="noteForm"
+            formGroup="noteForm"
             #documentNoteForm="ngForm"
             (ngSubmit)="onSubmit()"
           >
