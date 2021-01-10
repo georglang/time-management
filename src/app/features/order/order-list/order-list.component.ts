@@ -25,7 +25,7 @@ export class OrderListComponent implements OnInit {
   public showButtonsIfOrderIsSelected: boolean = false;
   public showDeleteButton: boolean = false;
 
-  @ViewChild(MatSort, { static: false })
+  @ViewChild(MatSort)
   sort: MatSort;
 
   constructor(

@@ -12,7 +12,7 @@ export class NotesComponent implements OnInit {
 
   constructor(private _ngZone: NgZone) {}
 
-  @ViewChild('autosize', { static: false }) autosize: CdkTextareaAutosize;
+  @ViewChild('autosize') autosize: CdkTextareaAutosize;
 
   public triggerResize() {
     // Wait for changes to be applied, then trigger textarea resize.
