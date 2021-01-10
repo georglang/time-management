@@ -8,11 +8,13 @@
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e",
-    "prod": "ng build --prod && cd dist/angular-pwa/ http-server -o -c1"
+    "prod": "ng build --prod && cd dist/angular-pwa/ http-server -o -c1",
+    "start-pwa": "ng build --prod && http-server -p 8080 -c-1 dist/angular-pwa"
   },
   "private": true,
   "dependencies": {
     "@angular-devkit/build-angular": "^0.1100.1",
+    "@angular-devkit/schematics": "^11.0.6",
     "@angular/animations": "^11.0.0",
     "@angular/cdk": "^11.0.0",
     "@angular/common": "^11.0.0",
@@ -42,6 +44,7 @@
     "ng-connection-service": "^1.0.4",
     "ngx-toastr": "^9.1.0",
     "pdfjs": "^2.1.0",
+    "pwa": "^1.9.7",
     "rxjs": "^6.3.3",
     "zone.js": "~0.10.2"
   },
@@ -54,6 +57,7 @@
     "@types/jspdf": "^1.3.3",
     "@types/node": "^8.10.38",
     "codelyzer": "~6.0.1",
+    "http-server": "^0.12.3",
     "install": "^0.13.0",
     "jasmine-core": "~2.99.1",
     "jasmine-spec-reporter": "~4.2.1",
