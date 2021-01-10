@@ -27,7 +27,7 @@ import { materials } from '../../material/material-list/materials';
   styleUrls: ['./create-entry.component.sass'],
 })
 export class CreateEntryComponent implements OnInit {
-  @ViewChild('autosize') autosize: CdkTextareaAutosize;
+  @ViewChild('autosize', { static: false }) autosize: CdkTextareaAutosize;
 
   public createEntryForm: FormGroup;
   public workingHoursForm: FormGroup;

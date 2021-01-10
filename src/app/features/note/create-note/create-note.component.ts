@@ -26,7 +26,7 @@ export class CreateNoteComponent implements OnInit {
     private location: Location
   ) {}
 
-  @ViewChild('autosize') autosize: CdkTextareaAutosize;
+  @ViewChild('autosize', { static: true }) autosize: CdkTextareaAutosize;
 
   public triggerResize() {
     // Wait for changes to be applied, then trigger textarea resize.
