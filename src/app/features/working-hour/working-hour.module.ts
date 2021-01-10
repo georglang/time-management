@@ -22,6 +22,7 @@ import { MainModule } from 'src/app/shared/modules/main.module';
 import { WorkingHourRoutingModule } from './working-hour-routing.module';
 import { AngularMaterialModule } from 'src/app/shared/modules/angular-material.module';
 import { WorkingHourListComponent } from './working-hour-list/working-hour-list.component';
+import { CreateWorkingHourComponent } from './create-working-hour/create-working-hour.component';
 
 @NgModule({
   imports: [
@@ -39,7 +40,8 @@ import { WorkingHourListComponent } from './working-hour-list/working-hour-list.
     EditWorkingHourComponent,
     ConfirmDeleteDialogComponent,
     SettingsDialogComponent,
-    WorkingHourListComponent
+    CreateWorkingHourComponent,
+    WorkingHourListComponent,
   ],
   providers: [
     FirestoreOrderService,
