@@ -21,6 +21,7 @@ import { environment } from '../../../environments/environment.prod';
 import { MainModule } from 'src/app/shared/modules/main.module';
 import { WorkingHourRoutingModule } from './working-hour-routing.module';
 import { AngularMaterialModule } from 'src/app/shared/modules/angular-material.module';
+import { WorkingHourListComponent } from './working-hour-list/working-hour-list.component';
 
 @NgModule({
   imports: [
@@ -38,6 +39,7 @@ import { AngularMaterialModule } from 'src/app/shared/modules/angular-material.m
     EditWorkingHourComponent,
     ConfirmDeleteDialogComponent,
     SettingsDialogComponent,
+    WorkingHourListComponent
   ],
   providers: [
     FirestoreOrderService,
