@@ -9,7 +9,8 @@
     "lint": "ng lint",
     "e2e": "ng e2e",
     "prod": "ng build --prod && cd dist/angular-pwa/ http-server -o -c1",
-    "start-pwa": "ng build --prod && http-server -p 8080 -c-1 dist/angular-pwa"
+    "start-pwa": "ng build --prod && http-server -p 8080 -c-1 dist/angular-pwa",
+    "postinstall": "ngcc"
   },
   "private": true,
   "dependencies": {
