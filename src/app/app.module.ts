@@ -20,7 +20,6 @@ import { AngularFireModule } from '@angular/fire';
 import { AngularFireAuthModule } from '@angular/fire/auth';
 import { SignInComponent } from './core/auth/sign-in/sign-in.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { MainModule } from './shared/modules/main.module';
 
 @NgModule({
   declarations: [AppComponent, SignInComponent, NoConnectionSnackBarComponent],
@@ -28,7 +27,6 @@ import { MainModule } from './shared/modules/main.module';
     BrowserModule,
     BrowserAnimationsModule,
     AppRoutingModule,
-    MainModule,
     AngularMaterialModule,
     WorkingHourModule,
     ToastrModule.forRoot(),

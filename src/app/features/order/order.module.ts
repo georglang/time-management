@@ -1,8 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { MainModule } from 'src/app/shared/modules/main.module';
-import { AngularMaterialModule } from 'src/app/shared/modules/angular-material.module';
+import { SharedModule } from './../../shared/shared.module';
 
 import { OrderRoutingModule } from './order-routing.module';
 import { OrderListComponent } from './order-list/order-list.component';
@@ -16,9 +15,8 @@ import { LazyLoadedTabNavigationComponent } from 'src/app/shared/components/lazy
     FormsModule,
     ReactiveFormsModule,
     CommonModule,
-    MainModule,
     OrderRoutingModule,
-    AngularMaterialModule,
+    SharedModule,
   ],
   declarations: [
     OrderListComponent,
