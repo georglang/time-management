@@ -33,7 +33,7 @@ import { MainModule } from './shared/modules/main.module';
     WorkingHourModule,
     ToastrModule.forRoot(),
     ServiceWorkerModule.register('ngsw-worker.js', {
-      enabled: true,
+      enabled: environment.production,
     }),
     AngularFireModule.initializeApp(environment.firebase),
     AngularFireAuthModule,
