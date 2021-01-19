@@ -15,8 +15,8 @@ import { LazyLoadedTabNavigationComponent } from 'src/app/shared/components/lazy
     FormsModule,
     ReactiveFormsModule,
     CommonModule,
-    OrderRoutingModule,
     SharedModule,
+    OrderRoutingModule,
   ],
   declarations: [
     OrderListComponent,

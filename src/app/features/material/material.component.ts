@@ -1,15 +1,124 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
+import { Router, ActivatedRoute } from '@angular/router';
+import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
+import { ToastrService } from 'ngx-toastr';
+
+import { MatTableDataSource } from '@angular/material/table';
+import { SelectionModel } from '@angular/cdk/collections';
+import { ConfirmDeleteDialogComponent } from '../working-hour/confirm-delete-dialog/confirm-delete-dialog.component';
+import { IMaterial } from './Material';
+import { FirestoreMaterialService } from './services/firestore-material-service/firestore-material.service';
 
 @Component({
   selector: 'app-material',
   templateUrl: './material.component.html',
-  styleUrls: ['./material.component.sass']
+  styleUrls: ['./material.component.sass'],
 })
 export class MaterialComponent implements OnInit {
+  public paramOrderId;
+  public displayedColumns = ['date', 'material', 'amount', 'unit'];
+  public dataSource = new MatTableDataSource();
+  public hasMaterialsFound: boolean = false;
+  public selection = new SelectionModel<IMaterial>(true, []);
+  public highlighted = new SelectionModel<IMaterial>(false, []);
+  public selectedMaterial: IMaterial;
+  public showButtonsIfMaterialIsSelected: boolean = false;
+  public showPrintButton: boolean = false;
+  public showDeleteButton: boolean = false;
 
-  constructor() { }
+  constructor(
+    private firestoreMaterialService: FirestoreMaterialService,
+    private route: ActivatedRoute,
+    private router: Router,
+    public dialog: MatDialog,
+    private toastrService: ToastrService
+  ) {}
 
   ngOnInit() {
+    this.route.params.subscribe((params) => {
+      this.paramOrderId = params['id'];
+      this.getMaterialsFromCloudDatabase(this.paramOrderId);
+    });
   }
 
+  private getMaterialsFromCloudDatabase(orderId: string): void {
+    if (this.firestoreMaterialService !== undefined) {
+      this.firestoreMaterialService
+        .getMaterialsByOrderId(orderId)
+        .subscribe((materials: IMaterial[]) => {
+          if (materials.length > 0) {
+            this.setMaterialDataSource(materials);
+          } else {
+            this.hasMaterialsFound = false;
+          }
+        });
+    }
+  }
+
+  public showEditAndDeleteButton(selectedWorkingHour: IMaterial) {
+    this.selectedMaterial = selectedWorkingHour;
+    if (this.highlighted.selected.length == 0) {
+      this.showButtonsIfMaterialIsSelected = false;
+    } else {
+      this.showButtonsIfMaterialIsSelected = true;
+    }
+  }
+
+  public editMaterial(material: IMaterial) {
+    debugger;
+    this.router.navigate([
+      'working-hours/order-details/' +
+        material.orderId +
+        '/edit-material/' +
+        material.id,
+    ]);
+  }
+
+  public deleteMaterial(material: IMaterial) {
+    this.openDeleteWorkingHourDialog(material.id);
+  }
+
+  public createEntry() {
+    this.router.navigate([
+      'working-hours/order-details/' + this.paramOrderId + /create-entry/,
+    ]);
+  }
+
+  public openDeleteWorkingHourDialog(materialId: string): void {
+    const dialogConfig = new MatDialogConfig();
+    dialogConfig.disableClose = true;
+    dialogConfig.autoFocus = true;
+
+    const dialogRef = this.dialog.open(
+      ConfirmDeleteDialogComponent,
+      dialogConfig
+    );
+    dialogRef.afterClosed().subscribe((shouldDelete) => {
+      if (shouldDelete) {
+        this.deleteMaterialInFirebase(materialId);
+      }
+    });
+  }
+
+  public deleteMaterialInFirebase(materialId: string): void {
+    this.firestoreMaterialService
+      .deleteMaterial(this.paramOrderId, materialId)
+      .then((data) => {
+        this.showDeleteMessage();
+        this.getMaterialsFromCloudDatabase(this.paramOrderId);
+      });
+  }
+
+  public showDeleteMessage() {
+    const successConfig = {
+      positionClass: 'toast-bottom-center',
+      timeout: 500,
+    };
+    this.toastrService.error('Erfolgreich gelöscht', 'Eintrag', successConfig);
+  }
+
+  private setMaterialDataSource(materials: IMaterial[]) {
+    this.dataSource = new MatTableDataSource<IMaterial>(materials);
+    this.hasMaterialsFound = true;
+  }
 }

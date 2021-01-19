@@ -125,13 +125,13 @@ export class OrderDetailComponent implements OnInit {
 
   public createNewWorkingHour() {
     this.router.navigate([
-      'hours-of-work/order-details/' + this.paramOrderId + /create-entry/,
+      'working-hours/order-details/' + this.paramOrderId + /create-entry/,
     ]);
   }
 
   public editWorkingHour(workingHour: IWorkingHour) {
     this.router.navigate([
-      'hours-of-work/order-details/' +
+      'working-hours/order-details/' +
         this.paramOrderId +
         /edit-working-hour/ +
         workingHour.id,

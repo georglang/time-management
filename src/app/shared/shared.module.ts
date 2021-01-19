@@ -4,8 +4,8 @@ import { AngularMaterialModule } from './modules/angular-material.module';
 import { HeaderComponent } from '../features/working-hour/header/header.component';
 
 @NgModule({
-  declarations: [HeaderComponent],
   imports: [CommonModule, AngularMaterialModule],
+  declarations: [HeaderComponent],
   exports: [AngularMaterialModule, HeaderComponent],
   providers: [],
 })

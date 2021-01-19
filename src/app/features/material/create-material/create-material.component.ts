@@ -4,7 +4,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { FormControl } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { map, startWith } from 'rxjs/operators';
-import { materials } from '../material-list/materials';
+// import { materials } from '../material-list/materials';
 
 import { Location } from '@angular/common';
 import { MessageService } from '../../working-hour/services/message-service/message.service';
@@ -23,7 +23,7 @@ export class CreateMaterialComponent implements OnInit {
   public submitted = false;
 
   myControl = new FormControl();
-  options: string[] = materials;
+  // options: string[] = materials;
 
   filteredOptions: Observable<string[]>;
 
@@ -59,9 +59,9 @@ export class CreateMaterialComponent implements OnInit {
   private _filter(value: string): string[] {
     const filterValue = value.toLowerCase();
 
-    return this.options.filter(
-      (option) => option.toLowerCase().indexOf(filterValue) === 0
-    );
+    // return this.options.filter(
+    //   (option) => option.toLowerCase().indexOf(filterValue) === 0
+    // );
   }
 
   public navigateToOrderList() {

@@ -27,7 +27,7 @@ export class LazyLoadedTabNavigationComponent implements OnInit {
               label: tab.label,
               icon: tab.icon,
               route:
-                '/orders/order-details/' +
+                '/orders/' +
                 this.paramOrderId +
                 '/working-hours/',
             });
@@ -38,7 +38,7 @@ export class LazyLoadedTabNavigationComponent implements OnInit {
               label: tab.label,
               icon: tab.icon,
               route:
-                '/orders/order-details/' + this.paramOrderId + '/materials/',
+                '/orders/' + this.paramOrderId + '/materials/',
             });
             break;
           }
@@ -46,7 +46,7 @@ export class LazyLoadedTabNavigationComponent implements OnInit {
             this.tabsWithRoutes.push({
               label: tab.label,
               icon: tab.icon,
-              route: '/orders/order-details/' + this.paramOrderId + '/notes/',
+              route: '/orders/' + this.paramOrderId + '/notes/',
             });
             break;
           }

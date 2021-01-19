@@ -13,12 +13,12 @@ import { FirestoreOrderService } from '../order/services/firestore-order-service
 import { FirestoreWorkingHourService } from './services/firestore-working-hour-service/firestore-working-hour.service';
 
 import { SortFormArrayByDate } from '../../shared/pipes/sort-form-array-by-date.pipe';
-import { CreateEntryComponent } from './create-entry/create-entry.component';
+// import { CreateEntryComponent } from './create-entry/create-entry.component';
 import { EditWorkingHourComponent } from './edit-working-hour/edit-working-hour.component';
 import { ConfirmDeleteDialogComponent } from './confirm-delete-dialog/confirm-delete-dialog.component';
 import { SettingsDialogComponent } from './settings-dialog/settings-dialog.component';
 import { environment } from '../../../environments/environment.prod';
-import { WorkingHourRoutingModule } from './working-hour-routing.module';
+import { WorkingHourRoutingModule } from './working-hour.routing.module';
 import { WorkingHourListComponent } from './working-hour-list/working-hour-list.component';
 import { CreateWorkingHourComponent } from './create-working-hour/create-working-hour.component';
 import { SharedModule } from '../../shared/shared.module';
@@ -26,15 +26,15 @@ import { SharedModule } from '../../shared/shared.module';
 @NgModule({
   imports: [
     CommonModule,
-    WorkingHourRoutingModule,
     ReactiveFormsModule,
     FormsModule,
     AngularFirestoreModule,
     SharedModule,
+    WorkingHourRoutingModule,
   ],
   declarations: [
     SortFormArrayByDate,
-    CreateEntryComponent,
+    // CreateEntryComponent,
     EditWorkingHourComponent,
     ConfirmDeleteDialogComponent,
     SettingsDialogComponent,

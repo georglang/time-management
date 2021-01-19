@@ -1,15 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 
 @Component({
-  selector: 'app-hours-of-work-list',
+  selector: 'app-working-hour-list',
   templateUrl: './working-hour-list.component.html',
-  styleUrls: ['./working-hour-list.component.sass']
+  styleUrls: ['./working-hour-list.component.sass'],
 })
 export class WorkingHourListComponent implements OnInit {
+  constructor() {}
 
-  constructor() { }
-
-  ngOnInit() {
-  }
-
+  ngOnInit() {}
 }
